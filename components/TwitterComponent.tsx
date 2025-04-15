@@ -361,6 +361,14 @@ const ScrollingListWithHeader = React.forwardRef(ScrollingListWithHeaderInternal
 // Styles for ScrollingListWithHeader
 const scrollingListStyles = StyleSheet.create({
   outerWrapper: { flex: 1 }, // Renamed style key
+  refreshIndicatorContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 100,
+    width: '100%',
+    height: 40,
+  },
 });
 
 // Export the refactored components with new names

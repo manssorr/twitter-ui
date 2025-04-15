@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, useReducer, Reducer } from 'react';
+import React, { useCallback, useMemo, useState, useReducer, Reducer, useRef, useEffect } from 'react';
 import {
   Linking,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   ScrollView,
   SectionListData,
+  RefreshControl,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -27,6 +28,8 @@ import Animated, {
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
+  withTiming,
+  Easing,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { ImageProps } from 'expo-image';
@@ -41,6 +44,15 @@ import Views from "~/assets/svg/views.svg"
 import Category from "~/assets/svg/category.svg"
 
 
+
+const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
+const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
+const BANNER_BOTTOM_MARGIN = 60; // Margin at the bottom of the banner
+const HEADER_PROFILE_IMAGE_SIZE = 'l';
+const HEADER_PROFILE_IMAGE_SIZE_VALUE = 100;
+const HEADER_PROFILE_IMAGE_START_SCALE = 1;
+const HEADER_PROFILE_IMAGE_END_SCALE = 0.6;
+const SCREEN_HORIZONTAL_PADDING = 16;
 
 type ProfileImageSize = 'xxs' | 'xs' | 's' | 'm' | 'l';
 type ProfileImageProps = ImageProps & { displaySize?: ProfileImageSize; className?: string };
@@ -115,12 +127,12 @@ const EngagementActions = () => {
       <TouchableOpacity className="flex-row items-center gap-1.5">
         <Like width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
         <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity> 
+      </TouchableOpacity>
 
       <TouchableOpacity className="flex-row items-center gap-1.5">
         <Views width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
         <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity>   
+      </TouchableOpacity>
 
       <TouchableOpacity className="flex-row items-center gap-1.5">
         <Save width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
@@ -246,19 +258,16 @@ const FeedItem: React.FC<FeedItemProps> = ({ itemData }) => {
 const canUseBlurEffect =
   Platform.OS === 'ios' || (Platform.OS === 'android' && Number(Platform.Version) >= 31);
 
-const SCREEN_HORIZONTAL_PADDING = 8;
 const APP_PRIMARY_COLOR = '#1d9bf0';
-const HEADER_PROFILE_IMAGE_SIZE: ProfileImageSize = 'm';
-const HEADER_PROFILE_IMAGE_START_SCALE = 1;
-const HEADER_PROFILE_IMAGE_END_SCALE = 0.5;
-const HEADER_PROFILE_IMAGE_SIZE_VALUE = PROFILE_IMAGE_SIZE_MAP[HEADER_PROFILE_IMAGE_SIZE];
-const BANNER_BOTTOM_MARGIN = HEADER_PROFILE_IMAGE_SIZE_VALUE;
 
 const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
   const navigation = useNavigation();
-  const { left: leftInset, right: rightInset } = useSafeAreaInsets();
+  const { left: leftInset, right: rightInset, top: safeAreaTop } = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const bannerTotalHeight = useSharedValue(110 + BANNER_BOTTOM_MARGIN);
+  const [refreshing, setRefreshing] = useState(false);
+  const listRef = useRef<any>(null);
+  const pullToRefreshThreshold = PULL_TO_REFRESH_THRESHOLD;
 
   const blurOverlayStyle = useAnimatedStyle(() => ({
     opacity: interpolate(Math.abs(scrollOffset.value), [0, 50], [0, 1], Extrapolate.CLAMP),
@@ -283,6 +292,38 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
     const scale = interpolate(scrollOffset.value, [0, -(windowHeight + bannerTotalHeight.value)], [1, windowHeight / bannerTotalHeight.value], Extrapolate.CLAMP);
     return { transform: [{ scaleY: scale }, { scaleX: scale }] };
   }, [windowHeight]);
+
+
+
+
+
+
+  // Animate scroll back to top when refreshing finishes
+  useEffect(() => {
+    if (!refreshing && listRef.current && Math.round(scrollOffset.value) < 0) {
+      // Use optional chaining to safely access scrollToLocation
+      listRef.current?.scrollToLocation?.({
+        sectionIndex: 0,
+        itemIndex: 0,
+        viewOffset: 0,
+        animated: true,
+      });
+    }
+  }, [refreshing, listRef, scrollOffset]);
+
+  // Style for the pull-down arrow icon
+  const arrowStyle = useAnimatedStyle(() => {
+    const opacity = refreshing ? 0 : interpolate(
+      -scrollOffset.value, // Use negative scroll offset (positive when pulling)
+      [PULL_TO_REFRESH_VISIBLE_THRESHOLD, pullToRefreshThreshold],
+      [0, 1],
+      Extrapolate.CLAMP
+    );
+    return {
+      opacity: withTiming(opacity, { duration: 100, easing: Easing.ease }),
+    };
+  });
+
 
   return (
     <View className="relative z-10">
@@ -310,8 +351,29 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
               className="h-full w-full"
             />
           </View>
+
+
+
+
         </Animated.View>
+
+
       </Animated.View>
+
+
+
+    {/* Pull-to-Refresh Indicator Area */}
+    <Animated.View style={[scrollingListStyles.refreshIndicatorContainer, { top: safeAreaTop + 44 + 10 }]}>
+        {refreshing ? (
+          <ActivityIndicator size="large" color={'#fff'} />
+        ) : (
+          <Animated.View style={arrowStyle} className="absolute bottom-0 left-0 right-0 items-center justify-center w-full">
+            <Feather name="arrow-down" size={24} color={'#fff'} />
+          </Animated.View>
+        )}
+      </Animated.View>
+
+
 
       <TopNavigationBar
         navBarVisibility={navBarVisibility}
@@ -406,7 +468,7 @@ const ProfileDetailsHeader = () => {
         </Text>
         <View className="flex-row gap-2 items-center flex-wrap">
           <View className="flex-row gap-1.5 items-center">
-           <Category width={16} height={16} opacity={0.5} />
+            <Category width={16} height={16} opacity={0.5} />
             <Text className="text-neutral-500 dark:text-neutral-400 text-base">{current_user.category}</Text>
           </View>
           <View className="flex-row gap-1.5 items-center">
@@ -436,9 +498,11 @@ const ProfileDetailsHeader = () => {
               <ProfileImage
                 key={`follower-${imgNum}`}
                 displaySize="xs"
-                source={{ uri: index === 0 ? "https://pbs.twimg.com/profile_images/1676741952014897152/j5t0mY_I_400x400.jpg" : 
-                  index === 1 ? "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png" : 
-                  "https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg"  }}
+                source={{
+                  uri: index === 0 ? "https://pbs.twimg.com/profile_images/1676741952014897152/j5t0mY_I_400x400.jpg" :
+                    index === 1 ? "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png" :
+                      "https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg"
+                }}
                 // `https://i.pravatar.cc/128?img=${imgNum}` }}
                 style={{
                   position: 'absolute',
@@ -463,14 +527,23 @@ const ProfileDetailsHeader = () => {
 export default function UserProfileScreen() {
   const { bottom: bottomInset } = useSafeAreaInsets();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  const listRef = useRef<any>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
-
+  const scrollOffset = useSharedValue(0);
 
   const feedSections: SectionListData<FeedContent, { title: string }>[] = useMemo(() => [
     { title: 'Feed', data: sampleFeedItems },
   ], []);
 
   const profileTabs = ['Posts', 'Affiliates', 'Replies', 'Highlights', 'Videos', 'Photos', 'Articles'];
+
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   return (
     <>
@@ -514,7 +587,27 @@ export default function UserProfileScreen() {
             </ScrollView>
           </View>
         )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+          />
+        }
+        ref={listRef}
       />
     </>
   );
 };
+
+
+const scrollingListStyles = StyleSheet.create({
+  outerWrapper: { flex: 1 },
+  refreshIndicatorContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 5, // Above list, below nav bar
+    height: 60,
+  },
+});
