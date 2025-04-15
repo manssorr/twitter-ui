@@ -333,6 +333,8 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
           style={parallaxScaleStyle}
         >
           <View style={{ marginBottom: -BANNER_BOTTOM_MARGIN }}>
+
+            
             {canUseBlurEffect ? (
               <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 1 }, blurOverlayStyle]}>
                 <BlurView style={StyleSheet.absoluteFill} intensity={60} tint="dark" />
@@ -343,6 +345,8 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
                 className="absolute inset-0 z-10 bg-black/60"
               />
             )}
+
+      
             <Image
               source={{ uri: current_user.header_picture }}
               contentFit="cover"
@@ -350,6 +354,9 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
               style={[{ width: windowWidth }, { height: bannerTotalHeight.value }]}
               className="h-full w-full"
             />
+
+
+            
           </View>
 
 
@@ -358,20 +365,29 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
         </Animated.View>
 
 
+        
+
+            {/* Pull-to-Refresh Indicator Area */}
+    <Animated.View style={[scrollingListStyles.refreshIndicatorContainer, { top: safeAreaTop + 20 }]}>
+        
+          <ActivityIndicator size="sm" color={'#fff'} />
+          <Feather name="arrow-down" size={24} color={'#fff'} />
+       
       </Animated.View>
 
 
 
-    {/* Pull-to-Refresh Indicator Area */}
-    <Animated.View style={[scrollingListStyles.refreshIndicatorContainer, { top: safeAreaTop + 44 + 10 }]}>
-        {refreshing ? (
-          <ActivityIndicator size="large" color={'#fff'} />
-        ) : (
-          <Animated.View style={arrowStyle} className="absolute bottom-0 left-0 right-0 items-center justify-center w-full">
-            <Feather name="arrow-down" size={24} color={'#fff'} />
-          </Animated.View>
-        )}
+
       </Animated.View>
+
+
+
+
+
+
+      
+
+
 
 
 
@@ -607,7 +623,8 @@ const scrollingListStyles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    zIndex: 5, // Above list, below nav bar
+    zIndex: 99999, // Above list, below nav bar
     height: 60,
+
   },
 });
