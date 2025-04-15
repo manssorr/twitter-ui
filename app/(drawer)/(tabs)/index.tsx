@@ -32,6 +32,7 @@ import Animated, {
   Easing,
   runOnJS,
   useAnimatedScrollHandler,
+  useAnimatedReaction,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { ImageProps } from 'expo-image';
@@ -273,6 +274,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
   const prevScrollOffsetBeforeRefresh = useSharedValue(0);
   // Track if we're in the middle of a tab change
   const isChangingTab = useSharedValue(false);
+  const hasReachedThreshold = useSharedValue(false);
 
   // Modified blur overlay style that maintains state after refresh
   const blurOverlayStyle = useAnimatedStyle(() => {
@@ -290,6 +292,28 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
       ),
     };
   });
+
+  useEffect(() => {
+    if (!refreshing) {
+      // Reset the flag after refresh completes
+      // The timeout ensures this happens after scroll animations finish
+      setTimeout(() => {
+        hasReachedThreshold.value = false;
+      }, 500); // Longer timeout to ensure animation completes
+    }
+  }, [refreshing]);
+
+  useAnimatedReaction(
+    () => scrollOffset.value,
+    (currentValue, previousValue) => {
+      // Reset threshold tracking when scroll returns to top after refresh completes
+      if (currentValue >= 0 && !refreshing && hasReachedThreshold.value) {
+        // We can't call setTimeout from a worklet, so we need a small delay
+        // This ensures the flag is reset when the user starts a new pull
+        hasReachedThreshold.value = false;
+      }
+    }
+  );
 
   const profileImageCurrentScale = useDerivedValue(() => interpolate(
     scrollOffset.value, 
@@ -332,6 +356,54 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
     return { transform: [{ scaleY: scale }, { scaleX: scale }] };
   }, [windowHeight]);
 
+  // Create a derived value to ensure activity indicator shows during transitions
+  const isNearRefreshThreshold = useDerivedValue(() => {
+    return scrollOffset.value < 0 && -scrollOffset.value >= pullToRefreshThreshold * 0.85;
+  });
+
+  // Style for the activity indicator - ensure it shows during transitions
+  const activityIndicatorStyle = useAnimatedStyle(() => {
+    // Show indicator during refreshing OR when close to threshold
+    // This ensures there's no gap between arrow disappearing and indicator appearing
+    const showIndicator = refreshing || isNearRefreshThreshold.value;
+    
+    // Ensure immediate visibility during transitions
+    return {
+      opacity: showIndicator ? 1 : 0,
+      position: 'absolute',
+    };
+  });
+
+  // Arrow style - create slight overlap with activity indicator
+  const arrowStyle = useAnimatedStyle(() => {
+    // Hide arrow when refreshing or after reaching near threshold
+    if (refreshing || (hasReachedThreshold.value && scrollOffset.value < 0)) {
+      return {
+        opacity: 0,
+        position: 'absolute',
+      };
+    }
+
+    // Mark threshold slightly earlier to ensure overlap with indicator
+    if (scrollOffset.value < 0 && -scrollOffset.value >= pullToRefreshThreshold * 0.85) {
+      hasReachedThreshold.value = true;
+      return {
+        opacity: 0,
+        position: 'absolute',
+      };
+    }
+    
+    // Show arrow during initial pull
+    const showArrow = scrollOffset.value < 0 && 
+                     -scrollOffset.value < pullToRefreshThreshold * 0.85 && 
+                     !hasReachedThreshold.value;
+                     
+    return {
+      opacity: showArrow ? 1 : 0,
+      position: 'absolute',
+    };
+  });
+
   // Before refreshing, store the current scroll offset
   const handleRefreshStart = useCallback(() => {
     prevScrollOffsetBeforeRefresh.value = scrollOffset.value;
@@ -366,42 +438,6 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
       });
     }
   }, [refreshing, listRef, scrollOffset]);
-
-  // Style for the pull-down arrow icon
-  const arrowStyle = useAnimatedStyle(() => {
-    // Show arrow only when pulling down (negative scrollOffset) and not refreshing
-    const opacity = refreshing ? 0 : 
-      scrollOffset.value >= 0 ? 0 : // Hide when not pulling down
-      interpolate(
-        -scrollOffset.value, // Use negative scroll offset (positive when pulling)
-        [0, pullToRefreshThreshold * 0.1, pullToRefreshThreshold * 0.95, pullToRefreshThreshold], 
-        [0, 1, 1, 0], 
-        Extrapolate.CLAMP
-      );
-    
-    return {
-      opacity: withTiming(opacity, { duration: 50, easing: Easing.ease }),
-      position: 'absolute', 
-    };
-  });
-
-  // Style for the activity indicator - only at threshold or when refreshing
-  const activityIndicatorStyle = useAnimatedStyle(() => {
-    // Only show activity indicator when refreshing or exactly at threshold
-    const opacity = refreshing ? 1 : // Always show when refreshing
-      scrollOffset.value >= 0 ? 0 : // Hide when not pulling down
-      interpolate(
-        -scrollOffset.value,
-        [pullToRefreshThreshold * 0.9, pullToRefreshThreshold], 
-        [0, 1],
-        Extrapolate.CLAMP
-      );
-    
-    return {
-      opacity: withTiming(opacity, { duration: 100, easing: Easing.ease }),
-      position: 'absolute',
-    };
-  });
 
   return (
     <View className="relative z-10">
