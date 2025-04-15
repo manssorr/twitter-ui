@@ -30,6 +30,8 @@ import Animated, {
   useSharedValue,
   withTiming,
   Easing,
+  runOnJS,
+  useAnimatedScrollHandler,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { ImageProps } from 'expo-image';
@@ -260,24 +262,61 @@ const canUseBlurEffect =
 
 const APP_PRIMARY_COLOR = '#1d9bf0';
 
-const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
+const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
   const navigation = useNavigation();
   const { left: leftInset, right: rightInset, top: safeAreaTop } = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const bannerTotalHeight = useSharedValue(110 + BANNER_BOTTOM_MARGIN);
-  const [refreshing, setRefreshing] = useState(false);
   const listRef = useRef<any>(null);
   const pullToRefreshThreshold = PULL_TO_REFRESH_THRESHOLD;
+  // Store the previous scroll offset value before refresh
+  const prevScrollOffsetBeforeRefresh = useSharedValue(0);
+  // Track if we're in the middle of a tab change
+  const isChangingTab = useSharedValue(false);
 
-  const blurOverlayStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(Math.abs(scrollOffset.value), [0, 50], [0, 1], Extrapolate.CLAMP),
-  }));
+  // Modified blur overlay style that maintains state after refresh
+  const blurOverlayStyle = useAnimatedStyle(() => {
+    // Use max value between current scroll and previous to maintain blur during refresh
+    const effectiveScrollOffset = isChangingTab.value ? 
+      Math.max(50, Math.abs(scrollOffset.value)) : 
+      Math.abs(scrollOffset.value);
+    
+    return {
+      opacity: interpolate(
+        effectiveScrollOffset, 
+        [0, 50], 
+        [0, 1], 
+        Extrapolate.CLAMP
+      ),
+    };
+  });
+
   const profileImageCurrentScale = useDerivedValue(() => interpolate(
-    scrollOffset.value, [0, BANNER_BOTTOM_MARGIN], [HEADER_PROFILE_IMAGE_START_SCALE, HEADER_PROFILE_IMAGE_END_SCALE], Extrapolate.CLAMP
+    scrollOffset.value, 
+    [0, BANNER_BOTTOM_MARGIN], 
+    [HEADER_PROFILE_IMAGE_START_SCALE, HEADER_PROFILE_IMAGE_END_SCALE], 
+    Extrapolate.CLAMP
   ));
-  const bannerVerticalShiftStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: interpolate(scrollOffset.value, [0, BANNER_BOTTOM_MARGIN], [0, -BANNER_BOTTOM_MARGIN], Extrapolate.CLAMP) }],
-  }));
+
+  // Modified banner shift style to maintain position
+  const bannerVerticalShiftStyle = useAnimatedStyle(() => {
+    const effectiveScroll = isChangingTab.value ? 
+      Math.min(0, scrollOffset.value) : 
+      scrollOffset.value;
+      
+    return {
+      transform: [{ 
+        translateY: interpolate(
+          effectiveScroll, 
+          [0, BANNER_BOTTOM_MARGIN], 
+          [0, -BANNER_BOTTOM_MARGIN], 
+          Extrapolate.CLAMP
+        ) 
+      }],
+    };
+  });
+
+  // Other animation styles remain the same
   const profileRowVerticalShiftStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -scrollOffset.value + BANNER_BOTTOM_MARGIN / 2 }],
   }));
@@ -293,12 +332,29 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
     return { transform: [{ scaleY: scale }, { scaleX: scale }] };
   }, [windowHeight]);
 
+  // Before refreshing, store the current scroll offset
+  const handleRefreshStart = useCallback(() => {
+    prevScrollOffsetBeforeRefresh.value = scrollOffset.value;
+  }, [scrollOffset, prevScrollOffsetBeforeRefresh]);
 
+  // Handle refresh end
+  const handleRefreshEnd = useCallback(() => {
+  }, []);
 
+  // Track component mounting/unmounting for tab changes
+  useEffect(() => {
+    return () => {
+      // When component is about to unmount (like during tab change)
+      isChangingTab.value = true;
+    };
+  }, [isChangingTab]);
 
+  // Reset the tab change flag when component mounts
+  useEffect(() => {
+    isChangingTab.value = false;
+  }, [isChangingTab]);
 
-
-  // Animate scroll back to top when refreshing finishes
+  // Animate scroll back to top when refreshing finishes with improved handling
   useEffect(() => {
     if (!refreshing && listRef.current && Math.round(scrollOffset.value) < 0) {
       // Use optional chaining to safely access scrollToLocation
@@ -313,24 +369,46 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
 
   // Style for the pull-down arrow icon
   const arrowStyle = useAnimatedStyle(() => {
-    const opacity = refreshing ? 0 : interpolate(
-      -scrollOffset.value, // Use negative scroll offset (positive when pulling)
-      [PULL_TO_REFRESH_VISIBLE_THRESHOLD, pullToRefreshThreshold],
-      [0, 1],
-      Extrapolate.CLAMP
-    );
+    // Show arrow only when pulling down (negative scrollOffset) and not refreshing
+    const opacity = refreshing ? 0 : 
+      scrollOffset.value >= 0 ? 0 : // Hide when not pulling down
+      interpolate(
+        -scrollOffset.value, // Use negative scroll offset (positive when pulling)
+        [0, pullToRefreshThreshold * 0.1, pullToRefreshThreshold * 0.95, pullToRefreshThreshold], 
+        [0, 1, 1, 0], 
+        Extrapolate.CLAMP
+      );
+    
     return {
-      opacity: withTiming(opacity, { duration: 100, easing: Easing.ease }),
+      opacity: withTiming(opacity, { duration: 50, easing: Easing.ease }),
+      position: 'absolute', 
     };
   });
 
+  // Style for the activity indicator - only at threshold or when refreshing
+  const activityIndicatorStyle = useAnimatedStyle(() => {
+    // Only show activity indicator when refreshing or exactly at threshold
+    const opacity = refreshing ? 1 : // Always show when refreshing
+      scrollOffset.value >= 0 ? 0 : // Hide when not pulling down
+      interpolate(
+        -scrollOffset.value,
+        [pullToRefreshThreshold * 0.9, pullToRefreshThreshold], 
+        [0, 1],
+        Extrapolate.CLAMP
+      );
+    
+    return {
+      opacity: withTiming(opacity, { duration: 100, easing: Easing.ease }),
+      position: 'absolute',
+    };
+  });
 
   return (
     <View className="relative z-10">
       <Animated.View style={[StyleSheet.absoluteFill, bannerVerticalShiftStyle]}>
         <Animated.View
           onLayout={(e) => (bannerTotalHeight.value = e.nativeEvent.layout.height)}
-          style={parallaxScaleStyle}
+          style={[parallaxScaleStyle, { minHeight: 110 + BANNER_BOTTOM_MARGIN }]}
         >
           <View style={{ marginBottom: -BANNER_BOTTOM_MARGIN }}>
 
@@ -351,7 +429,10 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
               source={{ uri: current_user.header_picture }}
               contentFit="cover"
               contentPosition="center"
-              style={[{ width: windowWidth }, { height: bannerTotalHeight.value }]}
+              style={[
+                { width: windowWidth }, 
+                { height: bannerTotalHeight.value, minHeight: 110 + BANNER_BOTTOM_MARGIN }
+              ]}
               className="h-full w-full"
             />
 
@@ -368,10 +449,19 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset }) => {
         
 
             {/* Pull-to-Refresh Indicator Area */}
-    <Animated.View style={[scrollingListStyles.refreshIndicatorContainer, { top: safeAreaTop + 20 }]}>
+    <Animated.View 
+      style={[
+        scrollingListStyles.refreshIndicatorContainer, 
+        { top: safeAreaTop + 20 }
+      ]}
+    >
         
-          <ActivityIndicator size="sm" color={'#fff'} />
-          <Feather name="arrow-down" size={24} color={'#fff'} />
+          <Animated.View style={arrowStyle}>
+            <Feather name="arrow-down" size={24} color="#ffffff" />
+          </Animated.View>
+          <Animated.View style={activityIndicatorStyle}>
+            <ActivityIndicator size="small" color="#ffffff" />
+          </Animated.View>
        
       </Animated.View>
 
@@ -519,7 +609,7 @@ const ProfileDetailsHeader = () => {
                     index === 1 ? "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png" :
                       "https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg"
                 }}
-                // `https://i.pravatar.cc/128?img=${imgNum}` }}
+                // `https://i.pravatar.cc/128?img=${imgNum}}` }}
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -546,7 +636,7 @@ export default function UserProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const listRef = useRef<any>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
-  const scrollOffset = useSharedValue(0);
+  const scrollPosition = useSharedValue(0);
 
   const feedSections: SectionListData<FeedContent, { title: string }>[] = useMemo(() => [
     { title: 'Feed', data: sampleFeedItems },
@@ -560,6 +650,12 @@ export default function UserProfileScreen() {
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollPosition.value = event.contentOffset.y;
+    },
+  });
 
   return (
     <>
@@ -607,6 +703,7 @@ export default function UserProfileScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
+            progressViewOffset={100} // Add appropriate offset for header
           />
         }
         ref={listRef}
@@ -620,11 +717,12 @@ const scrollingListStyles = StyleSheet.create({
   outerWrapper: { flex: 1 },
   refreshIndicatorContainer: {
     position: 'absolute',
-    left: 0,
-    right: 0,
     alignItems: 'center',
-    zIndex: 99999, // Above list, below nav bar
-    height: 60,
-
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    left: '50%',
+    marginLeft: -20,
+    zIndex: 10,
   },
 });
