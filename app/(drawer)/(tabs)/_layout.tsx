@@ -6,7 +6,7 @@ import { TabBarIcon } from '~/components/TabBarIcon';
 
 import Home from "~/assets/svg/tabs/home.svg"
 import Search from "~/assets/svg/tabs/search.svg"
-import Qrok from "~/assets/svg/tabs/qrok.svg"
+import Grok from "~/assets/svg/tabs/grok.svg"
 import Notifications from "~/assets/svg/tabs/notifications.svg"
 import Messages from "~/assets/svg/tabs/messages.svg"
 import Foundation from '@expo/vector-icons/Foundation';
@@ -80,7 +80,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="grok"
         options={{
-          tabBarIcon: ({ color }) => <Qrok width={26} height={26} color={color} />,
+          tabBarIcon: ({ color }) => <Grok width={26} height={26} color={color} />,
         }}
       />
       <Tabs.Screen

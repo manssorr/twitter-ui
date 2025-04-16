@@ -45,13 +45,14 @@ import Save from "~/assets/svg/save.svg"
 import Share from "~/assets/svg/share.svg"
 import Views from "~/assets/svg/views.svg"
 import Category from "~/assets/svg/category.svg"
+import Grok from "~/assets/svg/tabs/grok.svg";
 
 
 
 const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
 const BANNER_BOTTOM_MARGIN = 60; // Margin at the bottom of the banner
-const HEADER_PROFILE_IMAGE_SIZE = 'l';
+const HEADER_PROFILE_IMAGE_SIZE = 'm';
 const HEADER_PROFILE_IMAGE_SIZE_VALUE = 100;
 const HEADER_PROFILE_IMAGE_START_SCALE = 1;
 const HEADER_PROFILE_IMAGE_END_SCALE = 0.6;
@@ -68,7 +69,7 @@ const PROFILE_IMAGE_DIMENSIONS: Record<ProfileImageSize, number> = {
   xxs: 20,
   xs: 30,
   s: 40,
-  m: 70,
+  m: 60,
   l: 100,
 };
 
@@ -92,7 +93,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
   }
 
   return (
-    <View className={` p-1 rounded-lg mx-1.5 ${className}`}>
+    <View className={` p-1.5 rounded-xl mx-1.5 ${className} bg-white`}>
       {isLoading && (
         <View
           style={dimensionStyle}
@@ -521,12 +522,22 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
         navBarVisibility={navBarVisibility}
         rightContent={
           <View className="flex-row gap-1.5">
-            <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
-              <Feather color="white" name="more-horizontal" size={20} />
+
+
+<TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
+              <Grok width={20} height={17} fill="white" />
             </TouchableOpacity>
+
+   
             <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
               <Feather color="white" name="search" size={20} />
             </TouchableOpacity>
+
+            <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
+              <Share width={20} height={20} fill="white" />
+            </TouchableOpacity>
+
+
           </View>
         }
         leftContent={
@@ -560,6 +571,10 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
               <ProfileImage
                 displaySize={HEADER_PROFILE_IMAGE_SIZE}
                 source={{ uri: current_user.profile_picture }}
+                style={{
+                  padding:10,
+                  backgroundColor: 'white'
+                }}
               />
             </TouchableOpacity>
           </Animated.View>
@@ -592,8 +607,8 @@ const ProfileDetailsHeader = () => {
   return (
     <ExpandedHeader>
       <View
-        style={{ marginTop: topInset + 10 + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2 + 10 }}
-        className={`flex-col gap-3 px-${SCREEN_HORIZONTAL_PADDING / 4} w-full`}
+        style={{ marginTop: topInset - 10   + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2  }}
+        className={`flex-col gap-2 px-${SCREEN_HORIZONTAL_PADDING / 3} w-full`}
       >
         <View className="flex-row gap-2 items-center">
           <Text className="text-2xl font-extrabold text-black dark:text-white">{current_user.name}</Text>
