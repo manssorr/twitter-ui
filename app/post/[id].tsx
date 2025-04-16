@@ -3,29 +3,8 @@ import { View, Text, ScrollView } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { FeedItem, FeedContent } from '~/components/FeedItem'; // Assuming FeedItem is in components
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import sampleFeedItems from '~/dummy/posts.json';
 
-// Sample data (replace with actual data source/fetching)
-const sampleFeedItems: FeedContent[] = [
-  {
-    contentId: 'post-abc',
-    authorName: 'Premier League',
-    authorHandle: 'premierleague',
-    authorImageUrl: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg',
-    postedTime: '3h',
-    message: `Three points ✅\nClean sheet ✅\nPlayer of the Match ✅\n\nA very happy 20th birthday for Dean Huijsen 🎂\n`,
-    mediaUrl: 'https://pbs.twimg.com/media/GohzgPVXQAArqUo?format=jpg&name=large',
-  },
-  {
-    contentId: 'post-def',
-    authorName: 'Code Enthusiast',
-    authorHandle: 'coderocks',
-    authorImageUrl: 'https://picsum.photos/seed/def/100/100',
-    postedTime: '6h',
-    message: `A lightning fast start ⚡️⚡️⚡️\n\nIt didn't take Antoine Semenyo long to give the Cherries the lead\n`,
-    mediaUrl: 'https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096',
-  },
-    // Add more items as needed
-];
 
 export default function PostDetailScreen() {
     const params = useLocalSearchParams();

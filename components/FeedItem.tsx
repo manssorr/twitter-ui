@@ -44,10 +44,11 @@ export interface FeedContent {
     postedTime: string;
     message: string;
     mediaUrl?: string;
+    is_organization?: boolean;
 }
 
 // Reusable Profile Image Component
-export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize = 's', className = '', ...imageProps }) => {
+export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize = 's', className = '', is_organization = false, ...imageProps }) => {
     const [{ isLoading, hasError }, dispatch] = useReducer<ProfileImageReducer>(
         (state, action) => {
             if (action.type === 'loaded') return { isLoading: false, hasError: false };
@@ -65,7 +66,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
     }
 
     return (
-        <View className={`p-1.5 rounded-xl mx-1.5 ${className} bg-white`}>
+        <View className={`p-1.5 ${is_organization ? '' : 'rounded-full'} mx-1.5 ${className} bg-white`}>
             {isLoading && (
                 <View
                     style={dimensionStyle}
@@ -80,7 +81,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
                 onLoad={() => dispatch({ type: 'loaded' })}
                 contentFit="cover"
                 style={[dimensionStyle, style]}
-                className="rounded-md"
+                className={is_organization ? '' : 'rounded-full'}
             />
         </View>
     );
@@ -95,31 +96,31 @@ const EngagementActions = () => {
     return (
         <View className="flex-row items-center justify-between mt-2">
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Comment width={20} height={20} fill={iconColor} />
+                <Comment width={18} height={18} fill={iconColor} />
                 <Text className={textColor}>100</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Repost width={20} height={20} fill={iconColor} />
+                <Repost width={18} height={18} fill={iconColor} />
                 <Text className={textColor}>100</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Like width={20} height={20} fill={iconColor} />
+                <Like width={18} height={18} fill={iconColor} />
                 <Text className={textColor}>100</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Views width={20} height={20} fill={iconColor} />
+                <Views width={18} height={18} fill={iconColor} />
                 <Text className={textColor}>100</Text>
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Save width={20} height={20} fill={iconColor} />
+                <Save width={18} height={18} fill={iconColor} />
             </TouchableOpacity>
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Feather name="share" size={20} color={iconColor} />
+                <Feather name="share" size={18} color={iconColor} />
             </TouchableOpacity>
         </View>
     );
@@ -136,20 +137,20 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress }) => {
     const { colorScheme } = useColorScheme();
 
     return (
-        <TouchableOpacity onPress={onPress} className="p-4 border-b border-neutral-200 dark:border-neutral-800">
+        <TouchableOpacity onPress={onPress} className="p-1 pb-4 pr-4 border-b border-neutral-200 dark:border-neutral-800">
             <View className="flex-row">
-                <ProfileImage source={{ uri: itemData.authorImageUrl }} displaySize="s" />
-                <View className="ml-2 flex-1">
+                <ProfileImage source={{ uri: itemData.authorImageUrl }} displaySize="s" is_organization />
+                <View className="ml-1 flex-1">
                     <View className="flex-row items-center">
-                        <Text className="font-bold text-black dark:text-white mr-1">{itemData.authorName}</Text>
-                        <Text className="text-neutral-500 dark:text-neutral-400 mr-1">@{itemData.authorHandle}</Text>
-                        <Text className="text-neutral-500 dark:text-neutral-400">· {itemData.postedTime}</Text>
+                        <Text className=" text-lg font-bold text-black dark:text-white mr-1">{itemData.authorName}</Text>
+                        <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{itemData.authorHandle}</Text>
+                        <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {itemData.postedTime}</Text>
                     </View>
                     <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
                     {itemData.mediaUrl && (
                         <Image
                             source={{ uri: itemData.mediaUrl }}
-                            className="w-full aspect-[16/9] mt-2 rounded-lg"
+                            className="w-full aspect-[4/4] mt-2 rounded-lg"
                             contentFit="cover"
                         />
                     )}
