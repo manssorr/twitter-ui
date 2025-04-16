@@ -46,8 +46,8 @@ import Share from "~/assets/svg/share.svg"
 import Views from "~/assets/svg/views.svg"
 import Category from "~/assets/svg/category.svg"
 import Grok from "~/assets/svg/tabs/grok.svg";
-
-
+// Import the refactored component and type
+import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP } from '~/components/FeedItem';
 
 const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
@@ -58,107 +58,21 @@ const HEADER_PROFILE_IMAGE_START_SCALE = 1;
 const HEADER_PROFILE_IMAGE_END_SCALE = 0.6;
 const SCREEN_HORIZONTAL_PADDING = 16;
 
-type ProfileImageSize = 'xxs' | 'xs' | 's' | 'm' | 'l';
-type ProfileImageProps = ImageProps & { displaySize?: ProfileImageSize; className?: string };
-
-type ProfileImageReducerState = { isLoading: boolean; hasError: boolean };
-type ProfileImageReducerActions = { type: 'loaded' } | { type: 'error' };
-type ProfileImageReducer = Reducer<ProfileImageReducerState, ProfileImageReducerActions>;
-
-const PROFILE_IMAGE_DIMENSIONS: Record<ProfileImageSize, number> = {
-  xxs: 20,
-  xs: 30,
-  s: 40,
-  m: 60,
-  l: 100,
+const current_user = {
+  name: 'Premier League',
+  handle: 'premierleague',
+  bio: 'The official account of the Premier League 📱',
+  url: 'premierleague.com',
+  followed_by: '45.5M',
+  items_count: '166.6K',
+  following_count: 80,
+  joined_date: "July 2011",
+  category: "Sports, Fitness & Recreation",
+  profile_picture: "https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg",
+  header_picture: "https://pbs.twimg.com/profile_banners/343627165/1744359099/1500x500",
+  is_verified: true,
+  verified_badge: "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg"
 };
-
-export const PROFILE_IMAGE_SIZE_MAP = { ...PROFILE_IMAGE_DIMENSIONS };
-
-export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize = 's', className = '', ...imageProps }) => {
-  const [{ isLoading, hasError }, dispatch] = useReducer<ProfileImageReducer>(
-    (state, action) => {
-      if (action.type === 'loaded') return { isLoading: false, hasError: false };
-      if (action.type === 'error') return { isLoading: false, hasError: true };
-      return state;
-    },
-    { isLoading: true, hasError: false }
-  );
-
-  const dimension = PROFILE_IMAGE_DIMENSIONS[displaySize];
-  const dimensionStyle = { width: dimension, height: dimension };
-
-  if (hasError) {
-    return <Feather name="user" size={dimension} color="grey" style={dimensionStyle} />;
-  }
-
-  return (
-    <View className={` p-1.5 rounded-xl mx-1.5 ${className} bg-white`}>
-      {isLoading && (
-        <View
-          style={dimensionStyle}
-          className="absolute justify-center items-center bg-neutral-200 dark:bg-neutral-700 rounded-md"
-        >
-          <ActivityIndicator size="small" color="grey" />
-        </View>
-      )}
-      <Image
-        {...imageProps}
-        onError={() => dispatch({ type: 'error' })}
-        onLoad={() => dispatch({ type: 'loaded' })}
-        contentFit="cover"
-        style={[dimensionStyle, style]}
-        className="rounded-md"
-      />
-    </View>
-  );
-};
-
-const EngagementActions = () => {
-  const colorScheme = useColorScheme();
-  return (
-    <View className="flex-row items-center gap-1.5 justify-between">
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Comment width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-        <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Repost width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-        <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Like width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-        <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Views width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-        <Text className="text-sm text-neutral-600 dark:text-neutral-400">100</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Save width={20} height={20} fill={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-      </TouchableOpacity>
-
-
-      <TouchableOpacity className="flex-row items-center gap-1.5">
-        <Feather name="share" size={20} color={colorScheme === 'dark' ? '#8b98a5' : '#536471'} />
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-interface FeedContent {
-  contentId: string;
-  authorName: string;
-  authorHandle: string;
-  authorImageUrl: string;
-  postedTime: string;
-  message: string;
-  mediaUrl?: string;
-}
 
 const sampleFeedItems: FeedContent[] = [
   {
@@ -188,76 +102,6 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
     mediaUrl: 'https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096',
   },
 ];
-
-const current_user = {
-  name: 'Premier League',
-  handle: 'premierleague',
-  bio: 'The official account of the Premier League 📱',
-  url: 'premierleague.com',
-  followed_by: '45.5M',
-  items_count: '166.6K',
-  following_count: 80,
-  joined_date: "July 2011",
-  category: "Sports, Fitness & Recreation",
-  profile_picture: "https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg",
-  header_picture: "https://pbs.twimg.com/profile_banners/343627165/1744359099/1500x500",
-  is_verified: true,
-  verified_badge: "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg"
-};
-
-interface FeedItemProps {
-  itemData: FeedContent;
-}
-
-const FeedItem: React.FC<FeedItemProps> = ({ itemData }) => {
-  return (
-    <View className="flex-row px-2 py-2.5 border-b border-neutral-200 dark:border-neutral-700 pr-4">
-      <ProfileImage
-        displaySize="s"
-        source={{ uri: current_user.profile_picture }}
-        className="rounded-full"
-      />
-      <View className="flex-1">
-        <View className="flex-row justify-between items-start mb-1">
-          <View className="flex-row items-center flex-shrink mr-1">
-
-            <Text className="font-bold text-base text-black dark:text-white mr-1">{current_user.name}</Text>
-            {current_user.is_verified && (
-              <Image
-                source={{ uri: current_user.verified_badge }}
-                className="w-4 h-4 mr-1" // Removed mr-1.5, adjusted spacing above
-              />
-            )}
-            <Text className="text-base text-neutral-500 dark:text-neutral-400 flex-shrink" numberOfLines={1}>
-              @{current_user.handle} · {itemData.postedTime}
-            </Text>
-          </View>
-          <TouchableOpacity className="pl-2">
-            <Feather name="more-horizontal" size={18} color="#556677" />
-          </TouchableOpacity>
-        </View>
-        <Text className="text-lg text-black dark:text-neutral-100 leading-snug">
-          {itemData.message}
-        </Text>
-
-        <Image
-          source={{ uri: itemData.mediaUrl }}
-          className="w-full h-[400px]  rounded-xl mb-2 bg-neutral-100 dark:bg-neutral-800 
-            
-            "
-          contentFit="cover"
-        />
-
-        <View className="">
-          <EngagementActions />
-        </View>
-      </View>
-
-
-    </View>
-  );
-};
-
 
 const canUseBlurEffect =
   Platform.OS === 'ios' || (Platform.OS === 'android' && Number(Platform.Version) >= 31);
