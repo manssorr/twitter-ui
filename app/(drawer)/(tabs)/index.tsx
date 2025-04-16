@@ -718,7 +718,8 @@ export default function UserProfileScreen() {
         ignoreLeftPadding
         ignoreRightPadding
         expandedHeaderCollapseThreshold={0.25}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: 'white' }}
+
         contentContainerStyle={{ paddingBottom: bottomInset, flexGrow: 1, backgroundColor: colorScheme === 'light' ? 'white' : 'black' }}
         renderItem={({ item }: { item: FeedContent }) => <FeedItem itemData={item} />}
         stickySectionHeadersEnabled
