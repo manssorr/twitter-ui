@@ -119,6 +119,7 @@ function CustomDrawerContent(props: any) {
             onPress={() => router.push('/ads')}
             style={{  }}
           /> */}
+
           <DrawerItem
             icon={({ color, size }) => <Bookmarks width={size} height={size} fill={color} />}
             label="Bookmarks"
@@ -126,6 +127,7 @@ function CustomDrawerContent(props: any) {
             onPress={() => router.push('/bookmarks')}
             style={{}}
           />
+          
           <DrawerItem
             icon={({ color, size }) => <Lists width={size} height={size} fill={color} />}
             label="Lists"

@@ -5,7 +5,7 @@ export default function Home() {
   const router = useRouter();
 
   const navigateToTabs = () => {
-    router.push("/(drawer)/(tabs)");
+    router.push("/(drawer)/(tabs)/(index)");
   };
 
   return (

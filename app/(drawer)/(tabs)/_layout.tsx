@@ -39,6 +39,7 @@ const TabBarBackground = () => {
 }
 
 
+
 export default function TabLayout() {
   return (
     <Tabs
@@ -56,7 +57,7 @@ export default function TabLayout() {
         tabBarShowLabel: false, // Remove title labels
       }}>
       <Tabs.Screen
-        name="index"
+        name="(index)"
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => <Home width={26} height={26} color={color} />,
@@ -64,33 +65,34 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="search"
+        name="(search)"
         options={{
+          headerShown: false,
           tabBarIcon: ({ color }) => <Search width={26} height={26} color={color} />,
         }}
       />
 
       <Tabs.Screen
-        name="video"
+        name="(video)"
         options={{
           tabBarIcon: ({ color }) => <Foundation name="play-circle" size={26} color={'#000'} />,
         }}
       />
 
       <Tabs.Screen
-        name="grok"
+        name="(grok)"
         options={{
           tabBarIcon: ({ color }) => <Grok width={26} height={26} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="notifications"
+        name="(notifications)"
         options={{
           tabBarIcon: ({ color }) => <Notifications width={26} height={26} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="messages"
+        name="(messages)"
         options={{
           tabBarIcon: ({ color }) => <Messages width={26} height={26} color={color} />,
         }}
