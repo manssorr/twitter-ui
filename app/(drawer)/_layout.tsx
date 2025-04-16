@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import { Ionicons, MaterialIcons, Feather, SimpleLineIcons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, usePathname, useSegments } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { BlurView } from 'expo-blur'; // Import BlurView
 
@@ -218,21 +218,27 @@ function CustomDrawerContent(props: any) {
 // No changes needed here
 const DrawerLayout = () => {
   const { width } = useWindowDimensions();
+  const pathname = useSegments();
+  const [isInTabRoute, setIsInTabRoute] = React.useState(false);
+
+  // Check if we're in any of the tab routes
+  useEffect(() => {
+    //weird logic for demo lol  but check route and groups and set a better logic. basically on group childs, we wanna disable drawer swipe.
+    setIsInTabRoute(pathname.length > 3);
+  }, [pathname]);
+
+  console.log(`PATHNAME__`, pathname);
+  
   return (
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
-        // Optional: Set a default background color for screens if needed
-        // cardStyle: { backgroundColor: 'white' },
-        headerShown: false, // Hide default headers if custom ones are used or not needed globally
-        swipeEnabled: true, // Ensure swipe gesture is enabled
-        swipeEdgeWidth: width,
+        headerShown: false,
+        swipeEnabled: true,
+        swipeEdgeWidth: isInTabRoute ? 0 : width,
         overlayColor: '#adadad8c',
         drawerStyle: {
-          // Ensure drawer background is transparent if you want blur to show through,
-          // or set a solid color if BlurView is only for the footer element itself.
-          // backgroundColor: 'transparent', // Example if blur should cover whole drawer background behind content
-          width: '80%', // Adjust width as needed
+          width: '80%',
         }
       }}
     >
