@@ -29,6 +29,7 @@ import Settings from "~/assets/svg/aside/settings.svg"
 import VerifiedOrgs from "~/assets/svg/aside/verified-orgs.svg"
 import Grok from "~/assets/svg/tabs/grok.svg"
 import X from "~/assets/svg/aside/x.svg"
+import Spaces from "~/assets/svg/aside/spaces.svg"
 
 
 // --- Custom Drawer Content Component ---
@@ -38,11 +39,12 @@ function CustomDrawerContent(props: any) {
   const { width } = useWindowDimensions();
 
   // --- Placeholder Data (Replace with actual data) ---
-  const userName = 'Saúl Sharma';
-  const userHandle = '@saul_sharma';
-  const followingCount = 137;
-  const followersCount = '5,835';
-  const profileImageUrl = 'https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg'; // Placeholder image
+  const userName = 'Premier League';
+  const userHandle = '@premierleague';
+  const followingCount = 80;
+  const followersCount = '45.6M';
+  const profileImageUrl = 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg'; // Placeholder image
+  const verified_badge = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Twitter_Verified_Badge_Gold.svg/1920px-Twitter_Verified_Badge_Gold.svg.png"
 
   return (
     // Use SafeAreaView and flex-1 for the main container
@@ -57,12 +59,20 @@ function CustomDrawerContent(props: any) {
           <TouchableOpacity onPress={() => router.push('/profile')} className="mr-4 mb-1">
             <Image
               source={{ uri: profileImageUrl }}
-              className="w-12 h-12 rounded-full"
+              className="w-12 h-12 rounded-sm"
               onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
             />
+
           </TouchableOpacity>
 
-          <Text className="text-lg font-extrabold text-gray-900">{userName}</Text>
+          <View className="flex-row items-center gap-1">
+            <Text className="text-lg font-extrabold text-gray-900">{userName}</Text>
+            <Image
+              source={{ uri: verified_badge }}
+              className="w-4 h-4"
+              onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+            />
+          </View>
           <Text className="text-base text-gray-500 mb-1">{userHandle}</Text>
           <View className="flex-row mt-1">
             <Text className="text-base text-gray-500 mr-4">
@@ -73,8 +83,8 @@ function CustomDrawerContent(props: any) {
             </Text>
           </View>
         </View>
-        <TouchableOpacity className="pl-2 pt-1"> {/* Added pt-1 for better alignment */}
-          <MaterialCommunityIcons name="dots-horizontal" size={24} color="#1DA1F2" />
+        <TouchableOpacity className="border border-gray-300 rounded-full"> {/* Added pt-1 for better alignment */}
+          <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" opacity={0.6} />
         </TouchableOpacity>
       </View>
 
@@ -127,7 +137,7 @@ function CustomDrawerContent(props: any) {
             onPress={() => router.push('/bookmarks')}
             style={{}}
           />
-          
+
           <DrawerItem
             icon={({ color, size }) => <Lists width={size} height={size} fill={color} />}
             label="Lists"
@@ -146,7 +156,7 @@ function CustomDrawerContent(props: any) {
             style={{}}
           />
           <DrawerItem
-            icon={({ color, size }) => <FontAwesome5 name="microphone-alt" color={color} size={size} />}
+            icon={({ color, size }) => <Spaces width={size} height={size} fill={color} />}
             label="Spaces"
             labelStyle={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}
             onPress={() => router.push('/spaces')}
@@ -228,7 +238,7 @@ const DrawerLayout = () => {
   }, [pathname]);
 
   console.log(`PATHNAME__`, pathname);
-  
+
   return (
     <Drawer
       drawerContent={(props) => <CustomDrawerContent {...props} />}

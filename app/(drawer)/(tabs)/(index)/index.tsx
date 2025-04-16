@@ -25,6 +25,7 @@ import sampleFeedItems from '~/dummy/posts.json';
 import users from '~/dummy/users.json';
 import { StyledExpoImage } from "~/components/Image"
 import X from "~/assets/svg/aside/x.svg"
+import { BlurView } from 'expo-blur';
 
 
 
@@ -50,7 +51,7 @@ const HeaderTabs: React.FC<HeaderTabsProps> = ({ tabs, selectedTabIndex, onTabPr
     const currentUser = users[0];
 
     return (
-        <View style={[styles.headerTabsContainer]} className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-700 w-full gap-4">
+        <View style={[styles.headerTabsContainer]} className=" border-b border-gray-200 dark:border-gray-700 w-full gap-4">
 
             <View className="flex-row items-center w-full justify-center">
                 <StyledExpoImage source={{ uri: currentUser.profile_picture }} className="w-10 h-10 rounded-full absolute left-4" />
@@ -186,12 +187,12 @@ export default function HomeScreen() {
 
     return (
         // Use a standard View, not SafeAreaView, as requested
-        <View style={styles.container} className="flex-1 bg-white dark:bg-black">
+        <BlurView style={styles.container} className="flex-1" intensity={80} tint={"light"}>
             {/* Animated Header Container */}
             {/* This container handles the safe area padding and the animation */}
             <Animated.View style={[styles.headerWrapper, headerAnimatedStyle]}>
                 {/* Add paddingTop dynamically based on insets */}
-                <View style={{ paddingTop: insets.top, backgroundColor: 'white' /* Match HeaderTabs bg */ }} className="dark:bg-black">
+                <View style={{ paddingTop: insets.top,  /* Match HeaderTabs bg */ }} className="">
                     {/* The actual visible Header Tabs */}
 
 
@@ -219,7 +220,7 @@ export default function HomeScreen() {
                 // Automatically adjust scroll indicator insets to avoid the header/safe area
                 automaticallyAdjustsScrollIndicatorInsets={true}
             />
-        </View>
+        </BlurView>
     );
 }
 
@@ -227,6 +228,9 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: 'white',
+        width: '100%',
+        height: '100%',
     },
     // This wrapper is positioned absolutely and animated
     headerWrapper: {
