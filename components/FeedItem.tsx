@@ -16,7 +16,8 @@ import Save from "~/assets/svg/save.svg"
 import Share from "~/assets/svg/share.svg"
 import Views from "~/assets/svg/views.svg"
 import { ImageProps } from 'expo-image';
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
+import LikeButton from './LikeButton';
 
 // Types and Constants moved from profile/[id].tsx
 type ProfileImageSize = 'xxs' | 'xs' | 's' | 'm' | 'l';
@@ -105,10 +106,7 @@ const EngagementActions = () => {
                 <Text className={textColor}>100</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity className="flex-row items-center gap-1.5">
-                <Like width={18} height={18} fill={iconColor} />
-                <Text className={textColor}>100</Text>
-            </TouchableOpacity>
+            <LikeButton iconColor={iconColor} textColor={textColor} />
 
             <TouchableOpacity className="flex-row items-center gap-1.5">
                 <Views width={18} height={18} fill={iconColor} />
@@ -141,11 +139,13 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress }) => {
             <View className="flex-row">
                 <ProfileImage source={{ uri: itemData.authorImageUrl }} displaySize="s" is_organization />
                 <View className="ml-1 flex-1">
-                    <View className="flex-row items-center">
-                        <Text className=" text-lg font-bold text-black dark:text-white mr-1">{itemData.authorName}</Text>
-                        <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{itemData.authorHandle}</Text>
-                        <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {itemData.postedTime}</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => router.push(`/profile/${itemData.authorHandle}`)}>
+                        <View className="flex-row items-center">
+                            <Text className=" text-lg font-bold text-black dark:text-white mr-1">{itemData.authorName}</Text>
+                            <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{itemData.authorHandle}</Text>
+                            <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {itemData.postedTime}</Text>
+                        </View>
+                    </TouchableOpacity>
                     <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
                     {itemData.mediaUrl && (
                         <Image
