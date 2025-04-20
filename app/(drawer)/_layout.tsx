@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
   Image,
   TouchableOpacity,
-  SafeAreaView // Import SafeAreaView for better handling of notches/status bars
+  SafeAreaView,
+  StyleSheet // Added for bottom sheet styles
 } from 'react-native';
 import {
   DrawerContentScrollView,
@@ -13,15 +14,23 @@ import {
 import { Ionicons, MaterialIcons, Feather, SimpleLineIcons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { Link, useRouter, usePathname, useSegments } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
-import { BlurView } from 'expo-blur'; // Import BlurView
+import { BlurView } from 'expo-blur';
 
-import { HeaderButton } from '../../components/HeaderButton'; // Assuming this component exists
+// Import Bottom Sheet components
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetBackdrop
+} from '@gorhom/bottom-sheet';
+
+import { HeaderButton } from '../../components/HeaderButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWindowDimensions } from 'react-native';
 import { useStore } from '../../store/store';
 import users from '../../dummy/users.json';
+import authorizedAccounts from '../../dummy/authorized_accounts.json';
 
-// import Ads from "~/assets/svg/aside/ads.svg"
+// SVG imports
 import Bookmarks from "~/assets/svg/aside/bookmarks.svg"
 import Lists from "~/assets/svg/aside/lists.svg"
 import Monetization from "~/assets/svg/aside/monetization.svg"
@@ -33,14 +42,40 @@ import Grok from "~/assets/svg/tabs/grok.svg"
 import X from "~/assets/svg/aside/x.svg"
 import Spaces from "~/assets/svg/aside/spaces.svg"
 
-
 // --- Custom Drawer Content Component ---
 function CustomDrawerContent(props: any) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const { currentUserId } = useStore();
+  const { currentUserId, setCurrentUserId } = useStore();
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [authorizedUsers, setAuthorizedUsers] = useState<any[]>([]);
+
+  // Bottom Sheet Refs and setup
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['50%'], []);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
+  // Handle account selection
+  const handleSelectAccount = useCallback((userId: string) => {
+    setCurrentUserId(userId);
+    bottomSheetModalRef.current?.dismiss();
+  }, [setCurrentUserId]);
+
+  // Filter users based on authorized accounts
+  useEffect(() => {
+    const filteredUsers = users.filter(user => 
+      authorizedAccounts.includes(user.id)
+    );
+    setAuthorizedUsers(filteredUsers);
+  }, []);
 
   useEffect(() => {
     // Find the user with the matching ID
@@ -54,10 +89,11 @@ function CustomDrawerContent(props: any) {
 
   // Set default user if none is selected
   useEffect(() => {
-    if (!currentUser && users.length > 0) {
-      setCurrentUser(users[0]);
+    if (!currentUser && authorizedUsers.length > 0) {
+      setCurrentUser(authorizedUsers[0]);
+      setCurrentUserId(authorizedUsers[0].id);
     }
-  }, []);
+  }, [authorizedUsers, currentUser, setCurrentUserId]);
 
   // Use the current user data or default placeholder
   const userName = currentUser?.name || 'Twitter User';
@@ -75,7 +111,6 @@ function CustomDrawerContent(props: any) {
       {/* This View is outside the ScrollView */}
 
       <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{ paddingTop: insets.top }}>
-
 
         <View className="flex-1">
           <TouchableOpacity onPress={() => router.push('/profile')} className="mr-4 mb-1">
@@ -107,7 +142,10 @@ function CustomDrawerContent(props: any) {
             </Text>
           </View>
         </View>
-        <TouchableOpacity className="border border-gray-300 rounded-full"> {/* Added pt-1 for better alignment */}
+        <TouchableOpacity 
+          className="border border-gray-300 rounded-full p-1"
+          onPress={handlePresentModalPress}
+        >
           <MaterialCommunityIcons name="dots-horizontal" size={24} color="black" opacity={0.6} />
         </TouchableOpacity>
       </View>
@@ -238,6 +276,79 @@ function CustomDrawerContent(props: any) {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* --- Bottom Sheet Modal for Account Switching --- */}
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={0}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+          />
+        )}
+        handleIndicatorStyle={{ backgroundColor: '#EEF3F4', height: 5, width: 35 }}
+        backgroundStyle={{
+          backgroundColor: '#ffffff',
+          borderRadius: 24
+        }}
+      >
+        <BottomSheetView style={styles.contentContainer}>
+          <Text className="text-xl font-bold text-black mb-4 px-4">Accounts</Text>
+          
+          {/* List of authorized accounts only */}
+          {authorizedUsers.map((user) => (
+            <TouchableOpacity
+              key={user.id}
+              onPress={() => handleSelectAccount(user.id)}
+              className="flex-row items-center py-3 px-4"
+            >
+              <Image
+                source={{ uri: user.profile_picture }}
+                className="w-10 h-10 rounded-sm mr-3"
+                onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+              />
+              <View className="flex-1">
+                <View className="flex-row items-center">
+                  <Text className="text-base font-semibold text-black">{user.name}</Text>
+                  {user.is_verified && (
+                    <Image
+                      source={{ uri: user.verified_badge }}
+                      className="w-4 h-4 ml-1"
+                      onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+                    />
+                  )}
+                </View>
+                <Text className="text-gray-500">@{user.handle}</Text>
+              </View>
+              {currentUserId === user.id && (
+                <Feather name="check" size={18} color="#1DA1F2" />
+              )}
+            </TouchableOpacity>
+          ))}
+          
+          {/* Add account and Manage accounts buttons */}
+          <View className="mt-2 border-t border-gray-200 pt-2 px-4">
+            <TouchableOpacity className="py-3 flex-row items-center">
+              <Feather name="plus-circle" size={20} color="#1DA1F2" />
+              <Text className="text-base font-semibold text-blue-500 ml-3">Add an existing account</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              className="py-3 flex-row items-center"
+              onPress={() => {
+                bottomSheetModalRef.current?.dismiss();
+                router.push('/edit-accounts');
+              }}
+            >
+              <Feather name="settings" size={20} color="#1DA1F2" />
+              <Text className="text-base font-semibold text-blue-500 ml-3">Manage accounts</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheetView>
+      </BottomSheetModal>
     </SafeAreaView>
   );
 }
@@ -262,7 +373,9 @@ function DrawerLayout() {
       screenOptions={{
         headerShown: false,
         swipeEnabled: true,
-        swipeEdgeWidth: isInTabRoute ? 0 : width,
+        // swipeEdgeWidth: isInTabRoute ? 0 : width,
+        swipeEdgeWidth: width,
+
         overlayColor: '#adadad8c',
         drawerStyle: {
           width: '80%',
@@ -285,8 +398,15 @@ function DrawerLayout() {
       <Drawer.Screen name="help" options={{ headerTitle: 'Help Center' /*, headerShown: false */ }} />
       <Drawer.Screen name="verified-orgs" options={{ headerTitle: 'Verified Orgs' /*, headerShown: false */ }} />
       <Drawer.Screen name="modal" options={{ presentation: 'modal', headerShown: false }} />
+      <Drawer.Screen name="edit-accounts" options={{ headerTitle: 'Edit Accounts' /*, headerShown: false */ }} />
     </Drawer>
   );
 }
+
+const styles = StyleSheet.create({
+  contentContainer: {
+    flex: 1,
+  },
+});
 
 export default DrawerLayout;

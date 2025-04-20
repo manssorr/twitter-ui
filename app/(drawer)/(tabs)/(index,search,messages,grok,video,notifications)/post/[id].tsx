@@ -12,9 +12,6 @@ import {
     BottomSheetView,
     BottomSheetBackdrop // Added for the backdrop
 } from '@gorhom/bottom-sheet';
-// --- Gesture Handler Import ---
-// GestureHandlerRootView Removed: Should be in root layout (_layout.tsx)
-// import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Define the possible sort types
 type SortType = 'relevant' | 'recent' | 'liked';
@@ -77,9 +74,6 @@ export default function PostDetailScreen() {
             </View>
         );
     }
-
-    // Main screen content
-    // No GestureHandlerRootView or BottomSheetModalProvider needed here anymore
     return (
         <>
             <ScrollView
