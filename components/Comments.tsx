@@ -123,7 +123,7 @@ interface CommentItemProps {
 // Single Comment Item Component
 export const CommentItem: React.FC<CommentItemProps> = ({ commentData }) => {
     return (
-        <View className="p-1 pb-4 border-b border-neutral-100 dark:border-neutral-800">
+        <View className="p-1  pt-2 border-b border-neutral-100 dark:border-neutral-800">
             <View className="flex-row">
                 <ProfileImage
                     source={{ uri: commentData.authorImageUrl }}
@@ -143,7 +143,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ commentData }) => {
                     </View>
                     <Text className="text-black dark:text-white mt-1">{commentData.message}</Text>
                     {/* <CommentEngagementActions /> */}
-                    <EngagementActions  />
+                    <EngagementActions />
                 </View>
             </View>
         </View>
