@@ -48,19 +48,24 @@ const TabBarBackground = () => {
 export default function TabLayout() {
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: 'black',
-        tabBarStyle: {
-          position: 'absolute',
-          borderTopWidth: 0,
-          elevation: 0,
-          backgroundColor: 'transparent',
-          paddingTop: 4
-        },
+        tabBarShowLabel: false,
         tabBarBackground: () => <TabBarBackground />,
-        tabBarShowLabel: false, // Remove title labels
-      }}>
+        tabBarStyle: [
+          {
+            position: 'absolute',
+            borderTopWidth: 0,
+            elevation: 0,
+            backgroundColor: 'transparent',
+            paddingTop: 4,
+          },
+          route.name === '(video)' ? { display: 'none' } : {},
+        ],
+      })}
+    >
+
       <Tabs.Screen
         name="(index)"
         options={{
