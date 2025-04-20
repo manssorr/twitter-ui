@@ -43,6 +43,14 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
 
+import Comment from "~/assets/svg/comment.svg";
+import Repost from "~/assets/svg/repost.svg";
+import Save from "~/assets/svg/save.svg";
+import Views from "~/assets/svg/views.svg";
+import LikeButton from '~/components/LikeButton';
+
+
+
 // Get screen dimensions
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -345,27 +353,33 @@ const VideoItem = React.memo(({ item, isVisible }) => {
         {/* Engagement Row */}
         <View style={styles.engagementRow}>
           <TouchableOpacity style={styles.engagementButton}>
-            <Icon name="comment-o" size={20} color="#ccc" />
+            <Comment width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.commentCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
             {/* Using 'retweet' icon for shares */}
-            <Icon name="retweet" size={20} color="#ccc" />
+            <Repost width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.retweetCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
-            <Icon name="heart-o" size={20} color="#ccc" />
+            <Icon name="heart-o" size={16} color="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
             {/* Using 'bar-chart' icon for views */}
-            <Icon name="bar-chart" size={20} color="#ccc" />
+            <Views width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.viewCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
-            <Icon name="bookmark-o" size={20} color="#ccc" />
+            <Save width={16} height={16} fill="#ccc" />
             {/* Bookmark count often not shown, or shown differently */}
           </TouchableOpacity>
+
+          <TouchableOpacity style={styles.engagementButton}>
+            <Feather name="share" size={16} color="#ccc" />
+            {/* Bookmark count often not shown, or shown differently */}
+          </TouchableOpacity>
+
         </View>
       </LinearGradient>
 
@@ -408,8 +422,9 @@ const VideoFeed = () => {
   return (
     <View style={styles.container}>
 
-      <TouchableOpacity onPress={() => { router.back() }} className="absolute left-4" style={{ top: insets.top + 10 }}>
-        <Feather name="arrow-left" size={22} color={'#536471'} />
+
+      <TouchableOpacity onPress={() => { router.back() }} className="absolute left-4 z-10" style={{ top: insets.top + 10 }}>
+        <Feather name="arrow-left" size={22} color={'#fff'} />
       </TouchableOpacity>
 
       <FlashList
