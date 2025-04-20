@@ -192,7 +192,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                 contentFit="cover"
                             />
                         )}
-                        <EngagementActions />
+                        <EngagementActions itemData={itemData} detailView={false}/>
                     </View>
                 </View>
             </TouchableOpacity>
@@ -243,7 +243,9 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
 
                 <View className="">
-                    <EngagementActions detailView={true} />
+                    <EngagementActions 
+                    itemData={itemData}
+                    detailView={true} />
                 </View>
             </View>
         </View>
