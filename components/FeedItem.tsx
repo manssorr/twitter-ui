@@ -22,6 +22,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { EngagementActions } from './EngagementActions';
 import users from '~/dummy/users.json';
+import { MoreContextIcons } from "~/app/(drawer)/(tabs)/(index,search,messages,grok,video,notifications)/post/[id]"
+
 
 // Initialize dayjs plugins
 dayjs.extend(relativeTime);
@@ -153,10 +155,10 @@ interface FeedItemProps {
 // Reusable Feed Item Component
 export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
-    
+
     // Get user information based on poster_id
     const userInfo = findUserById(itemData.poster_id);
-    
+
     // Use direct properties if available (for backward compatibility) or get from userInfo
     const authorName = itemData.authorName || userInfo?.name || 'Unknown';
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
@@ -170,13 +172,18 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                 <View className="flex-row">
                     <ProfileImage source={{ uri: authorImageUrl }} displaySize="s" is_organization={isOrganization} />
                     <View className="ml-1 flex-1">
-                        <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
-                            <View className="flex-row items-center">
-                                <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
-                                <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
-                                <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
-                            </View>
-                        </TouchableOpacity>
+
+                        <View className="flex-row items-center justify-between">
+                            <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
+                                <View className="flex-row items-center">
+                                    <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
+                                    <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
+                                    <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
+                                </View>
+                            </TouchableOpacity>
+                            <MoreContextIcons size="sm" />
+                        </View>
+
                         <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
                         {itemData.media_url && (
                             <Image
