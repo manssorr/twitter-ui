@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,8 @@ import { BlurView } from 'expo-blur'; // Import BlurView
 import { HeaderButton } from '../../components/HeaderButton'; // Assuming this component exists
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useWindowDimensions } from 'react-native';
+import { useStore } from '../../store/store';
+import users from '../../dummy/users.json';
 
 // import Ads from "~/assets/svg/aside/ads.svg"
 import Bookmarks from "~/assets/svg/aside/bookmarks.svg"
@@ -37,14 +39,34 @@ function CustomDrawerContent(props: any) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const { currentUserId } = useStore();
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // --- Placeholder Data (Replace with actual data) ---
-  const userName = 'Premier League';
-  const userHandle = '@premierleague';
-  const followingCount = 80;
-  const followersCount = '45.6M';
-  const profileImageUrl = 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg'; // Placeholder image
-  const verified_badge = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Twitter_Verified_Badge_Gold.svg/1920px-Twitter_Verified_Badge_Gold.svg.png"
+  useEffect(() => {
+    // Find the user with the matching ID
+    if (currentUserId) {
+      const user = users.find(user => user.id === currentUserId);
+      if (user) {
+        setCurrentUser(user);
+      }
+    }
+  }, [currentUserId]);
+
+  // Set default user if none is selected
+  useEffect(() => {
+    if (!currentUser && users.length > 0) {
+      setCurrentUser(users[0]);
+    }
+  }, []);
+
+  // Use the current user data or default placeholder
+  const userName = currentUser?.name || 'Twitter User';
+  const userHandle = currentUser?.handle ? `@${currentUser.handle}` : '@user';
+  const followingCount = currentUser?.following_count || 0;
+  const followersCount = currentUser?.followed_by || '0';
+  const profileImageUrl = currentUser?.profile_picture || 'https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png';
+  const verified_badge = currentUser?.verified_badge || '';
+  const isVerified = currentUser?.is_verified || false;
 
   return (
     // Use SafeAreaView and flex-1 for the main container
@@ -67,11 +89,13 @@ function CustomDrawerContent(props: any) {
 
           <View className="flex-row items-center gap-1">
             <Text className="text-lg font-extrabold text-gray-900">{userName}</Text>
-            <Image
-              source={{ uri: verified_badge }}
-              className="w-4 h-4"
-              onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
-            />
+            {isVerified && (
+              <Image
+                source={{ uri: verified_badge }}
+                className="w-4 h-4"
+                onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+              />
+            )}
           </View>
           <Text className="text-base text-gray-500 mb-1">{userHandle}</Text>
           <View className="flex-row mt-1">
@@ -202,31 +226,24 @@ function CustomDrawerContent(props: any) {
         </View>
       </DrawerContentScrollView>
 
-      {/* --- 3. Fixed Footer (Theme Toggle) --- */}
-      {/* This View is outside the ScrollView, wrapped in BlurView */}
-      {/* Added border-t */}
-      <BlurView intensity={30} tint="light"
-
-
-        className="px-4 absolute bottom-0 w-full" style={{ paddingBottom: insets.bottom - 15 }}>
-        <View className="px-5 py-4 flex-row justify-between items-center">
-          <TouchableOpacity className="p-1">
-            <Feather name="sun" size={24} color="black" />
+      {/* --- 3. Fixed Footer --- */}
+      {/* Added bottom safe area padding */}
+      <View className="px-5 py-2 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
+        <View className="flex-row justify-between">
+          <TouchableOpacity>
+            <Feather name="moon" size={22} color="black" />
           </TouchableOpacity>
-          {/* Add QR code icon if needed */}
-          {/* <TouchableOpacity className="p-1">
-                    <MaterialCommunityIcons name="qrcode-scan" size={24} color="black" />
-                </TouchableOpacity> */}
+          <TouchableOpacity>
+            <SimpleLineIcons name="bubble" size={22} color="black" />
+          </TouchableOpacity>
         </View>
-      </BlurView>
-
+      </View>
     </SafeAreaView>
   );
 }
 
 // --- Main Drawer Layout ---
-// No changes needed here
-const DrawerLayout = () => {
+function DrawerLayout() {
   const { width } = useWindowDimensions();
   const pathname = useSegments();
   const [isInTabRoute, setIsInTabRoute] = React.useState(false);
@@ -270,6 +287,6 @@ const DrawerLayout = () => {
       <Drawer.Screen name="modal" options={{ presentation: 'modal', headerShown: false }} />
     </Drawer>
   );
-};
+}
 
 export default DrawerLayout;

@@ -133,13 +133,17 @@ export default function PostDetailScreen() {
                     // You can customize opacity/color: style={[props.style, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}
                     />
                 )}
-            // Optional: Add background style for dark/light mode if needed
-            // backgroundStyle={{ backgroundColor: '#ffffff' }} // Example light background
-            // handleIndicatorStyle={{ backgroundColor: '#cccccc' }} // Example handle color
+                // Optional: Add background style for dark/light mode if needed
+                // backgroundStyle={{ backgroundColor: '#ffffff' }} // Example light background
+                handleIndicatorStyle={{ backgroundColor: '#EEF3F4', height: 5, width: 35 }} // Example handle color
+                backgroundStyle={{
+                    backgroundColor: '#ffffff',
+                    borderRadius: 30
+                }}
             >
                 <BottomSheetView style={styles.contentContainer}>
                     {/* Title inside the bottom sheet */}
-                    <Text className="text-lg font-semibold text-black dark:text-white mb-4 px-4">Sort replies</Text>
+                    <Text className="text-lg font-extrabold text-black dark:text-white  text-center">Sort replies</Text>
                     {/* Map through the sort options to create tappable rows */}
                     {Object.entries(sortOptions).map(([key, value]) => (
                         <TouchableOpacity
@@ -148,7 +152,7 @@ export default function PostDetailScreen() {
                             className="flex-row justify-between items-center py-3 px-4"
                         >
                             {/* Sort option text */}
-                            <Text className="text-base text-black dark:text-white">{value}</Text>
+                            <Text className="text-base font-semibold text-black dark:text-white">{value}</Text>
                             {/* Show checkmark only for the currently selected option */}
                             {selectedSort === key && (
                                 <Text className="text-xl text-blue-500">✓</Text>
@@ -165,6 +169,7 @@ export default function PostDetailScreen() {
 const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
+
         // Add padding if needed, e.g., paddingHorizontal: 16,
     },
 });

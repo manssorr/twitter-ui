@@ -1,15 +1,11 @@
 import { create } from 'zustand';
 
-export interface BearState {
-  bears: number;
-  increasePopulation: () => void;
-  removeAllBears: () => void;
-  updateBears: (newBears: number) => void;
+export interface AppState {
+  currentUserId: string | null;
+  setCurrentUserId: (id: string) => void;
 }
 
-export const useStore = create<BearState>((set) => ({
-  bears: 0,
-  increasePopulation: () => set((state) => ({ bears: state.bears + 1 })),
-  removeAllBears: () => set({ bears: 0 }),
-  updateBears: (newBears) => set({ bears: newBears }),
+export const useStore = create<AppState>((set) => ({
+  currentUserId: null,
+  setCurrentUserId: (id) => set({ currentUserId: id }),
 }));
