@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
-import { FeedItem } from '~/components/FeedItem'; // Assuming FeedItem is in components
+import { FeedItem, FeedContent } from '~/components/FeedItem'; // Assuming FeedItem is in components
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import sampleFeedItems from '~/dummy/posts.json';
 import Grok from '~/assets/svg/tabs/grok.svg';
@@ -95,20 +95,41 @@ export default function PostDetailScreen() {
         console.log('Selected sort:', sortType);
     }, []);
 
-    // Find the post (replace with real data fetching)
-    const postData = sampleFeedItems.find(item => item.contentId === postId);
+    // Enhanced post finding logic that can handle different post formats
+    const findPost = useMemo(() => {
+        // First try direct contentId match (legacy format)
+        let post = sampleFeedItems.find(item => 
+            (item as any).contentId === postId
+        );
+        
+        // If not found, try checking if the postId is a composite ID (post-poster_id-timestamp)
+        if (!post && postId.startsWith('post-')) {
+            // Extract the poster_id from the composite ID if possible
+            const parts = postId.split('-');
+            if (parts.length >= 2) {
+                const potentialPosterId = parts[1];
+                
+                // Try matching on poster_id for newer format posts
+                post = sampleFeedItems.find(item => 
+                    (item as any).poster_id === potentialPosterId
+                );
+            }
+        }
+        
+        return post as FeedContent | undefined;
+    }, [postId]);
 
     const handleNavigateToProfile = (handle: string) => {
         router.push(`/profile/${handle}`);
     };
 
     // Screen shown if the post isn't found
-    if (!postData) {
+    if (!findPost) {
         // No providers needed here anymore if they are in root layout
         return (
             <View className="flex-1 justify-center items-center bg-white dark:bg-black" style={{ paddingTop: insets.top }}>
                 <Stack.Screen options={{ title: 'Post Not Found' }} />
-                <Text className="text-neutral-500 dark:text-neutral-400">Could not find the requested post.</Text>
+                <Text className="text-neutral-500 dark:text-neutral-400">Could not find the requested post (ID: {postId}).</Text>
             </View>
         );
     }
@@ -126,7 +147,7 @@ export default function PostDetailScreen() {
 
                 {/* Render the main post */}
                 <FeedItem
-                    itemData={postData}
+                    itemData={findPost}
                     detailView={true}
                 // Ensure profile navigation is handled if needed
                 />
@@ -199,7 +220,7 @@ export default function PostDetailScreen() {
                     ))}
                 </BottomSheetView>
             </BottomSheetModal>
-        </> // Use Fragment shorthand <> </> as the outer element now
+        </>
     );
 }
 
@@ -207,7 +228,6 @@ export default function PostDetailScreen() {
 const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
-
-        // Add padding if needed, e.g., paddingHorizontal: 16,
+        padding: 16,
     },
 });

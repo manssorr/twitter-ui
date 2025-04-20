@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
     View,
     Text,
@@ -7,7 +7,7 @@ import {
     FlatList,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { FeedItem, FeedContent } from '~/components/FeedItem';
+import { FeedItem, FeedContent, findUserById } from '~/components/FeedItem';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import Animated from 'react-native-reanimated';
@@ -19,13 +19,67 @@ import { BlurView } from 'expo-blur';
 
 // --- Constants ---
 const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
-const profileTabs = ['For you', 'Following', 'TPOT', 'RN/ React', 'AI', 'Design', 'Premier League'];
 
-// Convert string timestamps to numbers to match FeedContent interface
-const processedFeedItems: FeedContent[] = sampleFeedItems.map(item => ({
-    ...item,
-    postedTime: parseInt(item.postedTime, 10)
-}));
+// Define category tabs with proper grouping
+const categoryTabs = ['For you', 'Following', 'RN/ React', 'AI', 'Premier League', 'Design', 'TPOT'];
+
+// Safely normalize post data with explicit type handling
+const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
+    // Explicitly handle new post format (with poster_id)
+    if (typeof item.poster_id === 'string') {
+        return {
+            contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
+            poster_id: item.poster_id,
+            posted_time: typeof item.posted_time === 'string' ? parseInt(item.posted_time, 10) : 
+                         typeof item.posted_time === 'number' ? item.posted_time : Date.now(),
+            message: item.message || '',
+            media_url: item.media_url || undefined,
+            like_count: item.like_count || 0,
+            retweet_count: item.retweet_count || 0,
+            reply_count: item.reply_count || 0,
+            view_count: item.view_count || '0',
+            category: item.category || 'For you'
+        };
+    } 
+    // Handle legacy format (with authorName, authorHandle, etc.)
+    else if (typeof item.authorName === 'string') {
+        // Try to find the user ID by matching name
+        const matchingUser = users.find(user => user.name === item.authorName);
+        const userId = matchingUser ? matchingUser.id : '0';
+        
+        return {
+            contentId: item.contentId || `post-legacy-${Date.now()}`,
+            poster_id: userId,
+            authorName: item.authorName,
+            authorHandle: item.authorHandle,
+            authorImageUrl: item.authorImageUrl,
+            posted_time: typeof item.postedTime === 'string' ? parseInt(item.postedTime, 10) : 
+                         typeof item.postedTime === 'number' ? item.postedTime : Date.now(),
+            message: item.message || '',
+            media_url: item.mediaUrl || undefined,
+            like_count: item.likeCount || 0,
+            retweet_count: item.retweetCount || 0,
+            reply_count: item.replyCount || 0,
+            view_count: item.viewCount || '0',
+            category: item.category || 'For you'
+        };
+    } 
+    // Fallback for any unrecognized format
+    else {
+        return {
+            contentId: `post-unknown-${Date.now()}`,
+            poster_id: '0', // Default placeholder ID
+            posted_time: Date.now(),
+            message: 'Unknown post format',
+            media_url: undefined,
+            like_count: 0,
+            retweet_count: 0,
+            reply_count: 0,
+            view_count: '0',
+            category: 'For you'
+        };
+    }
+});
 
 // --- Header Component ---
 const Header = () => {
@@ -51,23 +105,53 @@ export default function HomeScreen() {
         router.push(`/post/${postId}`);
     };
 
+    // Create filtered feed items based on category
+    const feedItemsByCategory = useMemo(() => {
+        const itemsByCategory: Record<string, FeedContent[]> = {};
+        
+        // Initialize with empty arrays for each category
+        categoryTabs.forEach(category => {
+            itemsByCategory[category] = [];
+        });
+        
+        // Special case for "For you" - either use posts explicitly marked "For you" or create a curated feed
+        const forYouItems = processedFeedItems.filter(item => item.category === 'For you');
+        itemsByCategory['For you'] = forYouItems.length > 0 ? 
+            forYouItems : 
+            processedFeedItems.slice(0, 5); // If no explicit "For you" posts, take first 5 posts
+        
+        // Filter other categories
+        processedFeedItems.forEach(item => {
+            if (item.category && item.category !== 'For you') {
+                if (itemsByCategory[item.category]) {
+                    itemsByCategory[item.category].push(item);
+                }
+            }
+        });
+        
+        return itemsByCategory;
+    }, []);
+
     // Render function for each tab
     const renderTab = useCallback((tabName: string) => {
+        // Get posts for this category tab
+        const tabPosts = feedItemsByCategory[tabName] || [];
+        
         const renderFeedItem = ({ item }: { item: FeedContent }) => (
-            <FeedItem itemData={item} onPress={() => handleItemPress(item.contentId)} />
+            <FeedItem itemData={item} onPress={() => handleItemPress(item.contentId || '')} />
         );
 
         return (
             <Tabs.FlatList
-                data={processedFeedItems}
+                data={tabPosts}
                 renderItem={renderFeedItem}
-                keyExtractor={(item) => item.contentId}
+                keyExtractor={(item) => item.contentId || `post-${item.poster_id}-${Date.now()}`}
                 contentContainerStyle={{
                     paddingBottom: insets.bottom,
                 }}
             />
         );
-    }, [insets.bottom]);
+    }, [insets.bottom, feedItemsByCategory]);
 
     // Custom tab bar
     const renderTabBar = (props: any) => (
@@ -91,7 +175,7 @@ export default function HomeScreen() {
                 pagerProps={{ scrollEnabled: true }}
                 initialTabName="For you"
             >
-                {profileTabs.map((tab) => (
+                {categoryTabs.map((tab) => (
                     <Tabs.Tab name={tab} key={tab}>
                         {renderTab(tab)}
                     </Tabs.Tab>

@@ -21,6 +21,7 @@ import LikeButton from './LikeButton';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { EngagementActions } from './EngagementActions';
+import users from '~/dummy/users.json';
 
 // Initialize dayjs plugins
 dayjs.extend(relativeTime);
@@ -44,14 +45,20 @@ export const PROFILE_IMAGE_SIZE_MAP = { ...PROFILE_IMAGE_DIMENSIONS };
 
 // Interface for Feed Content
 export interface FeedContent {
-    contentId: string;
-    authorName: string;
-    authorHandle: string;
-    authorImageUrl: string;
-    postedTime: number; // Changed from string to number (timestamp)
+    contentId?: string;
+    poster_id: string;
+    authorName?: string;    // Optional for backward compatibility
+    authorHandle?: string;  // Optional for backward compatibility
+    authorImageUrl?: string; // Optional for backward compatibility
+    posted_time: number;    // Changed from postedTime for consistency
     message: string;
-    mediaUrl?: string;
+    media_url?: string;     // Changed from mediaUrl for consistency
+    like_count?: number;    // Changed for consistency
+    retweet_count?: number; // Changed for consistency
+    reply_count?: number;   // Changed for consistency
+    view_count?: string;    // Changed for consistency
     is_organization?: boolean;
+    category?: string;      // Added for category-based filtering
 }
 
 // Utility function to format time based on the view
@@ -131,7 +138,10 @@ const FollowButton = () => {
     );
 };
 
-
+// Find user by ID from users array
+export const findUserById = (id: string) => {
+    return users.find(user => user.id === id);
+};
 
 // Props for FeedItem
 interface FeedItemProps {
@@ -143,25 +153,34 @@ interface FeedItemProps {
 // Reusable Feed Item Component
 export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
+    
+    // Get user information based on poster_id
+    const userInfo = findUserById(itemData.poster_id);
+    
+    // Use direct properties if available (for backward compatibility) or get from userInfo
+    const authorName = itemData.authorName || userInfo?.name || 'Unknown';
+    const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
+    const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
+    const isOrganization = itemData.is_organization || userInfo?.is_organization || false;
 
     // Regular feed item layout (horizontal layout)
     if (!detailView) {
         return (
             <TouchableOpacity onPress={onPress} className="p-1 pb-4 pr-4 border-b border-neutral-200 dark:border-neutral-800">
                 <View className="flex-row">
-                    <ProfileImage source={{ uri: itemData.authorImageUrl }} displaySize="s" is_organization={itemData.is_organization} />
+                    <ProfileImage source={{ uri: authorImageUrl }} displaySize="s" is_organization={isOrganization} />
                     <View className="ml-1 flex-1">
-                        <TouchableOpacity onPress={() => router.push(`/profile/${itemData.authorHandle}`)}>
+                        <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
                             <View className="flex-row items-center">
-                                <Text className=" text-lg font-bold text-black dark:text-white mr-1">{itemData.authorName}</Text>
-                                <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{itemData.authorHandle}</Text>
-                                <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.postedTime, false)}</Text>
+                                <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
+                                <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
+                                <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
                             </View>
                         </TouchableOpacity>
                         <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
-                        {itemData.mediaUrl && (
+                        {itemData.media_url && (
                             <Image
-                                source={{ uri: itemData.mediaUrl }}
+                                source={{ uri: itemData.media_url }}
                                 className="w-full aspect-[4/4] mt-2 rounded-lg"
                                 contentFit="cover"
                             />
@@ -179,26 +198,21 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
             {/* Second row: Name, Username and Follow Button */}
             <View className="flex-row justify-between items-center mb-3">
-
-
-
                 <View className="flex-row items-center">
                     <ProfileImage
-                        source={{ uri: itemData.authorImageUrl }}
+                        source={{ uri: authorImageUrl }}
                         displaySize="s"
-                        is_organization={itemData.is_organization}
+                        is_organization={isOrganization}
                     />
                     <TouchableOpacity
-                        onPress={() => router.push(`/profile/${itemData.authorHandle}`)}
+                        onPress={() => router.push(`/profile/${authorHandle}`)}
                     >
                         <View className="flex-col">
-                            <Text className="text-lg font-bold text-black dark:text-white">{itemData.authorName}</Text>
-                            <Text className="text-lg text-neutral-500 dark:text-neutral-400 -mt-1">@{itemData.authorHandle}</Text>
+                            <Text className="text-lg font-bold text-black dark:text-white">{authorName}</Text>
+                            <Text className="text-lg text-neutral-500 dark:text-neutral-400 -mt-1">@{authorHandle}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>
-
-
                 <FollowButton />
             </View>
 
@@ -206,9 +220,9 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
             <View className="mt-2">
                 <Text className="text-lg text-black dark:text-white">{itemData.message}</Text>
 
-                {itemData.mediaUrl && (
+                {itemData.media_url && (
                     <Image
-                        source={{ uri: itemData.mediaUrl }}
+                        source={{ uri: itemData.media_url }}
                         className="w-full aspect-[4/4] mt-4 rounded-lg"
                         contentFit="cover"
                     />
@@ -216,8 +230,8 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
 
                 <View className="flex-row items-center mt-2 gap-2">
-                    <Text className="text-neutral-500 dark:text-neutral-400 mt-2 text-lg">{formatTime(itemData.postedTime, true)}</Text>
-                    <Text className="text-neutral-500 dark:text-neutral-400 mt-2 text-lg"><Text className="text-black dark:text-white font-semibold">{itemData.viewCount}</Text> Views</Text>
+                    <Text className="text-neutral-500 dark:text-neutral-400 mt-2 text-lg">{formatTime(itemData.posted_time, true)}</Text>
+                    <Text className="text-neutral-500 dark:text-neutral-400 mt-2 text-lg"><Text className="text-black dark:text-white font-semibold">{itemData.view_count}</Text> Views</Text>
                 </View>
 
 
@@ -225,8 +239,6 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                     <EngagementActions detailView={true} />
                 </View>
             </View>
-
-
         </View>
     );
 };
