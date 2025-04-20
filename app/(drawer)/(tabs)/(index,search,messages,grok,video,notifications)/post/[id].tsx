@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import sampleFeedItems from '~/dummy/posts.json';
 import Grok from '~/assets/svg/tabs/grok.svg';
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import Comments from '~/components/Comments'; // Import the new Comments component
 
 // --- Bottom Sheet Imports ---
 import {
@@ -27,6 +27,19 @@ const sortOptions: Record<SortType, string> = {
     liked: 'Most liked replies',
 };
 
+export const MoreContextIcons = ({ size = "lg" }: { size?: 'sm' | 'lg' }) => {
+    const router = useRouter();
+    return (
+        <View className="flex-row items-center gap-3  ">
+            <TouchableOpacity onPress={() => { router.back() }}>
+                <Grok width={size === 'sm' ? 18 : 22} height={size === 'sm' ? 18 : 22} fill={'#536471'} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => { router.back() }}>
+                <Feather name="more-horizontal" size={size === 'sm' ? 18 : 22} color={'#536471'} />
+            </TouchableOpacity>
+        </View>
+    );
+};
 
 const PostHeader = () => {
     const insets = useSafeAreaInsets();
@@ -40,13 +53,8 @@ const PostHeader = () => {
 
             <Text className="text-xl font-bold text-black dark:text-white">Post</Text>
 
-            <View className="flex-row items-center gap-3 absolute right-4">
-                <TouchableOpacity onPress={() => { router.back() }}>
-                    <Grok width={22} height={22} fill={'#536471'} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => { router.back() }}>
-                    <Feather name="more-horizontal" size={22} color={'#536471'} />
-                </TouchableOpacity>
+            <View className="absolute right-4">
+                <MoreContextIcons />
             </View>
         </View>
     );
@@ -138,10 +146,8 @@ export default function PostDetailScreen() {
                         <Feather name="chevron-down" size={18} color={'#536471'} />
                     </TouchableOpacity>
 
-                    {/* Placeholder for Replies List */}
-                    {/* TODO: This list should be updated/sorted based on selectedSort */}
-                    <Text className="text-neutral-500 dark:text-neutral-400">Replies will load here...</Text>
-                    {/* Example: Map through sorted replies here */}
+                    {/* New Comments component */}
+                    <Comments postId={postId} />
                 </View>
             </ScrollView>
 
