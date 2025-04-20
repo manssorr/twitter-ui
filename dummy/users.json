@@ -32,5 +32,22 @@
         "is_verified": true,
         "verified_badge": "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg",
         "is_organization": true
+    },
+    {
+        "id": "3",
+        "name": "Fantasy PL",
+        "handle": "OfficialFPL",
+        "bio": "The official account of Fantasy Premier League",
+        "url": "fpl.com",
+        "followed_by": "12.3M",
+        "items_count": "1.2M",
+        "following_count": 120,
+        "joined_date": "March 2010",
+        "category": "Sports, Football",
+        "profile_picture": "https://pbs.twimg.com/profile_images/1670723481837633538/H-tSt31R_400x400.jpg",
+        "header_picture": "https://pbs.twimg.com/profile_banners/627673190/1721916293/1500x500",
+        "is_verified": true,
+        "verified_badge": "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg",
+        "is_organization": true
     }
 ]
