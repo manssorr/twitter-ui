@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router';
 import {
   OpacityTransitionView,
   TopNavigationBar,
@@ -33,6 +34,7 @@ import Animated, {
   runOnJS,
   useAnimatedScrollHandler,
   useAnimatedReaction,
+  SharedValue,
 } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { ImageProps } from 'expo-image';
@@ -48,6 +50,9 @@ import Category from "~/assets/svg/category.svg"
 import Grok from "~/assets/svg/tabs/grok.svg";
 // Import the refactored component and type
 import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP } from '~/components/FeedItem';
+// Import JSON data
+import usersData from '~/dummy/users.json';
+import postsData from '~/dummy/posts.json';
 
 const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
@@ -58,57 +63,36 @@ const HEADER_PROFILE_IMAGE_START_SCALE = 1;
 const HEADER_PROFILE_IMAGE_END_SCALE = 0.6;
 const SCREEN_HORIZONTAL_PADDING = 16;
 
-const current_user = {
-  name: 'Premier League',
-  handle: 'premierleague',
-  bio: 'The official account of the Premier League 📱',
-  url: 'premierleague.com',
-  followed_by: '45.5M',
-  items_count: '166.6K',
-  following_count: 80,
-  joined_date: "July 2011",
-  category: "Sports, Fitness & Recreation",
-  profile_picture: "https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg",
-  header_picture: "https://pbs.twimg.com/profile_banners/343627165/1744359099/1500x500",
-  is_verified: true,
-  verified_badge: "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg"
-};
-
-const sampleFeedItems: FeedContent[] = [
-  {
-    contentId: 'post-abc',
-    authorName: 'Premier League', // Added missing fields
-    authorHandle: 'premierleague', // Added missing fields
-    authorImageUrl: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg', // Added missing fields
-    postedTime: '3h',
-    message: `Three points ✅
-Clean sheet ✅
-Player of the Match ✅
-
-A very happy 20th birthday for Dean Huijsen 🎂
-`,
-    mediaUrl: 'https://pbs.twimg.com/media/GohzgPVXQAArqUo?format=jpg&name=large',
-  },
-  {
-    contentId: 'post-def',
-    authorName: 'Code Enthusiast',
-    authorHandle: 'coderocks',
-    authorImageUrl: 'https://picsum.photos/seed/def/100/100',
-    postedTime: '6h',
-    message: `A lightning fast start ⚡️⚡️⚡️
-
-It didn't take Antoine Semenyo long to give the Cherries the lead
-`,
-    mediaUrl: 'https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096',
-  },
-];
+// User interface definition for type safety
+interface User {
+  id: string;
+  name: string;
+  handle: string;
+  bio: string;
+  url: string;
+  followed_by: string;
+  items_count: string;
+  following_count: number;
+  joined_date: string;
+  category: string;
+  profile_picture: string;
+  header_picture: string;
+  is_verified: boolean;
+  verified_badge: string;
+  is_organization?: boolean;
+}
 
 const canUseBlurEffect =
   Platform.OS === 'ios' || (Platform.OS === 'android' && Number(Platform.Version) >= 31);
 
 const APP_PRIMARY_COLOR = '#1d9bf0';
 
-const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
+const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: { 
+  navBarVisibility: number; 
+  scrollOffset: SharedValue<number>; 
+  refreshing: boolean;
+  user: User;
+}) => {
   const navigation = useNavigation();
   const { left: leftInset, right: rightInset, top: safeAreaTop } = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -249,43 +233,8 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
     };
   });
 
-  // Before refreshing, store the current scroll offset
-  const handleRefreshStart = useCallback(() => {
-    prevScrollOffsetBeforeRefresh.value = scrollOffset.value;
-  }, [scrollOffset, prevScrollOffsetBeforeRefresh]);
-
-  // Handle refresh end
-  const handleRefreshEnd = useCallback(() => {
-  }, []);
-
-  // Track component mounting/unmounting for tab changes
-  useEffect(() => {
-    return () => {
-      // When component is about to unmount (like during tab change)
-      isChangingTab.value = true;
-    };
-  }, [isChangingTab]);
-
-  // Reset the tab change flag when component mounts
-  useEffect(() => {
-    isChangingTab.value = false;
-  }, [isChangingTab]);
-
-  // Animate scroll back to top when refreshing finishes with improved handling
-  useEffect(() => {
-    if (!refreshing && listRef.current && Math.round(scrollOffset.value) < 0) {
-      // Use optional chaining to safely access scrollToLocation
-      listRef.current?.scrollToLocation?.({
-        sectionIndex: 0,
-        itemIndex: 0,
-        viewOffset: 0,
-        animated: true,
-      });
-    }
-  }, [refreshing, listRef, scrollOffset]);
-
   return (
-    <View className="relative z-10">
+    <>
       <Animated.View style={[StyleSheet.absoluteFill, bannerVerticalShiftStyle]}>
         <Animated.View
           onLayout={(e) => (bannerTotalHeight.value = e.nativeEvent.layout.height)}
@@ -295,19 +244,19 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
 
             
             {canUseBlurEffect ? (
-              <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 1 }, blurOverlayStyle]}>
-                <BlurView style={StyleSheet.absoluteFill} intensity={60} tint="dark" />
-              </Animated.View>
+              <BlurView
+                style={[StyleSheet.absoluteFill, blurOverlayStyle, { zIndex: 1 }]}
+                intensity={80}
+                tint="dark"
+              />
             ) : (
               <Animated.View
-                style={blurOverlayStyle}
-                className="absolute inset-0 z-10 bg-black/60"
+                style={[StyleSheet.absoluteFill, blurOverlayStyle, { backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }]}
               />
             )}
 
-      
             <Image
-              source={{ uri: current_user.header_picture }}
+              source={{ uri: user.header_picture }}
               contentFit="cover"
               contentPosition="center"
               style={[
@@ -316,89 +265,76 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
               ]}
               className="h-full w-full"
             />
-
-
-            
           </View>
-
-
-
-
         </Animated.View>
+      </Animated.View>
 
-
-        
-
-            {/* Pull-to-Refresh Indicator Area */}
-    <Animated.View 
-      style={[
-        scrollingListStyles.refreshIndicatorContainer, 
-        { top: safeAreaTop + 20 }
-      ]}
-    >
-        
+      <View className="absolute w-full top-0 left-0 z-10">
+        <View
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: PULL_TO_REFRESH_THRESHOLD,
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexDirection: 'row',
+            paddingTop: safeAreaTop,
+          }}
+        >
           <Animated.View style={arrowStyle}>
-            <Feather name="arrow-down" size={24} color="#ffffff" />
+            <Feather name="arrow-down" size={24} color="white" />
           </Animated.View>
           <Animated.View style={activityIndicatorStyle}>
-            <ActivityIndicator size="small" color="#ffffff" />
+            <ActivityIndicator color="white" size="small" />
           </Animated.View>
-       
-      </Animated.View>
+        </View>
 
-
-
-
-      </Animated.View>
-
-
-
-
-
-
-      
-
-
-
-
-
-      <TopNavigationBar
-        navBarVisibility={navBarVisibility}
-        rightContent={
-          <View className="flex-row gap-1.5">
-
-
-<TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
-              <Grok width={20} height={17} fill="white" />
+        <Animated.View style={blurOverlayStyle}>
+          <View style={StyleSheet.absoluteFillObject}
+          />
+        </Animated.View>
+          
+        <TopNavigationBar 
+          leadingItem={
+            <TouchableOpacity 
+              onPress={() => navigation.goBack()} 
+              className="w-10 h-10 rounded-full bg-black/50 items-center justify-center"
+            >
+              <Feather color="white" name={'arrow-left'} size={20} />
             </TouchableOpacity>
+          }
+          trailingItem={
+            <View className='flex-row gap-2'>
+              <TouchableOpacity className="w-10 h-10 rounded-full bg-black/50 items-center justify-center">
+                <Feather name="search" size={20} color='white' />
+              </TouchableOpacity>
 
-   
-            <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
-              <Feather color="white" name="search" size={20} />
-            </TouchableOpacity>
-
-            <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
-              <Share width={20} height={20} fill="white" />
-            </TouchableOpacity>
-
-
-          </View>
-        }
-        leftContent={
-          <View className="flex-row items-center gap-3">
-            <TouchableOpacity
-              onPress={() => navigation.canGoBack() && navigation.goBack()}
-              className="bg-black/50 dark:bg-white/20 rounded-full p-2"
+              <TouchableOpacity className="w-10 h-10 rounded-full bg-black/50 items-center justify-center">
+                <Feather name="more-vertical" size={20} color='white' />
+              </TouchableOpacity>
+            </View>
+          }
+          centerItem={
+          <View
+            className="absolute top-0 left-0 w-full flex-row justify-between items-center px-4 z-10"
+            style={{ height: safeAreaTop + 50, paddingTop: safeAreaTop, alignItems: 'center', justifyContent: 'space-between' }}
+          >
+            <TouchableOpacity onPress={() => navigation.goBack()} 
+              className="w-10 h-10 rounded-full bg-black/50 items-center justify-center" 
+              style={{ alignItems: 'center' }}
             >
               <Feather color="white" name={'arrow-left'} size={20} />
             </TouchableOpacity>
             <OpacityTransitionView visibilityLevel={navBarVisibility}>
-              <Text className="text-lg font-bold text-white">{current_user.name}</Text>
-              <Text className="text-xs text-neutral-300">{current_user.items_count} posts</Text>
+              <Text className="text-lg font-bold text-white">{user.name}</Text>
+              <Text className="text-xs text-neutral-300">{user.items_count} posts</Text>
             </OpacityTransitionView>
           </View>
         }
-      />
+        />
+      </View>
 
 
       <Animated.View style={profileRowZIndexStyle} className={` flex  px-${SCREEN_HORIZONTAL_PADDING / 4}`}>
@@ -406,90 +342,95 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing }) => {
           style={[
             { left: Math.max(leftInset, SCREEN_HORIZONTAL_PADDING), right: Math.max(rightInset, SCREEN_HORIZONTAL_PADDING) },
             profileRowVerticalShiftStyle,
-            { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'end' },
+            { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
           ]}
-          className="absolute flex-row justify-between items-end "
         >
           <Animated.View style={profileImageTransformStyle}>
             <TouchableOpacity>
               <ProfileImage
                 displaySize={HEADER_PROFILE_IMAGE_SIZE}
-                source={{ uri: current_user.profile_picture }}
+                source={{ uri: user.profile_picture }}
                 style={{
                   padding:10,
                   backgroundColor: 'white'
                 }}
+                className="border-[3px] border-white dark:border-black bg-white dark:bg-black"
               />
             </TouchableOpacity>
           </Animated.View>
-          <TouchableOpacity className="absolute bottom-0 right-0 py-1 px-3 bg-transparent rounded-full border border-neutral-400/50 dark:border-neutral-600/50 flex flex-start  ">
-            <Text className="text-base font-bold text-black dark:text-white">Edit Profile</Text>
-          </TouchableOpacity>
+          <Animated.View
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              gap: 8,
+            }}
+          >
+            {/* Profile action buttons can go here */}
+          </Animated.View>
         </Animated.View>
       </Animated.View>
-    </View>
+    </>
   );
 };
 
-const ProfileDetailsHeader = () => {
+const ProfileDetailsHeader = ({ user }: { user: User }) => {
   const { top: topInset } = useSafeAreaInsets();
 
   const handleLinkPress = useCallback(async (url: string) => {
-    const formattedUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
-    try {
-      const isSupported = await Linking.canOpenURL(formattedUrl);
-      if (isSupported) {
-        await Linking.openURL(formattedUrl);
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        await Linking.openURL(`https://${url}`);
       } else {
-        console.warn(`Cannot open URL: ${formattedUrl}`);
+        await Linking.openURL(url);
       }
-    } catch (error) {
-      console.error("Error opening link:", error);
+    } else {
+      console.log(`Don't know how to open this URL: ${url}`);
     }
   }, []);
 
   return (
     <ExpandedHeader>
       <View
-        style={{ marginTop: topInset - 10   + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2  }}
+        style={{ marginTop: topInset - 10 + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2 }}
         className={`flex-col gap-2 px-${SCREEN_HORIZONTAL_PADDING / 3} w-full`}
       >
         <View className="flex-row gap-2 items-center">
-          <Text className="text-2xl font-extrabold text-black dark:text-white">{current_user.name}</Text>
-          {current_user.is_verified && (
+          <Text className="text-2xl font-extrabold text-black dark:text-white">{user.name}</Text>
+          {user.is_verified && (
             <Image
-              source={{ uri: current_user.verified_badge }}
+              source={{ uri: user.verified_badge }}
               style={{ width: 16, height: 16, alignItems: 'center' }}
             />
           )}
         </View>
-        <Text className="text-neutral-500 dark:text-neutral-400 text-base -mt-3">@{current_user.handle}</Text>
+        <Text className="text-neutral-500 dark:text-neutral-400 text-base -mt-3">@{user.handle}</Text>
         <Text className="text-black dark:text-white text-lg leading-relaxed">
-          {current_user.bio}
+          {user.bio}
         </Text>
         <View className="flex-row gap-2 items-center flex-wrap">
           <View className="flex-row gap-1.5 items-center">
             <Category width={16} height={16} opacity={0.5} />
-            <Text className="text-neutral-500 dark:text-neutral-400 text-base">{current_user.category}</Text>
+            <Text className="text-neutral-500 dark:text-neutral-400 text-base">{user.category}</Text>
           </View>
           <View className="flex-row gap-1.5 items-center">
             <Feather name="link" color="rgb(163 163 163)" size={14} />
-            <Text onPress={() => handleLinkPress(current_user.url)} className="text-sky-500 dark:text-sky-400 text-base">
-              {current_user.url}
+            <Text onPress={() => handleLinkPress(user.url)} className="text-sky-500 dark:text-sky-400 text-base">
+              {user.url}
             </Text>
           </View>
         </View>
         <View className="flex-row gap-1.5 items-center">
           <Feather name="calendar" color="rgb(163 163 163)" size={14} />
-          <Text className="text-neutral-500 dark:text-neutral-400 text-base">Joined {current_user.joined_date}</Text>
+          <Text className="text-neutral-500 dark:text-neutral-400 text-base">Joined {user.joined_date}</Text>
         </View>
         <View className="flex-row gap-4 items-center">
           <TouchableOpacity className="flex-row gap-1.5 items-center">
-            <Text className="text-black dark:text-white text-base font-semibold">{current_user.following_count}</Text>
+            <Text className="text-black dark:text-white text-base font-semibold">{user.following_count}</Text>
             <Text className="text-neutral-500 dark:text-neutral-400 text-base">Following</Text>
           </TouchableOpacity>
           <TouchableOpacity className="flex-row gap-1.5 items-center">
-            <Text className="text-black dark:text-white text-base font-semibold">{current_user.followed_by}</Text>
+            <Text className="text-black dark:text-white text-base font-semibold">{user.followed_by}</Text>
             <Text className="text-neutral-500 dark:text-neutral-400 text-base">Followers</Text>
           </TouchableOpacity>
         </View>
@@ -504,12 +445,11 @@ const ProfileDetailsHeader = () => {
                     index === 1 ? "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png" :
                       "https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg"
                 }}
-                // `https://i.pravatar.cc/128?img=${imgNum}}` }}
                 style={{
                   position: 'absolute',
                   top: 0,
                   zIndex: 3 - index,
-                  // left: (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * index,
+                  left: (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * index,
                   borderRadius: 100,
                 }}
                 className="border-2 border-white dark:border-black"
@@ -532,10 +472,79 @@ export default function UserProfileScreen() {
   const listRef = useRef<any>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
   const scrollPosition = useSharedValue(0);
+  const { id } = useLocalSearchParams();
+  
+  // Find user by ID or handle
+  const user = useMemo(() => {
+    const userId = typeof id === 'string' ? id : '';
+    // First try to find user by ID
+    let foundUser = usersData.find((user: User) => user.id === userId);
+    
+    // If not found by ID, try to find by handle (for backward compatibility)
+    if (!foundUser) {
+      foundUser = usersData.find((user: User) => user.handle.toLowerCase() === userId.toLowerCase());
+    }
+    
+    return foundUser || usersData[0]; // Default to first user if not found
+  }, [id]);
+  
+  // Find posts by this user
+  const userPosts = useMemo(() => {
+    // Check for posts with poster_id (newer format)
+    const posterIdPosts = postsData.filter((post: any) => 'poster_id' in post && post.poster_id === user.id);
+    
+    // Check for posts with authorHandle (older format) for backward compatibility
+    const authorHandlePosts = postsData.filter(
+      (post: any) => 'authorHandle' in post && post.authorHandle && post.authorHandle.toLowerCase() === user.handle.toLowerCase()
+    );
+    
+    const allUserPosts = [...posterIdPosts, ...authorHandlePosts];
+    
+    // Convert all posts to FeedContent format
+    return allUserPosts.map((post: any) => {
+      if ('poster_id' in post) {
+        // Handle new format posts
+        return {
+          poster_id: post.poster_id || user.id, // Ensure it's never undefined
+          posted_time: parseInt(post.posted_time),
+          message: post.message,
+          media_url: post.media_url,
+          like_count: post.like_count ? parseInt(post.like_count.toString()) : 0,
+          retweet_count: post.retweet_count ? parseInt(post.retweet_count.toString()) : 0,
+          reply_count: post.reply_count ? parseInt(post.reply_count.toString()) : 0,
+          view_count: post.view_count || "0",
+          // Optional fields for backward compatibility
+          contentId: post.poster_id + '-' + post.posted_time,
+          authorName: user.name,
+          authorHandle: user.handle,
+          authorImageUrl: user.profile_picture,
+          is_organization: user.is_organization || false
+        };
+      } else {
+        // Handle old format posts - converting to new format
+        return {
+          poster_id: user.id, // Use the user ID we found
+          posted_time: parseInt(post.postedTime) || Math.floor(Date.now() / 1000), // Convert to number if possible or use current time
+          message: post.message,
+          media_url: post.mediaUrl,
+          like_count: post.likeCount ? parseInt(post.likeCount.replace(/[KM]/g, '')) : 0,
+          retweet_count: post.retweetCount ? parseInt(post.retweetCount.replace(/[KM]/g, '')) : 0,
+          reply_count: post.replyCount ? parseInt(post.replyCount.replace(/[KM]/g, '')) : 0,
+          view_count: post.viewCount || "0",
+          // Keep the original fields for backward compatibility
+          contentId: post.contentId,
+          authorName: post.authorName,
+          authorHandle: post.authorHandle,
+          authorImageUrl: post.authorImageUrl,
+          is_organization: user.is_organization || false
+        };
+      }
+    });
+  }, [user]);
 
   const feedSections: SectionListData<FeedContent, { title: string }>[] = useMemo(() => [
-    { title: 'Feed', data: sampleFeedItems },
-  ], []);
+    { title: 'Feed', data: userPosts },
+  ], [userPosts]);
 
   const profileTabs = ['Posts', 'Affiliates', 'Replies', 'Highlights', 'Videos', 'Photos', 'Articles'];
 
@@ -556,14 +565,13 @@ export default function UserProfileScreen() {
     <>
       <StatusBar style="light" />
       <ScrollingListWithHeader
-        NavigationBarComponent={ProfileHeader}
-        ExpandedHeaderComponent={ProfileDetailsHeader}
+        NavigationBarComponent={() => <ProfileHeader navBarVisibility={1} scrollOffset={scrollPosition} refreshing={refreshing} user={user} />}
+        ExpandedHeaderComponent={() => <ProfileDetailsHeader user={user} />}
         sections={feedSections}
         ignoreLeftPadding
         ignoreRightPadding
         expandedHeaderCollapseThreshold={0.25}
         style={{ flex: 1, backgroundColor: 'white' }}
-
         contentContainerStyle={{ paddingBottom: bottomInset, flexGrow: 1, backgroundColor: colorScheme === 'light' ? 'white' : 'black' }}
         renderItem={({ item }: { item: FeedContent }) => <FeedItem itemData={item} />}
         stickySectionHeadersEnabled
@@ -606,19 +614,4 @@ export default function UserProfileScreen() {
       />
     </>
   );
-};
-
-
-const scrollingListStyles = StyleSheet.create({
-  outerWrapper: { flex: 1 },
-  refreshIndicatorContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 40,
-    height: 40,
-    left: '50%',
-    marginLeft: -20,
-    zIndex: 10,
-  },
-});
+}

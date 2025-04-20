@@ -30,8 +30,8 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
         return {
             contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
             poster_id: item.poster_id,
-            posted_time: typeof item.posted_time === 'string' ? parseInt(item.posted_time, 10) : 
-                         typeof item.posted_time === 'number' ? item.posted_time : Date.now(),
+            posted_time: typeof item.posted_time === 'string' ? parseInt(item.posted_time, 10) :
+                typeof item.posted_time === 'number' ? item.posted_time : Date.now(),
             message: item.message || '',
             media_url: item.media_url || undefined,
             like_count: item.like_count || 0,
@@ -40,21 +40,21 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             view_count: item.view_count || '0',
             category: item.category || 'For you'
         };
-    } 
+    }
     // Handle legacy format (with authorName, authorHandle, etc.)
     else if (typeof item.authorName === 'string') {
         // Try to find the user ID by matching name
         const matchingUser = users.find(user => user.name === item.authorName);
         const userId = matchingUser ? matchingUser.id : '0';
-        
+
         return {
             contentId: item.contentId || `post-legacy-${Date.now()}`,
             poster_id: userId,
             authorName: item.authorName,
             authorHandle: item.authorHandle,
             authorImageUrl: item.authorImageUrl,
-            posted_time: typeof item.postedTime === 'string' ? parseInt(item.postedTime, 10) : 
-                         typeof item.postedTime === 'number' ? item.postedTime : Date.now(),
+            posted_time: typeof item.postedTime === 'string' ? parseInt(item.postedTime, 10) :
+                typeof item.postedTime === 'number' ? item.postedTime : Date.now(),
             message: item.message || '',
             media_url: item.mediaUrl || undefined,
             like_count: item.likeCount || 0,
@@ -63,7 +63,7 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             view_count: item.viewCount || '0',
             category: item.category || 'For you'
         };
-    } 
+    }
     // Fallback for any unrecognized format
     else {
         return {
@@ -87,7 +87,7 @@ const Header = () => {
     const insets = useSafeAreaInsets();
 
     return (
-        <View style={{ paddingTop: insets.top }} className="border-b border-gray-200 dark:border-gray-700 w-full">
+        <View style={{ paddingTop: insets.top }} className=" w-full">
             <View className="flex-row items-center w-full justify-center py-3">
                 <StyledExpoImage source={{ uri: currentUser.profile_picture }} className="w-10 h-10 rounded-full absolute left-4" />
                 <X width={26} height={26} fill="black" />
@@ -108,18 +108,18 @@ export default function HomeScreen() {
     // Create filtered feed items based on category
     const feedItemsByCategory = useMemo(() => {
         const itemsByCategory: Record<string, FeedContent[]> = {};
-        
+
         // Initialize with empty arrays for each category
         categoryTabs.forEach(category => {
             itemsByCategory[category] = [];
         });
-        
+
         // Special case for "For you" - either use posts explicitly marked "For you" or create a curated feed
         const forYouItems = processedFeedItems.filter(item => item.category === 'For you');
-        itemsByCategory['For you'] = forYouItems.length > 0 ? 
-            forYouItems : 
+        itemsByCategory['For you'] = forYouItems.length > 0 ?
+            forYouItems :
             processedFeedItems.slice(0, 5); // If no explicit "For you" posts, take first 5 posts
-        
+
         // Filter other categories
         processedFeedItems.forEach(item => {
             if (item.category && item.category !== 'For you') {
@@ -128,7 +128,7 @@ export default function HomeScreen() {
                 }
             }
         });
-        
+
         return itemsByCategory;
     }, []);
 
@@ -136,7 +136,7 @@ export default function HomeScreen() {
     const renderTab = useCallback((tabName: string) => {
         // Get posts for this category tab
         const tabPosts = feedItemsByCategory[tabName] || [];
-        
+
         const renderFeedItem = ({ item }: { item: FeedContent }) => (
             <FeedItem itemData={item} onPress={() => handleItemPress(item.contentId || '')} />
         );
@@ -157,12 +157,21 @@ export default function HomeScreen() {
     const renderTabBar = (props: any) => (
         <MaterialTabBar
             {...props}
-            indicatorStyle={{ backgroundColor: APP_PRIMARY_COLOR }}
+            indicatorStyle={{ backgroundColor: APP_PRIMARY_COLOR, height: 3, borderRadius: 50 }}
             activeColor="black"
-            inactiveColor="gray"
             scrollEnabled={true}
-            style={{ elevation: 0, shadowOpacity: 0, borderBottomWidth: 0 }}
-            labelStyle={{ fontWeight: 'bold', textTransform: 'none' }}
+            style={{
+                paddingHorizontal: 16,
+                textAlign: 'center',
+                elevation: 0, shadowOpacity: 0, borderBottomWidth: 0,
+            }}
+
+            labelStyle={{
+                marginHorizontal: 10,
+                opacity: 1,
+                fontWeight: 'bold', textTransform: 'capitalize', textAlign: 'center', height: 24,
+                color: '#606E79'
+            }}
         />
     );
 
@@ -174,6 +183,12 @@ export default function HomeScreen() {
                 renderTabBar={renderTabBar}
                 pagerProps={{ scrollEnabled: true }}
                 initialTabName="For you"
+
+                headerContainerStyle={{
+                    backgroundColor: 'transparent',
+                    elevation: 0,
+                    shadowOpacity: 0,
+                }}
             >
                 {categoryTabs.map((tab) => (
                     <Tabs.Tab name={tab} key={tab}>
