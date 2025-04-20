@@ -12,6 +12,10 @@ import {
   Dimensions, // To potentially calculate swipe distances
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view'; // Import SwipeListView
+import Pin from "~/assets/svg/chat/pin.svg"
+import Report from "~/assets/svg/chat/report.svg"
+import Delete from "~/assets/svg/chat/delete.svg"
+import Snooze from "~/assets/svg/chat/snooze.svg"
 
 // --- Mock Data ---
 // (Keep your messagesData array as it is)
@@ -56,7 +60,7 @@ const initialMessagesData = [
     avatar: 'https://placehold.co/100x100/FEEBC8/9C4221?text=LFC', // Placeholder
     isYou: false,
   },
-   {
+  {
     id: '5',
     key: '5',
     name: 'Arsenal',
@@ -66,7 +70,7 @@ const initialMessagesData = [
     avatar: 'https://placehold.co/100x100/FECACA/7F1D1D?text=AFC', // Placeholder
     isYou: true,
   },
-   {
+  {
     id: '6',
     key: '6',
     name: 'BBC Sport',
@@ -85,7 +89,7 @@ const initialMessagesData = [
 // Header Component (Keep as is)
 const MessagesHeader = () => {
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white">
       <TouchableOpacity>
         <Image
           source={{ uri: 'https://placehold.co/80x80/DBEAFE/1E3A8A?text=Me' }}
@@ -104,7 +108,7 @@ const MessagesHeader = () => {
 // Search Bar Component (Keep as is)
 const SearchBar = () => {
   return (
-    <View className="px-4 py-2 bg-white border-b border-gray-200">
+    <View className="px-4 py-2 bg-white ">
       <View className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
         <Text className="mr-2 text-gray-500">🔍</Text>
         <TextInput
@@ -120,7 +124,7 @@ const SearchBar = () => {
 // Message Requests Component (Keep as is)
 const MessageRequests = () => {
   return (
-    <TouchableOpacity className="flex-row items-center px-4 py-3 bg-white border-b border-gray-200">
+    <TouchableOpacity className="flex-row items-center px-4 py-3 bg-white ">
       <Text className="text-2xl mr-4">✉️</Text>
       <View>
         <Text className="text-base font-medium text-gray-900">Message requests</Text>
@@ -137,7 +141,7 @@ const MessageItem = ({ data }) => {
     // Ensure the row has a background color so it hides the buttons underneath
     <TouchableOpacity
       activeOpacity={1} // Prevent opacity change on press if desired
-      className="flex-row items-start px-4 py-3 bg-white border-b border-gray-100"
+      className="flex-row items-start px-4 py-3 bg-white"
       // Add onPress for navigation or other actions if needed
       onPress={() => console.log('Pressed message:', item.name)}
     >
@@ -153,7 +157,7 @@ const MessageItem = ({ data }) => {
           <Text className="text-sm text-gray-500">· {item.time}</Text>
         </View>
         <Text className="text-sm text-gray-600" numberOfLines={2} ellipsizeMode="tail">
-           {item.lastMessage}
+          {item.lastMessage}
         </Text>
       </View>
     </TouchableOpacity>
@@ -162,61 +166,65 @@ const MessageItem = ({ data }) => {
 
 // Hidden Item Component (Action Buttons)
 const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDelete }) => {
-    const { item } = data;
+  const { item } = data;
 
-    // Function to close the row (optional, useful after action)
-    const closeRow = () => {
-        if (rowMap[item.key]) {
-            rowMap[item.key].closeRow();
-        }
-    };
+  // Function to close the row (optional, useful after action)
+  const closeRow = () => {
+    if (rowMap[item.key]) {
+      rowMap[item.key].closeRow();
+    }
+  };
 
-    return (
-        <View style={styles.rowBack}>
-            {/* Left Action (Swipe Left-to-Right reveals this) */}
-            <TouchableOpacity
-                style={[styles.backRightBtn, styles.backRightBtnLeft]} // Use backRightBtn styles for consistency, align left
-                onPress={() => {
-                    onPin(item.id);
-                    // closeRow(); // Optionally close row after action
-                }}
-            >
-                <Text style={styles.backTextWhite}>Pin</Text>
-                {/* Add Pin Icon here if you have one */}
-            </TouchableOpacity>
+  return (
+    <View style={styles.rowBack}>
+      {/* Left Action (Swipe Left-to-Right reveals this) */}
+      <TouchableOpacity
+        onPress={() => {
+          onPin(item.id);
+          // closeRow(); // Optionally close row after action
+        }}
+        className="flex-column items-center gap-3 border-r border-gray-200 w-20"
+      >
+        <Pin width={24} height={24} fill="#000" />
+        <Text className="text-gray-700 text-sm">Pin</Text>
+        {/* Add Pin Icon here if you have one */}
+      </TouchableOpacity>
 
-            {/* Right Actions (Swipe Right-to-Left reveals these) */}
-            <View style={[styles.backRightBtnContainer]}>
-                 <TouchableOpacity
-                    style={[styles.backRightBtn, styles.backRightBtnReport]}
-                    onPress={() => {
-                        onReport(item.id);
-                        // closeRow();
-                    }}
-                >
-                    <Text style={styles.backTextWhite}>Report</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.backRightBtn, styles.backRightBtnSnooze]}
-                    onPress={() => {
-                        onSnooze(item.id);
-                        // closeRow();
-                    }}
-                >
-                    <Text style={styles.backTextWhite}>Snooze</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.backRightBtn, styles.backRightBtnRight]} // Delete button specific style
-                    onPress={() => {
-                        onDelete(item.id);
-                        // No need to close row if it's being deleted
-                    }}
-                >
-                    <Text style={styles.backTextWhite}>Delete</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+      {/* Right Actions (Swipe Right-to-Left reveals these) */}
+      <View style={[styles.backRightBtnContainer]}>
+        <TouchableOpacity
+          onPress={() => {
+            onReport(item.id);
+            // closeRow();
+          }}
+          className="flex-column items-center gap-3 border-r border-gray-200 w-20"
+        >
+          <Report width={24} height={24} fill="#000" />
+          <Text className="text-gray-700 text-sm">Report</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            onSnooze(item.id);
+            // closeRow();
+          }}
+          className="flex-column items-center gap-3 border-r border-gray-200 w-20"
+        >
+          <Snooze width={24} height={24} fill="#000" />
+          <Text className="text-gray-700 text-sm">Snooze</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            onDelete(item.id);
+            // No need to close row if it's being deleted
+          }}
+          className="flex-column items-center gap-3 w-20"
+        >
+          <Delete width={24} height={24} fill="#f4222d" />
+          <Text className="text-[#f4222d] text-sm ">Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 };
 
 
@@ -250,14 +258,14 @@ export default function Messages() {
 
   // Render Hidden Item wrapper to pass handlers
   const renderHiddenItem = (data, rowMap) => (
-      <HiddenItemWithActions
-          data={data}
-          rowMap={rowMap}
-          onPin={handlePin}
-          onReport={handleReport}
-          onSnooze={handleSnooze}
-          onDelete={handleDelete}
-      />
+    <HiddenItemWithActions
+      data={data}
+      rowMap={rowMap}
+      onPin={handlePin}
+      onReport={handleReport}
+      onSnooze={handleSnooze}
+      onDelete={handleDelete}
+    />
   );
 
   // Calculate swipe distances (adjust these values as needed)
@@ -266,35 +274,35 @@ export default function Messages() {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-       <Stack.Screen options={{ title: 'Messages', headerShown: false }} />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <Stack.Screen options={{ title: 'Messages', headerShown: false }} />
 
-       <MessagesHeader />
-       <SearchBar />
+      <MessagesHeader />
+      <SearchBar />
 
-       {/* Message Requests Section - Keep outside the SwipeListView */}
-       <MessageRequests />
+      {/* Message Requests Section - Keep outside the SwipeListView */}
+      <MessageRequests />
 
-       {/* Use SwipeListView instead of ScrollView + map */}
-       <SwipeListView
-           data={messages} // Use state variable
-           renderItem={(data, rowMap) => ( // Pass rowMap if needed by MessageItem, usually not
-               <MessageItem data={data} />
-           )}
-           renderHiddenItem={renderHiddenItem} // Render the hidden buttons
-           // Swipe right-to-left configuration
-           rightOpenValue={-swipeRightOpenValue} // Negative value for right actions
-           stopRightSwipe={-swipeRightOpenValue - 20} // Stop slightly beyond the buttons
-           // Swipe left-to-right configuration
-           leftOpenValue={swipeLeftOpenValue}
-           stopLeftSwipe={swipeLeftOpenValue + 20} // Stop slightly beyond the button
-           keyExtractor={(item) => item.key} // Use the key extractor
-           // Optional: Disable swipes if needed
-           // disableRightSwipe={true} // Disables left-to-right swipe
-           // disableLeftSwipe={true} // Disables right-to-left swipe
-           className="flex-1 bg-white" // Apply styling to the list container
-           // Optional: Add ListFooterComponent, ListHeaderComponent etc. like FlatList
-       />
+      {/* Use SwipeListView instead of ScrollView + map */}
+      <SwipeListView
+        data={messages} // Use state variable
+        renderItem={(data, rowMap) => ( // Pass rowMap if needed by MessageItem, usually not
+          <MessageItem data={data} />
+        )}
+        renderHiddenItem={renderHiddenItem} // Render the hidden buttons
+        // Swipe right-to-left configuration
+        rightOpenValue={-swipeRightOpenValue} // Negative value for right actions
+        stopRightSwipe={-swipeRightOpenValue - 20} // Stop slightly beyond the buttons
+        // Swipe left-to-right configuration
+        leftOpenValue={swipeLeftOpenValue}
+        stopLeftSwipe={swipeLeftOpenValue + 20} // Stop slightly beyond the button
+        keyExtractor={(item) => item.key} // Use the key extractor
+        // Optional: Disable swipes if needed
+        // disableRightSwipe={true} // Disables left-to-right swipe
+        // disableLeftSwipe={true} // Disables right-to-left swipe
+        className="flex-1 bg-white" // Apply styling to the list container
+      // Optional: Add ListFooterComponent, ListHeaderComponent etc. like FlatList
+      />
 
     </SafeAreaView>
   );
@@ -305,7 +313,7 @@ export default function Messages() {
 const styles = StyleSheet.create({
   rowBack: {
     alignItems: 'center',
-    backgroundColor: '#DDD', // Background visible during swipe
+    // backgroundColor: '#DDD', // Background visible during swipe
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between', // Space between left and right actions
@@ -313,38 +321,12 @@ const styles = StyleSheet.create({
     // paddingRight: 0, // Keep this 0 if right buttons align edge-to-edge
   },
   backRightBtnContainer: {
-      flexDirection: 'row', // Arrange right buttons horizontally
-      // alignItems: 'center', // Align vertically if needed
-      // justifyContent: 'flex-end', // Align to the right
-      // height: '100%', // Make container fill height if buttons need vertical centering
+    flexDirection: 'row', // Arrange right buttons horizontally
+    // gap: 40,
+    // justifyContent: 'center',
+    alignItems: 'center', // Align vertically if needed
+    // justifyContent: 'flex-end', // Align to the right
+    // height: '100%', // Make container fill height if buttons need vertical centering
   },
-  backRightBtn: {
-    alignItems: 'center',
-    bottom: 0,
-    justifyContent: 'center',
-    position: 'absolute', // Position buttons absolutely within rowBack
-    top: 0,
-    width: 80, // Standard width for buttons
-  },
-  backRightBtnLeft: { // Specific style for the PIN button on the left
-    backgroundColor: 'blue', // Example color for Pin
-    left: 0, // Align to the left edge
-     // No need for `right:` here
-  },
-   backRightBtnReport: {
-    backgroundColor: 'gray',
-    right: 160, // Positioned left of Snooze (80 + 80)
-  },
-   backRightBtnSnooze: {
-    backgroundColor: 'orange',
-    right: 80, // Positioned left of Delete (80)
-  },
-  backRightBtnRight: { // Specific style for the DELETE button on the right
-    backgroundColor: 'red', // Red color for Delete
-    right: 0, // Align to the right edge
-  },
-  backTextWhite: {
-    color: '#FFF',
-    fontWeight: '600', // Semi-bold
-  },
+
 });

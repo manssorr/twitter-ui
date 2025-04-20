@@ -361,10 +361,10 @@ function DrawerLayout() {
   console.log(pathname)
 
 
-  const allowedDrawerRoutes = ['grok'];
- 
 
-  console.log(`PATHNAME__`, pathname);
+  //testing only grok tab for now
+  const allowedDrawerRoutes = ['grok'];
+
 
   return (
     <Drawer
