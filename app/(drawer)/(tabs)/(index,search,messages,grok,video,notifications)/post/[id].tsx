@@ -4,6 +4,9 @@ import { useLocalSearchParams, Stack, useRouter } from 'expo-router';
 import { FeedItem } from '~/components/FeedItem'; // Assuming FeedItem is in components
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import sampleFeedItems from '~/dummy/posts.json';
+import Grok from '~/assets/svg/tabs/grok.svg';
+import AntDesign from '@expo/vector-icons/AntDesign';
+
 
 // --- Bottom Sheet Imports ---
 import {
@@ -23,6 +26,32 @@ const sortOptions: Record<SortType, string> = {
     recent: 'Most recent replies',
     liked: 'Most liked replies',
 };
+
+
+const PostHeader = () => {
+    const insets = useSafeAreaInsets();
+    const router = useRouter();
+    return (
+        <View className="p-4  top-0 left-0 right-0 flex-row items-center justify-center">
+
+            <TouchableOpacity onPress={() => { router.back() }} className="absolute left-4">
+                <Feather name="arrow-left" size={22} color={'#536471'} />
+            </TouchableOpacity>
+
+            <Text className="text-xl font-bold text-black dark:text-white">Post</Text>
+
+            <View className="flex-row items-center gap-3 absolute right-4">
+                <TouchableOpacity onPress={() => { router.back() }}>
+                    <Grok width={22} height={22} fill={'#536471'} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { router.back() }}>
+                    <Feather name="more-horizontal" size={22} color={'#536471'} />
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+};
+
 
 export default function PostDetailScreen() {
     const params = useLocalSearchParams();
@@ -77,12 +106,15 @@ export default function PostDetailScreen() {
     }
     return (
         <>
+
             <ScrollView
                 className="flex-1 bg-white dark:bg-black"
                 style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
                 contentContainerStyle={{ flexGrow: 1 }}
             >
                 <Stack.Screen options={{ title: 'Post' }} />
+
+                <PostHeader />
 
                 {/* Render the main post */}
                 <FeedItem

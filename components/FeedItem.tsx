@@ -96,7 +96,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
     }
 
     return (
-        <View className={`p-1.5 ${is_organization ? '' : 'rounded-full'} mx-1.5 ${className} bg-white`}>
+        <View className={`py-1.5 ${is_organization ? '' : 'rounded-full'}  ${className} bg-white`}>
             {isLoading && (
                 <View
                     style={dimensionStyle}
@@ -212,7 +212,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
     // Detail view layout (vertical layout with different structure)
     return (
-        <View className="p-4 dark:border-neutral-800">
+        <View className="px-3 dark:border-neutral-800">
 
             {/* Second row: Name, Username and Follow Button */}
             <View className="flex-row justify-between items-center mb-3">
