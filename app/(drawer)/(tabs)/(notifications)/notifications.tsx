@@ -54,7 +54,7 @@ const notificationsData = [
     postPreview: 'Replying to @PremierLeague\nGreat summary of the weekend matches!',
     isRead: false,
   },
-   {
+  {
     id: '5',
     type: 'like',
     user: {
@@ -99,18 +99,16 @@ const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   const { name, index, indexDecimal, onPress, label } = props;
   // Check if this tab is active (when index matches the position)
   const isActive = Math.round(indexDecimal.value) === index;
-  
+
   return (
     <TouchableOpacity
       onPress={(e: GestureResponderEvent) => onPress(name)}
-      className={`py-3 flex-1 items-center ${
-        isActive ? 'border-b-2 border-blue-500' : '' // Active tab style
-      }`}
+      className={`py-3 flex-1 items-center ${isActive ? 'border-b-2 border-blue-500' : '' // Active tab style
+        }`}
     >
       <Text
-        className={`text-base ${
-          isActive ? 'font-semibold text-blue-500' : 'text-gray-600' // Active/inactive text style
-        }`}
+        className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'text-gray-600' // Active/inactive text style
+          }`}
       >
         {typeof label === 'string' ? label : name}
       </Text>
@@ -155,11 +153,11 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
       <View className="flex-1">
         {/* User Avatar (shown for follow, optional for others) */}
         {type === 'follow' && (
-           <Image
-             source={{ uri: user.avatar }}
-             className="w-8 h-8 rounded-full mb-2"
-             onError={(e) => console.log(`Failed to load avatar for ${user.name}:`, e.nativeEvent.error)}
-           />
+          <Image
+            source={{ uri: user.avatar }}
+            className="w-8 h-8 rounded-full mb-2"
+            onError={(e) => console.log(`Failed to load avatar for ${user.name}:`, e.nativeEvent.error)}
+          />
         )}
 
         {/* Action Text */}
@@ -183,27 +181,27 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 export default function Notifications() {
   // Premier League Avatar Placeholder
   const premierLeagueAvatar = 'https://placehold.co/100x100/E6FFFA/319795?text=PL';
-  
+
   // Header component to be used in the collapsible view
   const renderHeader = () => (
-    <ScreenHeader 
-      title="Notifications" 
+    <ScreenHeader
+      title="Notifications"
       avatarUri={premierLeagueAvatar}
     />
   );
-  
+
   const renderNotificationList = (notifications: typeof notificationsData) => {
     return notifications.map((notification) => (
-      <NotificationItem 
-        key={notification.id} 
-        notification={notification} 
+      <NotificationItem
+        key={notification.id}
+        notification={notification}
       />
     ));
   };
-  
+
   // Filter notifications based on tab
   const allNotifications = notificationsData;
-  const mentionsNotifications = notificationsData.filter(notification => 
+  const mentionsNotifications = notificationsData.filter(notification =>
     notification.type === 'mention' || notification.type === 'reply'
   );
   const verifiedNotifications = notificationsData; // Placeholder, you can implement actual filtering
@@ -212,14 +210,14 @@ export default function Notifications() {
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
-      
-      <Tabs.Container 
+
+      <Tabs.Container
         renderHeader={renderHeader}
         headerHeight={60} // Adjust based on your header height
         tabBarHeight={48} // Height of the tab bar
         renderTabBar={props => (
-          <MaterialTabBar 
-            {...props} 
+          <MaterialTabBar
+            {...props}
             TabItemComponent={CustomTabItem}
             indicatorStyle={{ backgroundColor: '#3b82f6', height: 3 }}
             activeColor="#3b82f6"
@@ -233,13 +231,13 @@ export default function Notifications() {
             {renderNotificationList(allNotifications)}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        
+
         <Tabs.Tab name="Mentions">
           <Tabs.ScrollView>
             {renderNotificationList(mentionsNotifications)}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        
+
         <Tabs.Tab name="Verified">
           <Tabs.ScrollView>
             {renderNotificationList(verifiedNotifications)}

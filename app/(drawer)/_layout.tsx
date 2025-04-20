@@ -71,7 +71,7 @@ function CustomDrawerContent(props: any) {
 
   // Filter users based on authorized accounts
   useEffect(() => {
-    const filteredUsers = users.filter(user => 
+    const filteredUsers = users.filter(user =>
       authorizedAccounts.includes(user.id)
     );
     setAuthorizedUsers(filteredUsers);
@@ -142,7 +142,7 @@ function CustomDrawerContent(props: any) {
             </Text>
           </View>
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           className="border border-gray-300 rounded-full p-1"
           onPress={handlePresentModalPress}
         >
@@ -298,7 +298,7 @@ function CustomDrawerContent(props: any) {
       >
         <BottomSheetView style={styles.contentContainer}>
           <Text className="text-xl font-bold text-black mb-4 px-4">Accounts</Text>
-          
+
           {/* List of authorized accounts only */}
           {authorizedUsers.map((user) => (
             <TouchableOpacity
@@ -329,14 +329,14 @@ function CustomDrawerContent(props: any) {
               )}
             </TouchableOpacity>
           ))}
-          
+
           {/* Add account and Manage accounts buttons */}
           <View className="mt-2 border-t border-gray-200 pt-2 px-4">
             <TouchableOpacity className="py-3 flex-row items-center">
               <Feather name="plus-circle" size={20} color="#1DA1F2" />
               <Text className="text-base font-semibold text-blue-500 ml-3">Add an existing account</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               className="py-3 flex-row items-center"
               onPress={() => {
                 bottomSheetModalRef.current?.dismiss();
@@ -357,13 +357,12 @@ function CustomDrawerContent(props: any) {
 function DrawerLayout() {
   const { width } = useWindowDimensions();
   const pathname = useSegments();
-  const [isInTabRoute, setIsInTabRoute] = React.useState(false);
 
-  // Check if we're in any of the tab routes
-  useEffect(() => {
-    //weird logic for demo lol  but check route and groups and set a better logic. basically on group childs, we wanna disable drawer swipe.
-    setIsInTabRoute(pathname.length > 3);
-  }, [pathname]);
+  console.log(pathname)
+
+
+  const allowedDrawerRoutes = ['grok'];
+ 
 
   console.log(`PATHNAME__`, pathname);
 
@@ -372,9 +371,9 @@ function DrawerLayout() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
-        swipeEnabled: true,
-        // swipeEdgeWidth: isInTabRoute ? 0 : width,
+        swipeEnabled: allowedDrawerRoutes.includes(pathname[3] || ''),
         swipeEdgeWidth: width,
+        // swipeEdgeWidth: width,
 
         overlayColor: '#adadad8c',
         drawerStyle: {
