@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Platform,
-  ActivityIndicator, // Added for loading state
+  ActivityIndicator,
 } from 'react-native';
 
 // Import FlashList for optimized list rendering
@@ -31,6 +31,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 // Import LinearGradient for subtle background effect
 import { LinearGradient } from 'expo-linear-gradient';
+import { router, useRouter } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 
 // Get screen dimensions
@@ -77,7 +80,7 @@ const samplePosts = [
       viewCount: 105000,
     },
   },
-    {
+  {
     videoId: '3',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', // Replace with your actual video URLs
     poster: {
@@ -96,7 +99,7 @@ const samplePosts = [
       viewCount: 12000,
     },
   },
-   {
+  {
     videoId: '4',
     videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // Replace with your actual video URLs
     poster: {
@@ -169,20 +172,21 @@ const VideoItem = React.memo(({ item, isVisible }) => {
   useEffect(() => {
     // Compare status directly with the string 'error'
     if (status === 'error' && error) {
-        console.error(`Video Error (${item.videoId}):`, error.message);
+      console.error(`Video Error (${item.videoId}):`, error.message);
     }
   }, [status, error, item.videoId]);
 
   // Sync local mute state with player's mute state
   useEffect(() => {
-      if (player) {
-          setIsMuted(player.muted);
-      }
-  // Using player?.muted might cause issues if player becomes null then valid again
-  // Better to depend on the player object itself
+    if (player) {
+      setIsMuted(player.muted);
+    }
+    // Using player?.muted might cause issues if player becomes null then valid again
+    // Better to depend on the player object itself
   }, [player]);
 
 
+  const insets = useSafeAreaInsets();
   // --- Callbacks ---
 
   // Toggle play/pause on video tap
@@ -209,7 +213,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
     // Add actual follow/unfollow logic here
   }, [item.poster.username]);
 
-   // Placeholder for More action
+  // Placeholder for More action
   const handleMoreOptions = useCallback(() => {
     console.log("More options pressed for:", item.videoId);
     // Add action sheet or menu logic here
@@ -235,7 +239,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
   return (
     <View style={styles.videoContainer}>
       {/* Touchable area for play/pause */}
-      <TouchableOpacity activeOpacity={1} onPress={togglePlayPause} style={StyleSheet.absoluteFill}>
+      <TouchableOpacity activeOpacity={1} onPress={togglePlayPause} style={[StyleSheet.absoluteFill, { top: insets.top }]}>
         <VideoView
           ref={videoViewRef} // Assign ref
           player={player}
@@ -249,7 +253,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
 
       {/* Loading Indicator: Compare status directly with the string 'loading' */}
       {status === 'loading' && (
-         <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />
+        <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />
       )}
 
       {/* Bottom Overlay with Gradient */}
@@ -258,57 +262,73 @@ const VideoItem = React.memo(({ item, isVisible }) => {
         colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.75)']}
         style={styles.overlayGradient}
       >
-        {/* Progress Bar Area */}
-        <View style={styles.progressContainer}>
-           <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-           {/* Wrap progress bar in a view to handle potential touch events if needed later */}
-           <View style={styles.progressBarTouchableArea}>
-               <View style={styles.progressBarBackground}>
-                    <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
-               </View>
-           </View>
-           <Text style={styles.timeText}>{formatTime(duration)}</Text>
-        </View>
+
 
         {/* Controls Row - Placeholders for most */}
+
         <View style={styles.controlsRow}>
+
+          <View className="flex-row items-center gap-2">
+            <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+            <Text style={styles.timeText}>/ {formatTime(duration)}</Text>
+          </View>
+
+
+          <View className="flex-row items-center gap-2">
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Settings pressed")}>
-                <Icon name="cog" size={20} color="#fff" />
+              <Icon name="cog" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("PiP pressed")}>
-                <Icon name="picture-o" size={20} color="#fff" />
+              <Icon name="picture-o" size={20} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
-                <Icon name={isMuted ? "volume-off" : "volume-up"} size={20} color="#fff" />
+              <Icon name={isMuted ? "volume-off" : "volume-up"} size={20} color="#fff" />
             </TouchableOpacity>
-             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Fullscreen pressed")}>
-                <Icon name="expand" size={20} color="#fff" />
+            <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Fullscreen pressed")}>
+              <Icon name="expand" size={20} color="#fff" />
             </TouchableOpacity>
+          </View>
+
+
         </View>
+
+
+        {/* Progress Bar Area */}
+        <View style={styles.progressContainer}>
+
+          {/* Wrap progress bar in a view to handle potential touch events if needed later */}
+          <View style={styles.progressBarTouchableArea}>
+            <View style={styles.progressBarBackground}>
+              <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
+            </View>
+          </View>
+
+        </View>
+
 
         {/* Poster Info Row */}
         <View style={styles.posterInfoRow}>
-            <Image
-              source={{ uri: item.poster.avatar }}
-              style={styles.avatar}
-              onError={(e) => console.log(`Failed to load avatar: ${e.nativeEvent.error}`)}
-            />
-            <View style={styles.posterTextContainer}>
-                <Text style={styles.posterName} numberOfLines={1}>{item.poster.name}</Text>
-                <Text style={styles.posterUsername} numberOfLines={1}>@{item.poster.username} · {item.postedTime}</Text>
-            </View>
-            <TouchableOpacity
-                // Add state logic here if needed for optimistic update
-                style={[styles.followButton, item.poster.isFollowing ? styles.followingButton : {}]}
-                onPress={handleFollow}
-            >
-                <Text style={[styles.followButtonText, item.poster.isFollowing ? styles.followingButtonText : {}]}>
-                    {item.poster.isFollowing ? 'Following' : 'Follow'}
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.moreButton} onPress={handleMoreOptions}>
-                <Icon name="ellipsis-h" size={16} color="#fff" />
-            </TouchableOpacity>
+          <Image
+            source={{ uri: item.poster.avatar }}
+            style={styles.avatar}
+            onError={(e) => console.log(`Failed to load avatar: ${e.nativeEvent.error}`)}
+          />
+          <View style={styles.posterTextContainer}>
+            <Text style={styles.posterName} numberOfLines={1}>{item.poster.name}</Text>
+            <Text style={styles.posterUsername} numberOfLines={1}>@{item.poster.username} · {item.postedTime}</Text>
+          </View>
+          <TouchableOpacity
+            // Add state logic here if needed for optimistic update
+            style={[styles.followButton, item.poster.isFollowing ? styles.followingButton : {}]}
+            onPress={handleFollow}
+          >
+            <Text style={[styles.followButtonText, item.poster.isFollowing ? styles.followingButtonText : {}]}>
+              {item.poster.isFollowing ? 'Following' : 'Follow'}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.moreButton} onPress={handleMoreOptions}>
+            <Icon name="ellipsis-h" size={16} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         {/* Title/Caption */}
@@ -316,43 +336,43 @@ const VideoItem = React.memo(({ item, isVisible }) => {
 
         {/* Engagement Row */}
         <View style={styles.engagementRow}>
-            <TouchableOpacity style={styles.engagementButton}>
-                <Icon name="comment-o" size={20} color="#ccc" />
-                <Text style={styles.engagementText}>{formatCount(item.engagement.commentCount)}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.engagementButton}>
-                 {/* Using 'retweet' icon for shares */}
-                <Icon name="retweet" size={20} color="#ccc" />
-                <Text style={styles.engagementText}>{formatCount(item.engagement.retweetCount)}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.engagementButton}>
-                <Icon name="heart-o" size={20} color="#ccc" />
-                <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.engagementButton}>
-                 {/* Using 'bar-chart' icon for views */}
-                <Icon name="bar-chart" size={20} color="#ccc" />
-                <Text style={styles.engagementText}>{formatCount(item.engagement.viewCount)}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.engagementButton}>
-                <Icon name="bookmark-o" size={20} color="#ccc" />
-                {/* Bookmark count often not shown, or shown differently */}
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.engagementButton}>
+            <Icon name="comment-o" size={20} color="#ccc" />
+            <Text style={styles.engagementText}>{formatCount(item.engagement.commentCount)}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.engagementButton}>
+            {/* Using 'retweet' icon for shares */}
+            <Icon name="retweet" size={20} color="#ccc" />
+            <Text style={styles.engagementText}>{formatCount(item.engagement.retweetCount)}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.engagementButton}>
+            <Icon name="heart-o" size={20} color="#ccc" />
+            <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.engagementButton}>
+            {/* Using 'bar-chart' icon for views */}
+            <Icon name="bar-chart" size={20} color="#ccc" />
+            <Text style={styles.engagementText}>{formatCount(item.engagement.viewCount)}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.engagementButton}>
+            <Icon name="bookmark-o" size={20} color="#ccc" />
+            {/* Bookmark count often not shown, or shown differently */}
+          </TouchableOpacity>
         </View>
       </LinearGradient>
 
-       {/* Simple Play/Pause indicator: Compare status directly with the string 'readyToPlay' */}
-       {!isPlaying && status === 'readyToPlay' && (
+      {/* Simple Play/Pause indicator: Compare status directly with the string 'readyToPlay' */}
+      {!isPlaying && status === 'readyToPlay' && (
         <View style={styles.playPauseIndicator}>
           <Icon name="play" size={60} color="rgba(255, 255, 255, 0.7)" />
         </View>
       )}
 
-       {/* Error Indicator: Compare status directly with the string 'error' */}
-       {status === 'error' && (
+      {/* Error Indicator: Compare status directly with the string 'error' */}
+      {status === 'error' && (
         <View style={styles.playPauseIndicator}>
           <Icon name="exclamation-triangle" size={60} color="rgba(255, 0, 0, 0.7)" />
-           <Text style={styles.errorText}>Video Error</Text>
+          <Text style={styles.errorText}>Video Error</Text>
         </View>
       )}
     </View>
@@ -365,8 +385,8 @@ const VideoFeed = () => {
   const viewableItems = useRef([]);
   const onViewableItemsChanged = useCallback(({ viewableItems: currentViewableItems }) => {
     viewableItems.current = currentViewableItems
-        .filter(item => item.key != null)
-        .map(item => item.key);
+      .filter(item => item.key != null)
+      .map(item => item.key);
   }, []);
   const renderItem = useCallback(({ item }) => {
     const isVisible = viewableItems.current.includes(item.videoId);
@@ -374,8 +394,16 @@ const VideoFeed = () => {
   }, []);
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
+
+      <TouchableOpacity onPress={() => { router.back() }} className="absolute left-4" style={{ top: insets.top + 10 }}>
+        <Feather name="arrow-left" size={22} color={'#536471'} />
+      </TouchableOpacity>
+
       <FlashList
         data={samplePosts}
         renderItem={renderItem}
@@ -388,7 +416,7 @@ const VideoFeed = () => {
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -439,9 +467,9 @@ const styles = StyleSheet.create({
   },
   // Added touchable area wrapper for potential seeking later
   progressBarTouchableArea: {
-      flex: 1,
-      marginHorizontal: 8,
-      paddingVertical: 5, // Add vertical padding for easier touch
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 5, // Add vertical padding for easier touch
   },
   progressBarBackground: {
     height: 4,
@@ -501,9 +529,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   followingButton: {
-     backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent background when following
-     borderWidth: 1,
-     borderColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent background when following
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   followButtonText: {
     color: '#000', // Black text for 'Follow'
@@ -512,7 +540,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   followingButtonText: {
-      color: '#fff', // White text for 'Following'
+    color: '#fff', // White text for 'Following'
   },
   moreButton: {
     padding: 5,
