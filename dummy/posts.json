@@ -4,17 +4,25 @@
       "authorName": "Premier League",
       "authorHandle": "premierleague",
       "authorImageUrl": "https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg",
-      "postedTime": "3h",
+      "postedTime": "1745173803",
       "message": "Three points ✅\nClean sheet ✅\nPlayer of the Match ✅\n\nA very happy 20th birthday for Dean Huijsen 🎂\n",
-      "mediaUrl": "https://pbs.twimg.com/media/GohzgPVXQAArqUo?format=jpg&name=large"
+      "mediaUrl": "https://pbs.twimg.com/media/GohzgPVXQAArqUo?format=jpg&name=large",
+      "likeCount": 1000,
+      "retweetCount": 500,
+      "replyCount": 200,
+      "viewCount": "2M"
     },
     {
       "contentId": "post-def",
       "authorName": "Code Enthusiast",
       "authorHandle": "coderocks",
       "authorImageUrl": "https://picsum.photos/seed/def/100/100",
-      "postedTime": "6h",
+      "postedTime": "1745134203",
       "message": "A lightning fast start ⚡️⚡️⚡️\n\nIt didn't take Antoine Semenyo long to give the Cherries the lead\n",
-      "mediaUrl": "https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096"
+      "mediaUrl": "https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096",
+      "likeCount": 1000,
+      "retweetCount": 500,
+      "replyCount": 200,
+      "viewCount": "2M"
     }   
   ]

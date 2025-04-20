@@ -18,6 +18,7 @@
     "@react-navigation/bottom-tabs": "^7.0.5",
     "@react-navigation/drawer": "^7.0.0",
     "@react-navigation/native": "^7.0.3",
+    "dayjs": "^1.11.13",
     "expo": "^52.0.46",
     "expo-blur": "^14.0.3",
     "expo-constants": "~17.0.8",
@@ -49,16 +50,16 @@
     "zustand": "^4.5.1"
   },
   "devDependencies": {
-    "ajv": "^8.12.0",
     "@babel/core": "^7.20.0",
     "@types/react": "~18.3.12",
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
+    "ajv": "^8.12.0",
     "eslint": "^8.57.0",
     "eslint-config-universe": "^12.0.1",
     "prettier": "^3.2.5",
-    "tailwindcss": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "tailwindcss": "^3.4.0",
     "typescript": "~5.3.3"
   },
   "eslintConfig": {

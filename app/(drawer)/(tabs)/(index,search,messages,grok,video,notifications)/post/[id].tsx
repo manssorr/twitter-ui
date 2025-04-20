@@ -12,6 +12,7 @@ import {
     BottomSheetView,
     BottomSheetBackdrop // Added for the backdrop
 } from '@gorhom/bottom-sheet';
+import { Feather } from '@expo/vector-icons';
 
 // Define the possible sort types
 type SortType = 'relevant' | 'recent' | 'liked';
@@ -86,22 +87,23 @@ export default function PostDetailScreen() {
                 {/* Render the main post */}
                 <FeedItem
                     itemData={postData}
+                    detailView={true}
                 // Ensure profile navigation is handled if needed
                 />
 
                 {/* --- Replies Section Header with Sort Trigger --- */}
-                <View className="p-4 mt-2 border-t border-neutral-200 dark:border-neutral-800">
+                <View className="p-4 mt-2 border-t border-neutral-200 dark:border-neutral-800 mb-20">
                     {/* This TouchableOpacity acts as the button to open the sheet */}
                     <TouchableOpacity
                         onPress={handlePresentModalPress} // Opens the sheet on press
                         className="flex-row items-center mb-3"
                     >
                         {/* Display current sort option */}
-                        <Text className="text-sm font-medium text-blue-500 dark:text-blue-400 mr-1">
+                        <Text className="text-base font-bold text-neutral-500 dark:text-blue-400 mr-1 ">
                             {sortOptions[selectedSort]}
                         </Text>
                         {/* Dropdown Icon */}
-                        <Text className="text-sm text-blue-500 dark:text-blue-400">▼</Text>
+                        <Feather name="chevron-down" size={18} color={'#536471'} />
                     </TouchableOpacity>
 
                     {/* Placeholder for Replies List */}
@@ -148,9 +150,13 @@ export default function PostDetailScreen() {
                             {/* Sort option text */}
                             <Text className="text-base font-semibold text-black dark:text-white">{value}</Text>
                             {/* Show checkmark only for the currently selected option */}
-                            {selectedSort === key && (
-                                <Text className="text-xl text-blue-500">✓</Text>
-                            )}
+                            {selectedSort === key ? (
+                                <View className="w-[22px] h-[22px]  bg-[#1D9BF0] flex items-center justify-center   rounded-full">
+                                    <Feather name="check" size={16} color={'white'} />
+                                </View>
+                            ) : <>
+                                <View className="w-[22px] h-[22px]  border-2 border-gray-400   rounded-full"></View>
+                            </>}
                         </TouchableOpacity>
                     ))}
                 </BottomSheetView>
