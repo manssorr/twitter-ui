@@ -34,6 +34,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Fontisto from '@expo/vector-icons/Fontisto';
+
+import SettingsIcon from "~/assets/svg/video/settings.svg";
+import P2PIcon from "~/assets/svg/video/p2p.svg";
+import AudioIcon from "~/assets/svg/video/audio.svg";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
 
 
 // Get screen dimensions
@@ -276,25 +283,26 @@ const VideoItem = React.memo(({ item, isVisible }) => {
 
           <View className="flex-row items-center gap-2">
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Settings pressed")}>
-              <Icon name="cog" size={20} color="#fff" />
+              <SettingsIcon width={20} height={20} fill="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("PiP pressed")}>
-              <Icon name="picture-o" size={20} color="#fff" />
+              <Fontisto name="airplay" size={16} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
-              <Icon name={isMuted ? "volume-off" : "volume-up"} size={20} color="#fff" />
+              <AudioIcon width={20} height={20} fill="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Fullscreen pressed")}>
-              <Icon name="expand" size={20} color="#fff" />
+              <P2PIcon width={20} height={20} fill="#fff" />
             </TouchableOpacity>
           </View>
-
 
         </View>
 
 
         {/* Progress Bar Area */}
         <View style={styles.progressContainer}>
+
+          <FontAwesome name="play" size={20} color="#fff" />
 
           {/* Wrap progress bar in a view to handle potential touch events if needed later */}
           <View style={styles.progressBarTouchableArea}>
@@ -457,6 +465,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10, // Increased space
     height: 20,
+    gap: 10
   },
   timeText: {
     color: '#fff',
@@ -487,8 +496,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
-    paddingHorizontal: 30,
+    // marginBottom: 15,
+    // paddingHorizontal: 30,
   },
   controlButton: {
     padding: 5,
