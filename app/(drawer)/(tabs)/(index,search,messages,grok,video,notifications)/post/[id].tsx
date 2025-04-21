@@ -98,24 +98,24 @@ export default function PostDetailScreen() {
     // Enhanced post finding logic that can handle different post formats
     const findPost = useMemo(() => {
         // First try direct contentId match (legacy format)
-        let post = sampleFeedItems.find(item => 
+        let post = sampleFeedItems.find(item =>
             (item as any).contentId === postId
         );
-        
+
         // If not found, try checking if the postId is a composite ID (post-poster_id-timestamp)
         if (!post && postId.startsWith('post-')) {
             // Extract the poster_id from the composite ID if possible
             const parts = postId.split('-');
             if (parts.length >= 2) {
                 const potentialPosterId = parts[1];
-                
+
                 // Try matching on poster_id for newer format posts
-                post = sampleFeedItems.find(item => 
+                post = sampleFeedItems.find(item =>
                     (item as any).poster_id === potentialPosterId
                 );
             }
         }
-        
+
         return post as FeedContent | undefined;
     }, [postId]);
 
@@ -228,6 +228,6 @@ export default function PostDetailScreen() {
 const styles = StyleSheet.create({
     contentContainer: {
         flex: 1,
-        padding: 16,
+        padding: 4,
     },
 });
