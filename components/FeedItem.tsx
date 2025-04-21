@@ -208,7 +208,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
                             <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
                             {itemData.media_url && (
-                                <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}> 
+                                <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}>
                                     <Galeria.Image>
                                         <Image
                                             source={{ uri: itemData.media_url }}
@@ -218,7 +218,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                     </Galeria.Image>
                                 </Galeria>
                             )}
-                            <EngagementActions itemData={itemData} detailView={false}/>
+                            <EngagementActions itemData={itemData} detailView={false} />
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -229,25 +229,25 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                     <ContextMenu.ItemTitle>View post</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon ios={{ name: 'doc.text' }} />
                 </ContextMenu.Item>
-                
+
                 <ContextMenu.Item key="report" destructive onSelect={() => console.log('Report post', itemData.contentId)}>
                     <ContextMenu.ItemTitle>Report post</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon ios={{ name: 'flag' }} />
                 </ContextMenu.Item>
-                
+
                 <ContextMenu.Item key="community-note" onSelect={() => console.log('Request Community Note', itemData.contentId)}>
                     <ContextMenu.ItemTitle>Request community note</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon ios={{ name: 'note.text' }} />
                 </ContextMenu.Item>
-                
+
                 <ContextMenu.Separator />
                 <ContextMenu.Label>{authorName} @{authorHandle}</ContextMenu.Label>
-                
+
                 <ContextMenu.Item key="follow" onSelect={() => console.log('Follow/Unfollow', userInfo?.id)}>
                     <ContextMenu.ItemTitle>Follow @{authorHandle}</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon ios={{ name: 'person.badge.plus' }} />
                 </ContextMenu.Item>
-                
+
                 {/* Follow-up actions as a Submenu instead of Group */}
                 <ContextMenu.Sub>
                     <ContextMenu.SubTrigger key="follow-up-trigger">
@@ -259,17 +259,17 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                             <ContextMenu.ItemTitle>Interactions</ContextMenu.ItemTitle>
                             <ContextMenu.ItemIcon ios={{ name: 'bubble.left.and.bubble.right' }} />
                         </ContextMenu.Item>
-                        
+
                         <ContextMenu.Item key="add-to-lists" onSelect={() => console.log('Add to Lists', userInfo?.id)}>
                             <ContextMenu.ItemTitle>Add to Lists</ContextMenu.ItemTitle>
                             <ContextMenu.ItemIcon ios={{ name: 'list.bullet' }} />
                         </ContextMenu.Item>
-                        
+
                         <ContextMenu.Item key="block" destructive onSelect={() => console.log('Block User', userInfo?.id)}>
                             <ContextMenu.ItemTitle>Block @{authorHandle}</ContextMenu.ItemTitle>
                             <ContextMenu.ItemIcon ios={{ name: 'nosign' }} />
                         </ContextMenu.Item>
-                        
+
                         <ContextMenu.Item key="mute" onSelect={() => console.log('Mute User', userInfo?.id)}>
                             <ContextMenu.ItemTitle>Mute @{authorHandle}</ContextMenu.ItemTitle>
                             <ContextMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
@@ -308,7 +308,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
     };
 
     return (
-        <View className="px-3 dark:border-neutral-800 ">
+        <View className="px-4 dark:border-neutral-800 ">
 
             {/* Second row: Name, Username and Follow Button */}
             <View className="flex-row justify-between items-center mb-3">
@@ -361,9 +361,9 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
 
 
                 <View className="">
-                    <EngagementActions 
-                    itemData={itemData}
-                    detailView={true} />
+                    <EngagementActions
+                        itemData={itemData}
+                        detailView={true} />
                 </View>
             </View>
         </View>

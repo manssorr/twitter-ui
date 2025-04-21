@@ -90,10 +90,9 @@ const ConfettiParticle = ({
     );
 };
 
-function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textColor: string, likes: number }) {
+function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textColor: string }) {
     const [isLiked, setIsLiked] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
-    const [likeCount, setLikeCount] = useState(likes);
     
     // Animation control values
     const unlikedIconScale = useSharedValue(1);
@@ -125,7 +124,6 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
     const handlePress = () => {
         const willBeLiked = !isLiked;
         setIsLiked(willBeLiked);
-        setLikeCount(willBeLiked ? likeCount + 1 : likeCount - 1);
         
         if (willBeLiked) {
             // Step 1: Animate the unliked icon scaling down (even faster)
@@ -249,7 +247,7 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
                     color: isLiked ? "#f91880" : textColor 
                 }}
             >
-                {likeCount}
+               {likes}
             </Text>
         </TouchableOpacity>
     );
