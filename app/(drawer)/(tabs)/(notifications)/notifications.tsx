@@ -286,14 +286,16 @@ export default function Notifications() {
 
   const insets = useSafeAreaInsets();
   const renderHeader = () => (
-    <ScreenHeader
-      title="Notifications"
-      avatarUri="https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg"
-    />
+    <View style={{ paddingTop: insets.top }} className="bg-white w-full">
+      <ScreenHeader
+        title="Notifications"
+        avatarUri="https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg"
+      />
+    </View>
   );
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-white" >
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
 
@@ -312,7 +314,8 @@ export default function Notifications() {
               paddingHorizontal: 16,
               textAlign: 'center',
               elevation: 0, shadowOpacity: 0, borderBottomWidth: 0,
-              borderBottomWidth: 1, borderBottomColor: '#f0f0f0'
+              borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
+               backgroundColor: 'white',
             }}
 
             labelStyle={{
@@ -335,6 +338,10 @@ export default function Notifications() {
           elevation: 0,
           shadowOpacity: 0,
         }}
+
+        minHeaderHeight={-100}
+        revealHeaderOnScroll
+
       >
         <Tabs.Tab name="All">
           <Tabs.ScrollView>
