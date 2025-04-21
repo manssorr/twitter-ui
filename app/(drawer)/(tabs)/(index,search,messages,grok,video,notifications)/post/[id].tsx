@@ -7,6 +7,7 @@ import sampleFeedItems from '~/dummy/posts.json';
 import Grok from '~/assets/svg/tabs/grok.svg';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Comments from '~/components/Comments';
+import users from '~/dummy/users.json';
 
 import {
     BottomSheetModal,
@@ -70,7 +71,7 @@ export const MoreContextIcons = ({ size = "lg", username = "unknown_user" }: { s
                         </DropdownMenu.SubTrigger>
                         <DropdownMenu.SubContent>
                             <DropdownMenu.Item key="add-remove">
-                                <DropdownMenu.ItemTitle>Add/remove @{username} from list</DropdownMenu.ItemTitle>
+                                <DropdownMenu.ItemTitle>Add/remove to list</DropdownMenu.ItemTitle>
                                 <DropdownMenu.ItemIcon ios={{ name: 'list.bullet' }} />
                             </DropdownMenu.Item>
                             <DropdownMenu.Item key="mute">
@@ -109,7 +110,8 @@ const PostHeader = ({ username }: { username?: string }) => {
 };
 
 const findUserById = (id: string) => {
-    return { handle: 'dummy_handle' };
+    const user = users.find(user => user.id === id);
+    return user;
 };
 
 export default function PostDetailScreen() {
