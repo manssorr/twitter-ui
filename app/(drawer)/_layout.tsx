@@ -336,7 +336,6 @@ function CustomDrawerContent(props: any) {
               className="py-3 flex-row items-center"
 
             >
-              <Feather name="settings" size={20} color="#1DA1F2" />
               <Text className="text-base font-semibold text-blue-500 ml-3">Add an Existing Account</Text>
             </TouchableOpacity>
           </View>
