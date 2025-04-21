@@ -47,11 +47,11 @@ import Views from "~/assets/svg/views.svg"
 import Category from "~/assets/svg/category.svg"
 import Grok from "~/assets/svg/tabs/grok.svg";
 // Import the refactored component and type
-import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP } from '~/components/FeedItem';
-import { useLocalSearchParams } from 'expo-router';
+import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP, findUserById } from '~/components/FeedItem';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import users from '~/dummy/users.json';
+import sampleFeedItems from '~/dummy/posts.json';
 import Messages from "~/assets/svg/tabs/messages.svg"
-
 
 const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
@@ -402,7 +402,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
               />
             </TouchableOpacity>
           </Animated.View>
-          {user.id == 1 || user.id == 2 ? (
+          {user.id === '1' || user.id === '2' ? (
             <TouchableOpacity className="absolute bottom-0 right-0 py-1 px-3 bg-transparent rounded-full border border-neutral-400/50 dark:border-neutral-600/50 flex flex-start  ">
               <Text className="text-base font-bold text-black dark:text-white">Edit Profile</Text>
             </TouchableOpacity>
@@ -519,6 +519,7 @@ export default function UserProfileScreen() {
   const listRef = useRef<any>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
   const scrollPosition = useSharedValue(0);
+  const router = useRouter();
 
   // Get the handle parameter from the URL
   const params = useLocalSearchParams();
@@ -529,50 +530,97 @@ export default function UserProfileScreen() {
     return users.find((user) => user.handle.toLowerCase() === userHandle.toLowerCase()) || users[0];
   }, [userHandle]);
 
+  // Process and filter the posts from posts.json for this user
+  const userPosts = useMemo(() => {
+    // Process all feed items similar to index.tsx
+    const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
+      // Explicitly handle new post format (with poster_id)
+      if (typeof item.poster_id === 'string') {
+        return {
+          contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
+          poster_id: item.poster_id,
+          posted_time: typeof item.posted_time === 'string' ? parseInt(item.posted_time, 10) :
+            typeof item.posted_time === 'number' ? item.posted_time : Date.now(),
+          message: item.message || '',
+          media_url: item.media_url || undefined,
+          like_count: item.like_count || 0,
+          retweet_count: item.retweet_count || 0,
+          reply_count: item.reply_count || 0,
+          view_count: item.view_count || '0',
+          category: item.category || 'For you'
+        };
+      }
+      // Handle legacy format (with authorName, authorHandle, etc.)
+      else if (typeof item.authorName === 'string') {
+        // Try to find the user ID by matching name
+        const matchingUser = users.find(user => user.name === item.authorName);
+        const userId = matchingUser ? matchingUser.id : '0';
+
+        return {
+          contentId: item.contentId || `post-legacy-${Date.now()}`,
+          poster_id: userId,
+          authorName: item.authorName,
+          authorHandle: item.authorHandle,
+          authorImageUrl: item.authorImageUrl,
+          posted_time: typeof item.postedTime === 'string' ? parseInt(item.postedTime, 10) :
+            typeof item.postedTime === 'number' ? item.postedTime : Date.now(),
+          message: item.message || '',
+          media_url: item.mediaUrl || undefined,
+          like_count: item.likeCount || 0,
+          retweet_count: item.retweetCount || 0,
+          reply_count: item.replyCount || 0,
+          view_count: item.viewCount || '0',
+          category: item.category || 'For you'
+        };
+      }
+      // Fallback for any unrecognized format
+      else {
+        return {
+          contentId: `post-unknown-${Date.now()}`,
+          poster_id: '0', // Default placeholder ID
+          posted_time: Date.now(),
+          message: 'Unknown post format',
+          media_url: undefined,
+          like_count: 0,
+          retweet_count: 0,
+          reply_count: 0,
+          view_count: '0',
+          category: 'For you'
+        };
+      }
+    });
+
+    // Filter posts for the current user
+    return processedFeedItems
+      .filter(post => post.poster_id === user.id)
+      .sort((a, b) => {
+        const timeA = typeof a.posted_time === 'number' ? a.posted_time : parseInt(String(a.posted_time), 10);
+        const timeB = typeof b.posted_time === 'number' ? b.posted_time : parseInt(String(b.posted_time), 10);
+        return timeB - timeA; // Descending order (newest first)
+      });
+  }, [user.id]);
+
   const feedSections: SectionListData<FeedContent, { title: string }>[] = useMemo(() => [
     {
       title: 'Feed',
-      data: [
+      data: userPosts.length > 0 ? userPosts : [
+        // Fallback post if no posts found for this user
         {
-          contentId: 'post-abc',
+          contentId: 'post-empty',
           poster_id: user.id,
           authorName: user.name,
           authorHandle: user.handle,
           authorImageUrl: user.profile_picture,
-          posted_time: Date.now() - 3 * 60 * 60 * 1000, // 3 hours ago
-          postedTime: '3h',
-          message: `Three points 
-Clean sheet 
-Player of the Match 
-
-A very happy 20th birthday for Dean Huijsen `,
-          media_url: 'https://pbs.twimg.com/media/GohzgPVXQAArqUo?format=jpg&name=large',
-          like_count: 5423,
-          retweet_count: 876,
-          reply_count: 234,
-          view_count: '102K'
-        },
-        {
-          contentId: 'post-def',
-          poster_id: user.id,
-          authorName: user.name,
-          authorHandle: user.handle,
-          authorImageUrl: user.profile_picture,
-          posted_time: Date.now() - 6 * 60 * 60 * 1000, // 6 hours ago
-          postedTime: '6h',
-          message: `A lightning fast start 
-
-It didn't take Antoine Semenyo long to give the Cherries the lead
-`,
-          media_url: 'https://pbs.twimg.com/media/GohLxVvWYAAR7rK?format=jpg&name=4096x4096',
-          like_count: 3211,
-          retweet_count: 542,
-          reply_count: 178,
-          view_count: '78K'
+          posted_time: Date.now(),
+          message: 'No posts yet',
+          like_count: 0,
+          retweet_count: 0,
+          reply_count: 0,
+          view_count: '0'
         }
       ]
     },
-  ], [user]);
+  ], [user, userPosts]);
 
   const profileTabs = ['Posts', 'Affiliates', 'Replies', 'Highlights', 'Videos', 'Photos', 'Articles'];
 
@@ -582,6 +630,10 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
       setRefreshing(false);
     }, 2000);
   }, []);
+
+  const handleItemPress = (postId: string) => {
+    router.push(`/post/${postId}`);
+  };
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
@@ -603,7 +655,7 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
         style={{ flex: 1, backgroundColor: 'white' }}
 
         contentContainerStyle={{ paddingBottom: bottomInset, flexGrow: 1, backgroundColor: colorScheme === 'light' ? 'white' : 'black' }}
-        renderItem={({ item }: { item: FeedContent }) => <FeedItem itemData={item} />}
+        renderItem={({ item }: { item: FeedContent }) => <FeedItem itemData={item} onPress={() => handleItemPress(item.contentId || '')} />}
         stickySectionHeadersEnabled
         renderSectionHeader={() => (
           <View className=" border-b border-neutral-200 dark:border-neutral-700">
