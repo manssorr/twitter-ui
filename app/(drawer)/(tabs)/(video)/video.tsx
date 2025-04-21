@@ -447,10 +447,12 @@ const styles = StyleSheet.create({
   },
   videoPlayer: {
     position: 'absolute',
-    top: 0,
+    top: SCREEN_HEIGHT / 12,
     left: 0,
     bottom: 0,
     right: 0,
+
+    height: SCREEN_HEIGHT / 1.75,
   },
   overlayGradient: {
     position: 'absolute',
