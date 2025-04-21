@@ -236,12 +236,102 @@ const TrendingItem = ({ item }) => {
 };
 
 
+// Mock data for Stories
+const storiesData = [
+  {
+    id: '1',
+    title: 'Elon Musk\'s Easter Doges: A Viral Celebration',
+    category: 'Celebrity',
+    status: 'Trending now',
+    posts: '10K posts',
+    profileImages: [
+      'https://pbs.twimg.com/profile_images/1893803697185910784/Na5lOWi5_normal.jpg',
+      'https://pbs.twimg.com/profile_images/1881092586040934401/bWIAQBgO_normal.jpg',
+      'https://pbs.twimg.com/profile_images/1672319913925419014/HD2CDQOv_400x400.jpg',
+    ]
+  },
+  {
+    id: '2',
+    title: 'Elon Musk Highlights Government Spending Concerns',
+    category: 'Politics',
+    status: 'Trending now',
+    posts: '3.7K posts',
+    profileImages: [
+      'https://pbs.twimg.com/profile_images/1881368435453542400/NnD56DYV_400x400.jpg',
+      'https://pbs.twimg.com/profile_images/1893803697185910784/Na5lOWi5_normal.jpg',
+      'https://pbs.twimg.com/profile_images/1899401226158039040/SmC-Bb8i_400x400.jpg',
+    ]
+  },
+  {
+    id: '3',
+    title: 'Trump Defends Tariff Policy, Critiques Business Critics',
+    category: 'Politics',
+    status: '9 hours ago',
+    posts: '8.4K posts',
+    profileImages: [
+      'https://pbs.twimg.com/profile_images/1043187066832650240/6iaOQ7xL_400x400.jpg',
+      'https://pbs.twimg.com/profile_images/1913234634801926144/yVHVVAid_400x400.jpg',
+      'https://pbs.twimg.com/profile_images/1867641239685713920/7jTW4Eag_400x400.jpg',
+    ]
+  },
+  {
+    id: '4',
+    title: 'Gold Prices Surge to Record Highs',
+    category: 'Finance',
+    status: 'Trending now',
+    posts: '1.1K posts',
+    profileImages: [
+      'https://pbs.twimg.com/profile_images/1582467096331501568/TA06rLOk_400x400.jpg',
+      'https://pbs.twimg.com/profile_images/914888589670043654/KVvwjcWA_400x400.jpg',
+      'https://pbs.twimg.com/profile_images/1145865652533547008/XBahoZmX_400x400.png',
+    ]
+  },
+];
+
 const StoriesForYou = () => {
   return (
-    <View className="mb-2">
-      <Text className="text-lg font-bold px-4 pt-2 pb-2 text-gray-900">
-        Stories for you
+    <View className="mb-4">
+      <Text className="text-2xl font-bold px-4 pt-2 pb-3 text-gray-900">
+        Stories For You
       </Text>
+
+      {storiesData.map((story, index) => (
+        <TouchableOpacity key={story.id} className="mb-5">
+          <View className="px-4">
+            <Text className="text-xl font-bold text-gray-900 mb-2">
+              {story.title}
+            </Text>
+
+            <View className="flex-row items-center mb-1">
+              {/* Profile images row */}
+              <View className="flex-row mr-3">
+                {story.profileImages.map((img, imgIndex) => (
+                  <Image
+                    key={imgIndex}
+                    source={{ uri: img }}
+                    className="w-8 h-8 rounded-full"
+                    style={{
+                      marginLeft: imgIndex > 0 ? -12 : 0,
+                      borderWidth: 2,
+                      borderColor: 'white',
+                      zIndex: 3 - imgIndex, // Higher z-index for first images
+                    }}
+                  />
+                ))}
+              </View>
+
+              <Text className="text-gray-500">
+                {story.status} · {story.category} · {story.posts}
+              </Text>
+            </View>
+          </View>
+
+          {/* Add a divider except for the last item */}
+          {index < storiesData.length - 1 && (
+            <View className="h-[0.5px] bg-gray-200 w-full mt-4" />
+          )}
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
