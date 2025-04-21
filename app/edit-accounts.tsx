@@ -39,7 +39,7 @@ const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
     <View style={styles.accountItem}>
       {/* Subtract icon on the left side with red border */}
       <View style={styles.subtractContainer}>
-        <Feather name="minus" size={18} color="white" />
+        <Feather name="minus" size={16} color="white" />
       </View>
 
       {/* Account info */}
@@ -196,8 +196,8 @@ const styles = StyleSheet.create({
     padding: 4
   },
   subtractContainer: {
-    width: 28,
-    height: 28,
+    width: 24,
+    height: 24,
     borderRadius: 14,
     backgroundColor: '#FF3B30',
     justifyContent: 'center',
