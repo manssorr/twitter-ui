@@ -8,69 +8,99 @@ import {
   SafeAreaView,
   StatusBar,
   GestureResponderEvent,
+  ScrollView,
+  FlatList,
 } from 'react-native';
 import { Tabs, MaterialTabBar, MaterialTabItemProps } from 'react-native-collapsible-tab-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SettingIcon from "~/assets/svg/aside/settings.svg"
+import HeartIcon from "~/assets/svg/like-filled.svg"
+import RetweetIcon from "~/assets/svg/notifications/repost.svg"
 
+// Import dummy users for avatars
+import usersData from "~/dummy/users.json";
 
 // --- Mock Data ---
-// Assuming the current user is @PremierLeague
-// Replace with your actual data fetching logic
+// Updated with more Twitter-like notifications showing multiple followers and likes
 const notificationsData = [
   {
     id: '1',
-    type: 'like', // 'like', 'follow', 'mention', 'reply' etc.
-    user: {
-      name: 'LFC Fans Zone',
-      avatar: 'https://placehold.co/100x100/FEEBC8/9C4221?text=LFC', // Placeholder
+    type: 'follow',
+    mainUser: {
+      id: '4', // Guillermo Rauch
     },
-    postPreview: 'What a goal! 🔥 #PL #Football',
+    otherCount: 7,
     isRead: false,
+    timestamp: '2h',
   },
   {
     id: '2',
-    type: 'follow',
-    user: {
-      name: 'Football Transfers',
-      avatar: 'https://placehold.co/100x100/E2E8F0/4A5568?text=FT', // Placeholder
+    type: 'like',
+    mainUser: {
+      id: '8', // Evan Bacon
     },
+    otherCount: 243,
+    postPreview: 'Introducing Netflix on React Native!\n\nTwo apps. One\'s built in JavaScript. Can you guess which?',
     isRead: false,
+    timestamp: '1d',
   },
   {
     id: '3',
-    type: 'mention',
-    user: {
-      name: 'Sky Sports',
-      avatar: 'https://placehold.co/100x100/C6F6D5/2F855A?text=Sky', // Placeholder
+    type: 'retweet',
+    mainUser: {
+      id: '5', // Paul Graham
     },
-    postPreview: 'Latest update on the title race featuring @PremierLeague highlights! Read more...',
-    isRead: true, // Example of a read notification
+    otherCount: 52,
+    postPreview: 'Just released a new update for our Twitter UI clone. Check it out!',
+    isRead: true,
+    timestamp: '3d',
   },
   {
     id: '4',
-    type: 'reply',
-    user: {
-      name: 'Man City News',
-      avatar: 'https://placehold.co/100x100/BFDBFE/1E40AF?text=MC', // Placeholder
+    type: 'follow',
+    mainUser: {
+      id: '10', // Andrej Karpathy
     },
-    postPreview: 'Replying to @PremierLeague\nGreat summary of the weekend matches!',
+    otherCount: 15,
     isRead: false,
+    timestamp: '1w',
   },
   {
     id: '5',
     type: 'like',
-    user: {
-      name: 'Chelsea FC Fan Page',
-      avatar: 'https://placehold.co/100x100/A5B4FC/312E81?text=CFC', // Placeholder
+    mainUser: {
+      id: '7', // Cristiano Ronaldo
     },
-    postPreview: 'Unbelievable save! Watch the highlights from today\'s @PremierLeague games.',
+    otherCount: 1287,
+    postPreview: 'Building with React Native has never been easier!',
     isRead: true,
+    timestamp: '2w',
   },
-  // Add more notifications as needed
+  {
+    id: '6',
+    type: 'retweet',
+    mainUser: {
+      id: '6', // Andrew Huberman
+    },
+    otherCount: 89,
+    postPreview: 'Here\'s how we implemented the Twitter-like UI in our app',
+    isRead: false,
+    timestamp: '2w',
+  },
 ];
 
 const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 
+// --- Helper Function to Format Numbers ---
+const formatNumber = (num: number) => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  }
+  return num.toString();
+};
 
 // --- Components ---
 
@@ -101,12 +131,10 @@ const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   return (
     <TouchableOpacity
       onPress={(e: GestureResponderEvent) => onPress(name)}
-      className={`py-3 flex-1 items-center ${isActive ? 'border-b-2 border-blue-500' : '' // Active tab style
-        }`}
+      className={`py-3 flex-1 items-center ${isActive ? 'border-b-2 border-blue-500' : ''}`}
     >
       <Text
-        className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'text-gray-600' // Active/inactive text style
-          }`}
+        className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'text-gray-600'}`}
       >
         {typeof label === 'string' ? label : name}
       </Text>
@@ -114,62 +142,103 @@ const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   );
 };
 
+// AvatarRow Component for multiple avatars
+const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?: number }) => {
+  // Limit the number of avatars to show
+  const visibleUsers = userIds.slice(0, maxVisible);
+
+  return (
+    <View className="flex-row my-2">
+      {visibleUsers.map((userId, index) => {
+        // Find user data from usersData
+        const user = usersData.find(u => u.id === userId);
+        if (!user) return null;
+
+        return (
+          <Image 
+            key={userId}
+            source={{ uri: user.profile_picture }}
+            className="w-9 h-9 rounded-full border-2 border-white"
+            style={{ marginLeft: index === 0 ? 0 : -10, zIndex: visibleUsers.length - index }}
+          />
+        );
+      })}
+    </View>
+  );
+};
+
 // Notification Item Component
 const NotificationItem = ({ notification }: { notification: typeof notificationsData[0] }) => {
-  const { type, user, postPreview } = notification;
+  const { type, mainUser, otherCount, postPreview, isRead, timestamp } = notification;
 
-  // Choose icon based on type
-  let icon = '🔔'; // Default
+  // Get the main user details
+  const user = usersData.find(u => u.id === mainUser.id);
+  if (!user) return null;
+
+  // Generate array of user IDs for the avatar row (use main user + some others from usersData)
+  const userIds = [mainUser.id];
+  
+  // Add different users based on the notification type
+  const remainingUsers = usersData
+    .filter(u => u.id !== mainUser.id)
+    .slice(0, 7); // Get up to 7 other users
+  
+  userIds.push(...remainingUsers.map(u => u.id));
+
+  // Choose icon and action text based on type
+  let icon = null;
+  let iconColor = '#000';
   let actionText = '';
 
   switch (type) {
     case 'like':
-      icon = '❤️';
-      actionText = 'liked your post';
+      icon = <HeartIcon width={18} height={18} fill="#f91880" />;
+      iconColor = '#f91880';
+      actionText = `liked your post`;
+      break;
+    case 'retweet':
+      icon = <RetweetIcon width={18} height={18} fill="#00ba7c" />;
+      iconColor = '#00ba7c';
+      actionText = `retweeted your post`;
       break;
     case 'follow':
-      icon = '👤'; // Using a person icon for follow
-      actionText = 'followed you';
+      icon = null; // No icon for follow notifications
+      actionText = `followed you`;
       break;
-    case 'mention':
-      icon = '@'; // Using '@' for mention
-      actionText = 'mentioned you';
-      break;
-    case 'reply':
-      icon = '💬';
-      actionText = 'replied to your post';
-      break;
-    // Add other notification types as needed
   }
 
   return (
-    <TouchableOpacity className="flex-row items-start px-4 py-4 bg-white border-b border-gray-100">
-      {/* Left: Icon */}
-      <Text className="text-xl mr-4 w-6 text-center">{icon}</Text>
+    <TouchableOpacity className={`flex-row px-4 py-3 ${isRead ? 'bg-white' : 'bg-gray-50'} border-b border-gray-100`}>
+      {/* Left: Icon (if applicable) */}
+      {icon && (
+        <View style={{ width: 24 }} className="mr-3 mt-2 items-center">
+          {icon}
+        </View>
+      )}
 
       {/* Right: Notification Details */}
       <View className="flex-1">
-        {/* User Avatar (shown for follow, optional for others) */}
-        {type === 'follow' && (
-          <Image
-            source={{ uri: user.avatar }}
-            className="w-8 h-8 rounded-full mb-2"
-            onError={(e) => console.log(`Failed to load avatar for ${user.name}:`, e.nativeEvent.error)}
-          />
-        )}
+        {/* Avatar Row for all notification types */}
+        <AvatarRow userIds={userIds} />
 
         {/* Action Text */}
         <Text className="text-base mb-1">
-          <Text className="font-semibold">{user.name} </Text>
+          <Text className="font-semibold">{user.name}</Text>
+          {otherCount > 0 && (
+            <Text className="text-gray-700"> and {formatNumber(otherCount)} others </Text>
+          )}
           <Text className="text-gray-700">{actionText}</Text>
         </Text>
 
-        {/* Post Preview (if available) */}
-        {postPreview && (
-          <Text className="text-sm text-gray-600" numberOfLines={3} ellipsizeMode="tail">
+        {/* Post Preview (for likes and retweets) */}
+        {postPreview && type !== 'follow' && (
+          <Text className="text-sm text-gray-600 mb-1" numberOfLines={2} ellipsizeMode="tail">
             {postPreview}
           </Text>
         )}
+
+        {/* Timestamp */}
+        <Text className="text-xs text-gray-500 mt-1">{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -177,42 +246,25 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 
 // --- Main Screen Component ---
 export default function Notifications() {
-  // Premier League Avatar Placeholder
-  const premierLeagueAvatar = 'https://placehold.co/100x100/E6FFFA/319795?text=PL';
-
   // Header component to be used in the collapsible view
+
+
+  const insets = useSafeAreaInsets();
   const renderHeader = () => (
     <ScreenHeader
       title="Notifications"
-      avatarUri={premierLeagueAvatar}
+      avatarUri="https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg"
     />
   );
 
-  const renderNotificationList = (notifications: typeof notificationsData) => {
-    return notifications.map((notification) => (
-      <NotificationItem
-        key={notification.id}
-        notification={notification}
-      />
-    ));
-  };
-
-  // Filter notifications based on tab
-  const allNotifications = notificationsData;
-  const mentionsNotifications = notificationsData.filter(notification =>
-    notification.type === 'mention' || notification.type === 'reply'
-  );
-  const verifiedNotifications = notificationsData; // Placeholder, you can implement actual filtering
-
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" />
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
-
+      
       <Tabs.Container
         renderHeader={renderHeader}
-        headerHeight={60} // Adjust based on your header height
-        tabBarHeight={48} // Height of the tab bar
+        pagerProps={{ scrollEnabled: true }}
         renderTabBar={props => (
           <MaterialTabBar
             {...props}
@@ -248,26 +300,34 @@ export default function Notifications() {
           elevation: 0,
           shadowOpacity: 0,
         }}
-
       >
         <Tabs.Tab name="All">
           <Tabs.ScrollView>
-            {renderNotificationList(allNotifications)}
+            {notificationsData.map(notification => (
+              <NotificationItem key={notification.id} notification={notification} />
+            ))}
           </Tabs.ScrollView>
         </Tabs.Tab>
-
+        
         <Tabs.Tab name="Mentions">
           <Tabs.ScrollView>
-            {renderNotificationList(mentionsNotifications)}
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">No mentions yet</Text>
+            </View>
           </Tabs.ScrollView>
         </Tabs.Tab>
-
+        
         <Tabs.Tab name="Verified">
           <Tabs.ScrollView>
-            {renderNotificationList(verifiedNotifications)}
+            {notificationsData.filter(n => {
+              const user = usersData.find(u => u.id === n.mainUser.id);
+              return user?.is_verified;
+            }).map(notification => (
+              <NotificationItem key={notification.id} notification={notification} />
+            ))}
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
-    </SafeAreaView>
+    </View>
   );
 }
