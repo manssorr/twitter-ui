@@ -27,60 +27,48 @@ type User = {
   verified_badge: string;
 };
 
-// Define props for AccountItem - simplified
+// Define props for AccountItem
 type AccountItemProps = {
   item: User;
-  // drag and isActive are handled by Sortable.Flex internally
   currentUserId: string | null;
 };
 
-// Memoized item component - simplified props and removed drag handlers
+// Memoized item component with proper handle
 const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
   return (
-    // Removed outer TouchableOpacity's onLongPress/disabled props
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-        backgroundColor: 'white', // isActive styling might need context/hook if desired
-        width: '100%',
-        alignSelf: 'stretch' // Ensure item stretches full width
-      }}
-    >
-      {/* Drag handle - Removed TouchableOpacity wrapper and onPressIn */}
-      <View style={{ marginRight: 12, padding: 4 }}>
-        <Feather name="menu" size={22} color="#767676" />
+    <View style={styles.accountItem}>
+      {/* Subtract icon on the left side with red border */}
+      <View style={styles.subtractContainer}>
+        <Feather name="minus" size={18} color="white" />
       </View>
 
-      {/* Account info (remains the same) */}
+      {/* Account info */}
       <Image
         source={{ uri: item.profile_picture }}
-        style={{ width: 40, height: 40, borderRadius: 4, marginRight: 12 }}
+        style={styles.profileImage}
         onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
       />
 
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ fontSize: 16, fontWeight: '600', marginRight: 4 }}>{item.name}</Text>
+      <View style={styles.accountInfo}>
+        <View style={styles.nameContainer}>
+          <Text style={styles.nameText}>{item.name}</Text>
           {item.is_verified && (
             <Image
               source={{ uri: item.verified_badge }}
-              style={{ width: 16, height: 16 }}
+              style={styles.verifiedBadge}
               onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
             />
           )}
         </View>
-        <Text style={{ fontSize: 14, color: '#657786' }}>@{item.handle}</Text>
+        <Text style={styles.handleText}>@{item.handle}</Text>
       </View>
 
-      {/* Current account indicator */}
-      {currentUserId === item.id && (
-        <Feather name="check" size={18} color="#1DA1F2" />
-      )}
+      {/* Drag handle on the right side */}
+      <Sortable.Handle>
+        <View style={styles.handleContainer}>
+          <Feather name="menu" size={22} color="#767676" />
+        </View>
+      </Sortable.Handle>
     </View>
   );
 });
@@ -105,72 +93,144 @@ export default function EditAccountsScreen() {
 
   // Handle saving the new order
   const handleSaveOrder = () => {
-    // Here you would save the new order to authorizedAccounts.json
-    // This is a mock implementation that would need to be connected to real storage
-
-    // const newOrder = orderedAccounts.map(user => user.id);
-    // console.log('New order saved:', newOrder);
     router.back();
-    // In a real implementation, you would write this to the file
-    // For now we'll just show a success message
-    // Alert.alert('Success', 'Account order updated successfully');
   };
 
-  // Handle drag end - Log parameters to inspect structure
-  const handleDragEnd = (params: any) => { // Use 'any' temporarily for inspection
-    console.log('Sortable.Flex onDragEnd params:', params);
-    // TODO: Implement state update logic based on the actual params structure
-    // Example (assuming params contains { from: number, to: number }):
-    // const { from, to } = params;
-    // setOrderedAccounts(currentAccounts => {
-    //   const newAccounts = [...currentAccounts];
-    //   const [movedItem] = newAccounts.splice(from, 1);
-    //   newAccounts.splice(to, 0, movedItem);
-    //   return newAccounts;
-    // });
+  // Define renderItem callback for the Grid
+  const renderItem = useCallback(({ item }: { item: User }) => (
+    <AccountItem
+      key={item.id}
+      item={item}
+      currentUserId={currentUserId}
+    />
+  ), [currentUserId]);
+
+  // Handle drag end 
+  const handleDragEnd = (params: any) => {
+    console.log('Sortable.Grid onDragEnd params:', params);
+    if (params.from !== undefined && params.to !== undefined) {
+      setOrderedAccounts(currentAccounts => {
+        const newAccounts = [...currentAccounts];
+        const [movedItem] = newAccounts.splice(params.from, 1);
+        newAccounts.splice(params.to, 0, movedItem);
+        return newAccounts;
+      });
+    }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white', paddingTop: insets.top }}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <View style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0'
-      }}>
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={handleSaveOrder}
-          style={{ padding: 4, position: 'absolute', left: 16 }}
+          style={styles.doneButton}
         >
-          <Text style={{ fontSize: 16, fontWeight: '500', color: 'black' }}>Done</Text>
+          <Text style={styles.doneText}>Done</Text>
         </TouchableOpacity>
-        <Text style={{ fontSize: 17, fontWeight: 'bold' }}>Accounts</Text>
+        <Text style={styles.headerTitle}>Accounts</Text>
       </View>
 
-      {/* Sortable account list using direct children */}
-      <View style={{ flex: 1, width: '100%' }}>
-        <Sortable.Flex
+      {/* Sortable Grid with columns=1 */}
+      <View style={styles.gridContainer}>
+        <Sortable.Grid
+          data={orderedAccounts}
+          renderItem={renderItem}
           onDragEnd={handleDragEnd}
-          flexDirection="column"
-          width="100%"
-          alignContent="flex-start"
-          gap={0}
-        >
-          {orderedAccounts.map((item) => (
-            // Render AccountItem directly as a child
-            <AccountItem
-              key={item.id} // Ensure key is present
-              item={item}
-              currentUserId={currentUserId}
-            />
-          ))}
-        </Sortable.Flex>
+          columns={1}
+          customHandle={true}
+          rowGap={0}
+          overDrag="vertical"
+          activeItemScale={1.02}
+        />
       </View>
     </SafeAreaView>
   );
 }
+
+// Add StyleSheet for better organization and consistency
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0'
+  },
+  doneButton: {
+    padding: 4,
+    position: 'absolute',
+    left: 16
+  },
+  doneText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'black'
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: 'bold'
+  },
+  gridContainer: {
+    flex: 1,
+    width: '100%'
+  },
+  accountItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    backgroundColor: 'white',
+    width: '100%'
+  },
+  handleContainer: {
+    padding: 4
+  },
+  subtractContainer: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#FF3B30'
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 4,
+    marginRight: 12
+  },
+  accountInfo: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  nameText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 4
+  },
+  verifiedBadge: {
+    width: 16,
+    height: 16
+  },
+  handleText: {
+    fontSize: 14,
+    color: '#657786'
+  }
+});
