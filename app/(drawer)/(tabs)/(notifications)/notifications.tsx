@@ -10,6 +10,8 @@ import {
   GestureResponderEvent,
 } from 'react-native';
 import { Tabs, MaterialTabBar, MaterialTabItemProps } from 'react-native-collapsible-tab-view';
+import SettingIcon from "~/assets/svg/aside/settings.svg"
+
 
 // --- Mock Data ---
 // Assuming the current user is @PremierLeague
@@ -67,28 +69,24 @@ const notificationsData = [
   // Add more notifications as needed
 ];
 
+const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
+
+
 // --- Components ---
 
 // Reusable Header Component (Adapted from Messages)
 const ScreenHeader = ({ title, avatarUri }: { title: string; avatarUri: string }) => {
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-      {/* Left: User Avatar */}
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
       <TouchableOpacity>
         <Image
-          source={{ uri: avatarUri }}
-          className="w-8 h-8 rounded-full"
-          onError={(e) => console.log('Failed to load user avatar:', e.nativeEvent.error)}
+          source={{ uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg' }}
+          className="w-10 h-10 rounded-full"
         />
       </TouchableOpacity>
-
-      {/* Center: Title */}
-      <Text className="text-lg font-semibold text-gray-900">{title}</Text>
-
-      {/* Right: Settings Icon */}
+      <Text className="text-xl font-bold text-black">Notifications</Text>
       <TouchableOpacity>
-        {/* Replace with an actual Icon component */}
-        <Text className="text-xl">⚙️</Text>
+        <SettingIcon width={24} height={24} fill="#000" />
       </TouchableOpacity>
     </View>
   );
@@ -218,13 +216,39 @@ export default function Notifications() {
         renderTabBar={props => (
           <MaterialTabBar
             {...props}
-            TabItemComponent={CustomTabItem}
-            indicatorStyle={{ backgroundColor: '#3b82f6', height: 3 }}
-            activeColor="#3b82f6"
-            inactiveColor="#4b5563"
-            style={{ backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#e5e7eb' }}
+            indicatorStyle={{
+              backgroundColor: APP_PRIMARY_COLOR, height: 3, borderRadius: 50
+            }}
+            activeColor="black"
+            scrollEnabled={true}
+            style={{
+              paddingHorizontal: 16,
+              textAlign: 'center',
+              elevation: 0, shadowOpacity: 0, borderBottomWidth: 0,
+              borderBottomWidth: 1, borderBottomColor: '#f0f0f0'
+            }}
+
+            labelStyle={{
+              marginHorizontal: 10,
+              opacity: 1,
+              fontWeight: 'bold', textTransform: 'capitalize', textAlign: 'center', height: 24,
+              color: '#606E79'
+            }}
+            headerContainerStyle={{
+              backgroundColor: 'transparent',
+              elevation: 0,
+              shadowOpacity: 0,
+            }}
+
           />
         )}
+
+        headerContainerStyle={{
+          backgroundColor: 'transparent',
+          elevation: 0,
+          shadowOpacity: 0,
+        }}
+
       >
         <Tabs.Tab name="All">
           <Tabs.ScrollView>
