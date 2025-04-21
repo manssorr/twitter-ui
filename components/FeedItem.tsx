@@ -9,6 +9,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 import { useColorScheme } from "nativewind";
 import { StyledExpoImage as Image } from "~/components/Image"
+import { Galeria } from '@nandorojo/galeria';
 import Comment from "~/assets/svg/comment.svg"
 import Repost from "~/assets/svg/repost.svg"
 import Like from "~/assets/svg/like.svg"
@@ -65,7 +66,8 @@ export interface FeedContent {
 
 // Utility function to format time based on the view
 const formatTime = (timestamp: number, isDetailView: boolean): string => {
-    const time = dayjs(timestamp);
+    // Multiply by 1000 to convert Unix seconds to milliseconds
+    const time = dayjs(timestamp * 1000);
 
     if (isDetailView) {
         // For detailed view, show full date and time
@@ -186,11 +188,15 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
                         <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
                         {itemData.media_url && (
-                            <Image
-                                source={{ uri: itemData.media_url }}
-                                className="w-full aspect-[4/4] mt-2 rounded-lg"
-                                contentFit="cover"
-                            />
+                            <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}> 
+                                <Galeria.Image>
+                                    <Image
+                                        source={{ uri: itemData.media_url }}
+                                        className="w-full aspect-[4/4] mt-2 rounded-lg"
+                                        contentFit="cover"
+                                    />
+                                </Galeria.Image>
+                            </Galeria>
                         )}
                         <EngagementActions itemData={itemData} detailView={false}/>
                     </View>
@@ -228,11 +234,15 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                 <Text className="text-lg text-black dark:text-white">{itemData.message}</Text>
 
                 {itemData.media_url && (
-                    <Image
-                        source={{ uri: itemData.media_url }}
-                        className="w-full aspect-[4/4] mt-4 rounded-lg"
-                        contentFit="cover"
-                    />
+                    <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}>
+                        <Galeria.Image>
+                            <Image
+                                source={{ uri: itemData.media_url }}
+                                className="w-full aspect-[4/4] mt-4 rounded-lg"
+                                contentFit="cover"
+                            />
+                        </Galeria.Image>
+                    </Galeria>
                 )}
 
 

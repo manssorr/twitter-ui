@@ -151,23 +151,19 @@ function CustomDrawerContent(props: any) {
       </View>
 
       {/* --- 2. Scrollable Middle Section --- */}
-      {/* DrawerContentScrollView now only wraps the scrollable items */}
-      {/* Added flex-shrink to allow it to shrink if content is short, and flex-grow to let it expand */}
       <DrawerContentScrollView
         {...props}
-        className="flex-shrink flex-grow" // Allow shrinking and growing
-        contentContainerStyle={{ paddingTop: 0 }} // Remove default top padding if any
+        className="flex-shrink flex-grow"
+        contentContainerStyle={{ paddingTop: 0 }}
         swipeEdgeWidth={width}
       >
-        {/* --- Custom Drawer Items Section 1 --- */}
         <View className="mt-4">
-          {/* Added slight vertical margin (my-0.5) to DrawerItems for spacing */}
           <DrawerItem
             icon={({ color, size }) => <Feather name="user" color={color} size={size} />}
             label="Profile"
             labelStyle={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}
             onPress={() => router.push('/profile')}
-            style={{}} // Add vertical spacing
+            style={{}} 
           />
           <DrawerItem
             icon={({ color, size }) => <X width={size} height={size} fill={color} />}
@@ -183,14 +179,6 @@ function CustomDrawerContent(props: any) {
             onPress={() => router.push('/communities')}
             style={{}}
           />
-
-          {/* <DrawerItem
-            icon={({ color, size }) => <Ads width={size} height={size} fill={color} />}
-            label="Ads"
-            labelStyle={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}
-            onPress={() => router.push('/ads')}
-            style={{  }}
-          /> */}
 
           <DrawerItem
             icon={({ color, size }) => <Bookmarks width={size} height={size} fill={color} />}
@@ -235,11 +223,9 @@ function CustomDrawerContent(props: any) {
 
         </View>
 
-        {/* --- Divider --- */}
-        <View className="h-px bg-gray-200 my-2 mx-5" /> {/* Reduced vertical margin */}
+        <View className="h-px bg-gray-200 my-2 mx-5" /> 
 
-        {/* --- Custom Drawer Items Section 2 --- */}
-        <View> {/* Removed mt-0 */}
+        <View> 
           <DrawerItem
             icon={({ color, size }) => <Grok width={size} height={size} fill={color} />}
             label="Download Grok"

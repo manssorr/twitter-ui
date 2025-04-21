@@ -35,14 +35,14 @@ export default function Home() {
         <Text className="text-3xl font-semibold text-white mb-12 tracking-tighter">Join today.</Text>
       </View>
       <TouchableOpacity
-        className="bg-white py-4 px-6 rounded-full w-4/5 items-center flex-row"
+        className="bg-white py-4 px-6 rounded-full w-full items-center flex-row"
         onPress={navigateToTabs}
       >
         {currentUser && (
           <>
-            <Image 
-              source={{ uri: currentUser.profile_picture }} 
-              className="w-8 h-8 rounded-full mr-4" 
+            <Image
+              source={{ uri: currentUser.profile_picture }}
+              className="w-8 h-8 rounded-full mr-4"
             />
             <Text className="text-black text-lg font-bold">Continue with @{currentUser.handle}</Text>
           </>
@@ -51,10 +51,10 @@ export default function Home() {
           <Text className="text-black text-lg font-bold">Continue</Text>
         )}
       </TouchableOpacity>
-      
+
       {users.length > 1 && (
-        <TouchableOpacity 
-          className="items-center mt-2" 
+        <TouchableOpacity
+          className="items-center mt-2"
           onPress={handleNextUser}
         >
           <Text className="text-[#1d9bf0] text-base">Switch account</Text>
