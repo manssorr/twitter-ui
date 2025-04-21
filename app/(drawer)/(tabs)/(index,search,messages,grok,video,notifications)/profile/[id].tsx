@@ -266,6 +266,8 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     }
   }, [refreshing, listRef, scrollOffset]);
 
+
+
   return (
     <View className="relative z-10">
       <Animated.View style={[StyleSheet.absoluteFill, bannerVerticalShiftStyle]}>
@@ -332,10 +334,6 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
 
 
       </Animated.View>
-
-
-
-
 
 
 
@@ -597,6 +595,7 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
       <StatusBar style="light" />
       <ScrollingListWithHeader
         NavigationBarComponent={(props) => <ProfileHeader {...props} user={user} refreshing={refreshing} />}
+
         ExpandedHeaderComponent={(props) => <ProfileDetailsHeader {...props} user={user} />}
         sections={feedSections}
         ignoreLeftPadding
