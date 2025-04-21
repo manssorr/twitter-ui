@@ -15,45 +15,83 @@ import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // --- Mock Data ---
-// Premier League relevant trending topics
-// Replace with your actual data fetching logic
+// Updated trending topics to match Twitter format
 const trendingData = [
   {
     id: '1',
-    category: 'Football · Trending',
-    topic: '#ManchesterDerby',
-    posts: '188K posts',
-    image: 'https://placehold.co/150x100/EF4444/FFFFFF?text=Derby', // Placeholder
+    rank: 1,
+    category: 'Sports · Trending',
+    topic: '#WrestleMania',
+    posts: '863K posts',
+    trendingWith: 'Joe Hendry, Becky, Randy Orton, Lyra'
   },
   {
     id: '2',
-    category: 'Premier League · Last night',
-    topic: 'VAR Controversy Hits Anfield',
-    posts: '95K posts',
-    image: 'https://placehold.co/150x100/F97316/FFFFFF?text=VAR', // Placeholder
+    rank: 2,
+    category: 'Sports · Trending',
+    topic: 'Ty Jerome',
+    posts: '9,687 posts',
+    trendingWith: '#LetEmKnow, Cavs, Donovan Mitchell, Garland'
   },
   {
     id: '3',
-    category: 'Sports · Trending',
-    topic: 'Erling Haaland',
-    posts: '120K posts',
-    image: 'https://placehold.co/150x100/22C55E/FFFFFF?text=Haaland', // Placeholder
+    rank: 3,
+    category: 'Trending in United States',
+    topic: 'Logan Paul',
+    posts: '18.5K posts',
+    trendingWith: 'AJ Styles'
   },
   {
     id: '4',
-    category: 'Football · Trending',
-    topic: 'Transfer Window Rumours',
-    posts: '250K posts',
-    image: 'https://placehold.co/150x100/8B5CF6/FFFFFF?text=Transfer', // Placeholder
+    rank: 4,
+    category: 'Sports · Trending',
+    topic: 'Dirty Dom',
+    posts: '9,420 posts',
+    trendingWith: ''
   },
   {
     id: '5',
+    rank: 5,
+    category: 'Trending in United States',
+    topic: '#TheLastOfUs',
+    posts: '23K posts',
+    trendingWith: ''
+  },
+  {
+    id: '6',
+    category: 'Football · Trending',
+    topic: '#ManchesterDerby',
+    posts: '188K posts',
+    trendingWith: ''
+  },
+  {
+    id: '7',
+    category: 'Premier League · Last night',
+    topic: 'VAR Controversy Hits Anfield',
+    posts: '95K posts',
+    trendingWith: ''
+  },
+  {
+    id: '8',
+    category: 'Sports · Trending',
+    topic: 'Erling Haaland',
+    posts: '120K posts',
+    trendingWith: ''
+  },
+  {
+    id: '9',
+    category: 'Football · Trending',
+    topic: 'Transfer Window Rumours',
+    posts: '250K posts',
+    trendingWith: ''
+  },
+  {
+    id: '10',
     category: 'Premier League · Live',
     topic: 'Weekend Fixtures Update',
     posts: '76K posts',
-    image: 'https://placehold.co/150x100/EC4899/FFFFFF?text=Fixtures', // Placeholder
-  },
-  // Add more trends as needed
+    trendingWith: ''
+  }
 ];
 
 const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
@@ -122,24 +160,40 @@ const FeaturedContent = () => {
   );
 };
 
-// Trending Item Component
+// Trending Item Component - Updated to match Twitter design
 const TrendingItem = ({ item }) => {
   return (
-    <TouchableOpacity className="flex-row items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
-      {/* Left: Text Content */}
-      <View className="flex-1 mr-3">
-        <Text className="text-xs text-gray-500 mb-0.5">{item.category}</Text>
-        <Text className="text-base font-semibold text-gray-900 mb-0.5">{item.topic}</Text>
-        <Text className="text-xs text-gray-500">{item.posts}</Text>
+    <TouchableOpacity className="flex-row px-4 py-3 bg-white border-b border-gray-100">
+      {/* Left side content with rank (if available) */}
+      <View className="flex-1">
+        {/* Top row: Category */}
+        <View className="flex-row items-center">
+          {item.rank && (
+            <Text className="text-sm text-gray-500 mr-2">{item.rank} ·</Text>
+          )}
+          <Text className="text-sm text-gray-500">{item.category}</Text>
+          
+          {/* Optional menu icon on the right */}
+          <Text className="ml-auto text-gray-400">···</Text>
+        </View>
+        
+        {/* Main topic - larger and bolder */}
+        <Text className="text-lg font-bold text-gray-900 mt-0.5">
+          {item.topic}
+        </Text>
+        
+        {/* Post count - smaller size */}
+        <Text className="text-sm text-gray-500 mt-0.5">
+          {item.posts}
+        </Text>
+        
+        {/* Trending with section - if available */}
+        {item.trendingWith && item.trendingWith.length > 0 && (
+          <Text className="text-sm text-gray-500 mt-0.5">
+            Trending with <Text className="text-blue-500">{item.trendingWith}</Text>
+          </Text>
+        )}
       </View>
-      {/* Right: Optional Image */}
-      {item.image && (
-        <Image
-          source={{ uri: item.image }}
-          className="w-16 h-16 rounded-lg" // Adjust size as needed
-          onError={(e) => console.log(`Failed to load trend image for ${item.topic}:`, e.nativeEvent.error)}
-        />
-      )}
     </TouchableOpacity>
   );
 };

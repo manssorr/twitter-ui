@@ -166,6 +166,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
     const isOrganization = itemData.is_organization || userInfo?.is_organization || false;
+    const verified_badge = itemData?.verified_badge || userInfo?.verified_badge;
 
     const router = useRouter();
 
@@ -191,6 +192,13 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                 <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
                                     <View className="flex-row items-center">
                                         <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
+                                        {verified_badge && (
+                                            <Image
+                                                source={{ uri: verified_badge }}
+                                                className="w-4 h-4"
+                                                onError={(e) => console.log('Failed to load verified badge:', e.nativeEvent.error)}
+                                            />
+                                        )}
                                         <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
                                         <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
                                     </View>
@@ -285,6 +293,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
     const isOrganization = itemData.is_organization || userInfo?.is_organization || false;
+    const verified_badge = itemData?.verified_badge || userInfo?.verified_badge;
 
     const router = useRouter();
 
@@ -314,6 +323,13 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
                     >
                         <View className="flex-col">
                             <Text className="text-lg font-bold text-black dark:text-white">{authorName}</Text>
+                            {verified_badge && (
+                                <Image
+                                    source={{ uri: verified_badge }}
+                                    className="w-4 h-4"
+                                    onError={(e) => console.log('Failed to load verified badge:', e.nativeEvent.error)}
+                                />
+                            )}
                             <Text className="text-lg text-neutral-500 dark:text-neutral-400 -mt-1">@{authorHandle}</Text>
                         </View>
                     </TouchableOpacity>
