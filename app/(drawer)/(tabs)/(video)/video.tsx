@@ -9,13 +9,14 @@ import {
   SafeAreaView,
   Platform,
   ActivityIndicator,
+  ViewToken,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { VideoView, useVideoPlayer } from 'expo-video';
 import { useEvent } from 'expo';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useRouter } from 'expo-router';
+import { router, useRouter, useNavigation } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Fontisto from '@expo/vector-icons/Fontisto';
@@ -33,6 +34,30 @@ import LikeButton from '~/components/LikeButton'; // Ensure this path is correct
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+// Define the VideoItem props interface to fix TypeScript errors
+interface VideoItemProps {
+  item: {
+    videoId: string;
+    videoUrl: string;
+    poster: {
+      avatar: string;
+      headerImage: string;
+      name: string;
+      username: string;
+      isFollowing: boolean;
+    };
+    title: string;
+    postedTime: string;
+    engagement: {
+      commentCount: number;
+      retweetCount: number;
+      likeCount: number;
+      viewCount: number;
+    };
+  };
+  isVisible: boolean;
+  isFocused: boolean;
+}
 
 const samplePosts = [
   {
@@ -179,7 +204,7 @@ const formatTime = (seconds) => {
   return `${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
-const VideoItem = React.memo(({ item, isVisible }) => {
+const VideoItem = React.memo(({ item, isVisible, isFocused }: VideoItemProps) => {
   const videoViewRef = useRef(null);
   const player = useVideoPlayer(item.videoUrl, (playerInstance) => {
     playerInstance.loop = true;
@@ -187,6 +212,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
   });
 
   const [isMuted, setIsMuted] = useState(player?.muted ?? false);
+  const [playAttempted, setPlayAttempted] = useState(false);
 
   const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
   const { status, error } = useEvent(player, 'statusChange', { status: player?.status });
@@ -195,14 +221,44 @@ const VideoItem = React.memo(({ item, isVisible }) => {
     duration: player?.duration ?? 0,
   });
 
+  // Make auto-play more aggressive on visibility change
   useEffect(() => {
     if (!player) return;
-    if (isVisible) {
-      player.play();
+    
+    if (isVisible && isFocused) {
+      console.log(`Auto-playing video: ${item.videoId} (Visible: ${isVisible}, Focused: ${isFocused})`);
+      
+      // Set a short delay to ensure the video component is fully mounted
+      if (!playAttempted) {
+        setPlayAttempted(true);
+        
+        // Try playing multiple times to overcome any race conditions
+        const playVideo = () => {
+          player.muted = false;
+          // Use Promise.resolve to handle cases where play() might not return a Promise
+          Promise.resolve(player.play())
+            .catch((err: Error) => {
+              console.log(`Fallback to muted playback for ${item.videoId}`);
+              player.muted = true;
+              Promise.resolve(player.play())
+                .catch((e: Error) => 
+                  console.error(`Failed to play video even muted:`, e)
+                );
+            });
+        };
+        
+        // Try to play immediately and then again after a short delay if needed
+        playVideo();
+        setTimeout(playVideo, 100);
+      }
     } else {
       player.pause();
+      // Reset play attempted flag when video is hidden so it will play again when visible
+      if (!isVisible) {
+        setPlayAttempted(false);
+      }
     }
-  }, [isVisible, player]);
+  }, [isVisible, isFocused, player, item.videoId, playAttempted]);
 
   useEffect(() => {
     if (status === 'error' && error) {
@@ -347,7 +403,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.engagementButton}>
-            <LikeButton textColor="#fff" iconColor="#fff" initialLikes={item.engagement.likeCount} iconSize={16} />
+            <LikeButton textColor="#fff" iconColor="#fff" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
           </TouchableOpacity>
 
@@ -380,29 +436,125 @@ const VideoItem = React.memo(({ item, isVisible }) => {
   );
 });
 
+interface EnhancedViewToken extends ViewToken {
+  percentVisible?: number;
+}
+
+interface ViewableItem {
+  item: any;
+  key: string;
+  index: number;
+  isViewable: boolean;
+  section?: any;
+  percentVisible: number;
+}
+
+interface ViewableItemsChangedInfo {
+  viewableItems: EnhancedViewToken[];
+  changed: EnhancedViewToken[];
+}
+
 const VideoFeed = () => {
-  const viewableItems = useRef([]);
-  const onViewableItemsChanged = useCallback(({ viewableItems: currentViewableItems }) => {
-    viewableItems.current = currentViewableItems
-      .filter(item => item.isViewable && item.item) // Ensure item exists and is viewable
-      .map(item => item.item.videoId); // Map to videoId
-  }, []);
+  const viewableItems = useRef<string[]>([]);
+  const [isScreenFocused, setIsScreenFocused] = useState(true);
+  const navigation = useNavigation();
+  const [autoPlayTriggered, setAutoPlayTriggered] = useState(false);
+  
+  // Add an effect to auto-play the first video immediately on component mount
+  useEffect(() => {
+    if (samplePosts.length > 0 && !autoPlayTriggered) {
+      console.log('Auto-playing first video on mount');
+      // Force first video to be visible
+      viewableItems.current = [samplePosts[0].videoId];
+      setAutoPlayTriggered(true);
+      
+      // Set a small timeout to ensure the component has mounted fully
+      setTimeout(() => {
+        // Force a re-render to ensure the video starts playing
+        setIsScreenFocused(prev => {
+          // Toggle and then immediately restore the value to force re-render
+          setTimeout(() => setIsScreenFocused(true), 0);
+          return false;
+        });
+      }, 300);
+    }
+  }, [autoPlayTriggered]);
+  
+  // Set up router event listeners to pause videos when navigating away
+  useEffect(() => {
+    // Handle back button press or any navigation away from this screen
+    const unsubscribeBeforeRemove = navigation.addListener('beforeRemove', () => {
+      console.log('Leaving video screen, pausing all videos');
+      setIsScreenFocused(false);
+    });
 
-  const renderItem = useCallback(({ item }) => {
-    // Check if item and item.videoId exist before accessing
-    const isVisible = item?.videoId ? viewableItems.current.includes(item.videoId) : false;
-    if (!item) return null; // Render nothing if item is somehow null/undefined
-    return <VideoItem item={item} isVisible={isVisible} />;
-  }, []);
+    return () => {
+      unsubscribeBeforeRemove();
+    };
+  }, [navigation]);
 
-  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
+  const onViewableItemsChanged = useCallback(({ viewableItems: currentViewableItems, changed }: ViewableItemsChangedInfo) => {
+    // More aggressive approach to viewability changes
+    if (currentViewableItems.length === 0) return;
+    
+    // Get the most visible item
+    const mostVisible = currentViewableItems.reduce((prev, current) => {
+      return (prev.item && current.item && 
+              (prev.percentVisible || 0) > (current.percentVisible || 0)) 
+          ? prev : current;
+    });
+    
+    if (mostVisible?.item?.videoId) {
+      // Set only the most visible video as viewable to ensure only one plays
+      const newVisibleId = mostVisible.item.videoId;
+      
+      // Only update if it's a different video to avoid unnecessary re-renders
+      if (!viewableItems.current.includes(newVisibleId)) {
+        console.log('Now playing video:', newVisibleId, 'Visibility:', mostVisible.percentVisible || 0);
+        viewableItems.current = [newVisibleId];
+        
+        // Force immediate re-render
+        setAutoPlayTriggered(prev => !prev);
+      }
+    }
+  }, []);
+  
+  const renderItem = useCallback(({ item, index }: { item: any, index: number }) => {
+    if (!item) return null;
+    
+    // For the first item, force visibility on first render
+    let isVisible = viewableItems.current.includes(item.videoId);
+    if (index === 0 && !autoPlayTriggered) {
+      isVisible = true;
+    }
+    
+    return <VideoItem 
+      key={item.videoId} 
+      item={item} 
+      isVisible={isVisible} 
+      isFocused={isScreenFocused} 
+    />;
+  }, [isScreenFocused, viewableItems.current, autoPlayTriggered]);
+
+  // Configure viewability to be extremely sensitive
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 20, // Reduce threshold to detect visibility sooner
+    minimumViewTime: 0, // No delay at all
+    waitForInteraction: false // Don't wait for user interaction
+  }).current;
 
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => { router.back() }} style={[styles.backButton, { top: insets.top + 10 }]}>
+      <TouchableOpacity 
+        onPress={() => { 
+          setIsScreenFocused(false); // Pause videos immediately when back button is pressed
+          router.back();
+        }} 
+        style={[styles.backButton, { top: insets.top + 10 }]}
+      >
         <Feather name="arrow-left" size={22} color={'#fff'} />
       </TouchableOpacity>
 
@@ -417,10 +569,7 @@ const VideoFeed = () => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
-        removeClippedSubviews={true} // Optimization
-        initialNumToRender={1} // Optimization
-        maxToRenderPerBatch={1} // Optimization
-        windowSize={3} // Optimization: Render items within 3 screens
+        removeClippedSubviews={false} // Prevent hiding videos when scrolling
       />
     </View>
   );

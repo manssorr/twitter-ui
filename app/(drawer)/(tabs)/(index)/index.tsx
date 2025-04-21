@@ -88,7 +88,7 @@ const Header = () => {
     const insets = useSafeAreaInsets();
 
     return (
-        <View style={{ paddingTop: insets.top }} className=" w-full">
+        <View style={{ paddingTop: insets.top }} className="bg-white w-full">
             <View className="flex-row items-center w-full justify-center py-3">
                 <StyledExpoImage source={{ uri: currentUser.profile_picture }} className="w-10 h-10 rounded-full absolute left-4" />
                 <X width={26} height={26} fill="black" />
@@ -196,6 +196,7 @@ export default function HomeScreen() {
                 paddingHorizontal: 16,
                 textAlign: 'center',
                 elevation: 0, shadowOpacity: 0, borderBottomWidth: 0,
+                backgroundColor: 'white',
             }}
 
             labelStyle={{
@@ -205,6 +206,7 @@ export default function HomeScreen() {
                 fontSize: 15,
                 color: '#606E79'
             }}
+            
         />
     );
 
@@ -213,11 +215,12 @@ export default function HomeScreen() {
 
             <AddPostButton />
             <Tabs.Container
-                headerHeight={90 + insets.top} // Adjust based on your header size
+                // headerHeight={90 + insets.top} // Adjust based on your header size
                 renderHeader={Header}
                 renderTabBar={renderTabBar}
                 pagerProps={{ scrollEnabled: true }}
                 initialTabName="For you"
+                revealHeaderOnScroll
 
                 headerContainerStyle={{
                     backgroundColor: 'transparent',
