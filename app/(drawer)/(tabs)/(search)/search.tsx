@@ -15,6 +15,8 @@ import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SettingIcon from "~/assets/svg/aside/settings.svg"
 import SearchIcon from "~/assets/svg/tabs/search.svg"
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // --- Mock Data ---
 // Updated trending topics to match Twitter format
@@ -101,27 +103,27 @@ const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 // --- Components ---
 
 const ExploreHeader = () => {
-
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white">
       <TouchableOpacity>
         <Image
-          source={{ uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg' }}
+          source={{
+            uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg',
+          }}
           className="w-10 h-10 rounded-full"
         />
       </TouchableOpacity>
 
-      <View className="py-2 bg-white">
-        <View className="flex-row items-center bg-[#EEF3F4] rounded-full px-3 py-2 gap-2 align-center justify-center flex w-full">
+      <View className="flex-1 px-4">
+        <View className="flex-row items-center bg-[#EEF3F4] rounded-full px-3 py-2 gap-2">
           <SearchIcon width={16} height={16} fill="#5C6A75" />
           <TextInput
             placeholder="Search"
             placeholderTextColor="#6b7280"
-            className=" text-gray-900 text-lg relative -top-1"
+            className="flex-1 text-gray-900 text-lg relative -top-1"
           />
         </View>
       </View>
-
 
       <TouchableOpacity>
         <SettingIcon width={24} height={24} fill="#000" />
@@ -134,26 +136,63 @@ const ExploreHeader = () => {
 // Featured Content Component
 const FeaturedContent = () => {
   // Placeholder image for Premier League featured content
-  const featuredImageUrl = 'https://placehold.co/600x300/3B82F6/FFFFFF?text=Premier+League+Highlights';
+  const featuredImageUrl = 'https://pbs.twimg.com/semantic_core_img/1844526946882879503/orUmRvLL?format=jpg&name=900x900';
   return (
-    <View className="mb-4">
+    <View className="mb-2">
+
       <ImageBackground
         source={{ uri: featuredImageUrl }}
-        className="h-48 w-full justify-end p-4" // Height and padding
+        className="h-48 w-full justify-end p-4 relative"
+        resizeMode="cover"
+        onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
+      >
+        <LinearGradient
+          colors={['transparent', 'rgba(0,0,0,0.8)']}
+          locations={[0, 0.8]}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '100%',
+          }}
+        />
+        <Text className="text-white text-3xl font-extrabold shadow-lg z-10">Devils at Hurricanes</Text>
+        <Text className="text-white text-sm shadow-md z-10">NHL · 2 hours ago</Text>
+      </ImageBackground>
+
+
+
+      {/* Optional: Promoted/Sponsored Banner */}
+      <ImageBackground
+        source={{ uri: 'https://pbs.twimg.com/media/GjiSI34aIAUxqvk?format=png&name=900x900' }}
+        className="h-24  justify-end p-5 mt-3 mx-2 rounded-lg overflow-hidden flex-row justify-between" // Height and padding
         resizeMode="cover" // Cover the area
         onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
       >
-        <Text className="text-white text-2xl font-bold shadow-lg">This Weekend's Action</Text>
-        <Text className="text-white text-sm shadow-md">Catch all the goals and highlights!</Text>
-        {/* Optional: Add overlay or gradient for better text visibility */}
+        <View>
+
+          <View className="flex-row items-center justify-between">
+            <Text className="text-white text-2xl font-bold">NBA Portal</Text>
+          </View>
+
+
+          <View className="flex-row items-center gap-2">
+            <Text className="text-base text-white">Brought to you by <Text className="font-bold">Sponsor</Text></Text>
+            {/* Replace with actual sponsor logo if available */}
+            <Image source={{ uri: 'https://pbs.twimg.com/media/Gjxr_4DXAAAWFR8?format=png&name=900x900' }} className="h-5 w-16" resizeMode="contain" />
+
+          </View>
+        </View>
+
+
+        <View className="flex h-full items-center justify-center ">
+          <TouchableOpacity className="bg-[#0f1419bf] rounded-full p-2" >
+            <AntDesign name="arrowright" size={18} color="white" />
+          </TouchableOpacity>
+        </View>
+
       </ImageBackground>
-      {/* Optional: Promoted/Sponsored Banner */}
-      <View className="flex-row items-center justify-between bg-blue-50 p-3 mt-1 border-t border-b border-blue-100">
-        <Text className="text-blue-800 font-semibold">PL Portal</Text>
-        <Text className="text-xs text-gray-500">Brought to you by <Text className="font-bold">Sponsor</Text></Text>
-        {/* Replace with actual sponsor logo if available */}
-        <Image source={{ uri: 'https://placehold.co/80x20/A5B4FC/1E3A8A?text=Sponsor' }} className="h-5 w-16" resizeMode="contain" />
-      </View>
     </View>
   );
 };
@@ -193,6 +232,17 @@ const TrendingItem = ({ item }) => {
         )}
       </View>
     </TouchableOpacity>
+  );
+};
+
+
+const StoriesForYou = () => {
+  return (
+    <View className="mb-2">
+      <Text className="text-lg font-bold px-4 pt-2 pb-2 text-gray-900">
+        Stories for you
+      </Text>
+    </View>
   );
 };
 
@@ -252,14 +302,7 @@ export default function Search() {
             {/* Featured content at the top of the Trending tab */}
             <FeaturedContent />
 
-            {/* Section Title */}
-            <Text className="text-lg font-bold px-4 pt-2 pb-2 text-gray-900">
-              Premier League Trends
-            </Text>
-
-            <View className="p-6 items-center justify-center">
-              <Text className="text-gray-500">Personalized content will appear here</Text>
-            </View>
+            <StoriesForYou />
           </Tabs.ScrollView>
         </Tabs.Tab>
 
