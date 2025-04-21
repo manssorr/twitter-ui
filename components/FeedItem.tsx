@@ -108,7 +108,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
     }
 
     return (
-        <View className={`py-1.5 ${is_organization ? '' : 'rounded-full'}  ${className} `}>
+        <View className={`py-1.5 ${is_organization ? 'rounded-md' : 'rounded-full'}  ${className}  `}>
             {isLoading && (
                 <View
                     style={dimensionStyle}
@@ -123,7 +123,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
                 onLoad={() => dispatch({ type: 'loaded' })}
                 contentFit="cover"
                 style={[dimensionStyle, style]}
-                className={is_organization ? '' : 'rounded-full'}
+                className={is_organization ? 'rounded-md' : 'rounded-full'}
             />
         </View>
     );
@@ -186,7 +186,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                 <TouchableOpacity onPress={onPress} className="p-1 py-2 pr-4 border-b border-neutral-200 dark:border-neutral-800">
                     <View className="flex-row">
                         <ProfileImage source={{ uri: authorImageUrl }} displaySize="s" is_organization={isOrganization} />
-                        <View className="ml-1 flex-1">
+                        <View className="ml-2 flex-1">
 
                             <View className="flex-row items-center justify-between">
                                 <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
@@ -210,57 +210,57 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                             <TouchableOpacity className="p-1 -m-1">
                                                 <Feather name="more-horizontal" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
                                             </TouchableOpacity>
-                                    </DropdownMenu.Trigger>
-                                    <DropdownMenu.Content>
-                                        <DropdownMenu.Item key="interactions">
-                                            <DropdownMenu.ItemTitle>View post interactions</DropdownMenu.ItemTitle>
-                                            <DropdownMenu.ItemIcon
-                                                ios={{ name: 'chart.bar.xaxis' }}
-                                            />
-                                        </DropdownMenu.Item>
-                                        <DropdownMenu.Item key="report">
-                                            <DropdownMenu.ItemTitle>Report post</DropdownMenu.ItemTitle>
-                                            <DropdownMenu.ItemIcon
-                                                ios={{ name: 'flag' }}
-                                            />
-                                        </DropdownMenu.Item>
-                                        <DropdownMenu.Item key="community-note">
-                                            <DropdownMenu.ItemTitle>Request community note</DropdownMenu.ItemTitle>
-                                            <DropdownMenu.ItemIcon
-                                                ios={{ name: 'note.text' }}
-                                            />
-                                        </DropdownMenu.Item>
-                                        <DropdownMenu.Item key="offline">
-                                            <DropdownMenu.ItemTitle>Add to offline</DropdownMenu.ItemTitle>
-                                            <DropdownMenu.ItemIcon
-                                                ios={{ name: 'arrow.down.circle' }}
-                                            />
-                                        </DropdownMenu.Item>
+                                        </DropdownMenu.Trigger>
+                                        <DropdownMenu.Content>
+                                            <DropdownMenu.Item key="interactions">
+                                                <DropdownMenu.ItemTitle>View post interactions</DropdownMenu.ItemTitle>
+                                                <DropdownMenu.ItemIcon
+                                                    ios={{ name: 'chart.bar.xaxis' }}
+                                                />
+                                            </DropdownMenu.Item>
+                                            <DropdownMenu.Item key="report">
+                                                <DropdownMenu.ItemTitle>Report post</DropdownMenu.ItemTitle>
+                                                <DropdownMenu.ItemIcon
+                                                    ios={{ name: 'flag' }}
+                                                />
+                                            </DropdownMenu.Item>
+                                            <DropdownMenu.Item key="community-note">
+                                                <DropdownMenu.ItemTitle>Request community note</DropdownMenu.ItemTitle>
+                                                <DropdownMenu.ItemIcon
+                                                    ios={{ name: 'note.text' }}
+                                                />
+                                            </DropdownMenu.Item>
+                                            <DropdownMenu.Item key="offline">
+                                                <DropdownMenu.ItemTitle>Add to offline</DropdownMenu.ItemTitle>
+                                                <DropdownMenu.ItemIcon
+                                                    ios={{ name: 'arrow.down.circle' }}
+                                                />
+                                            </DropdownMenu.Item>
 
-                                        <DropdownMenu.Sub>
-                                            <DropdownMenu.SubTrigger key="user-actions">
-                                                <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
-                                                <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
-                                            </DropdownMenu.SubTrigger>
-                                            <DropdownMenu.SubContent>
-                                                <DropdownMenu.Item key="add-remove">
-                                                    <DropdownMenu.ItemTitle>Add/remove @{authorHandle} from list</DropdownMenu.ItemTitle>
-                                                    <DropdownMenu.ItemIcon ios={{ name: 'list.bullet' }} />
-                                                </DropdownMenu.Item>
-                                                <DropdownMenu.Item key="mute">
-                                                    <DropdownMenu.ItemTitle>Mute @{authorHandle}</DropdownMenu.ItemTitle>
-                                                    <DropdownMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
-                                                </DropdownMenu.Item>
-                                                <DropdownMenu.Item key="block" destructive>
-                                                    <DropdownMenu.ItemTitle>Block @{authorHandle}</DropdownMenu.ItemTitle>
-                                                    <DropdownMenu.ItemIcon ios={{ name: 'nosign' }} />
-                                                </DropdownMenu.Item>
-                                            </DropdownMenu.SubContent>
-                                        </DropdownMenu.Sub>
+                                            <DropdownMenu.Sub>
+                                                <DropdownMenu.SubTrigger key="user-actions">
+                                                    <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
+                                                    <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
+                                                </DropdownMenu.SubTrigger>
+                                                <DropdownMenu.SubContent>
+                                                    <DropdownMenu.Item key="add-remove">
+                                                        <DropdownMenu.ItemTitle>Add/remove @{authorHandle} from list</DropdownMenu.ItemTitle>
+                                                        <DropdownMenu.ItemIcon ios={{ name: 'list.bullet' }} />
+                                                    </DropdownMenu.Item>
+                                                    <DropdownMenu.Item key="mute">
+                                                        <DropdownMenu.ItemTitle>Mute @{authorHandle}</DropdownMenu.ItemTitle>
+                                                        <DropdownMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
+                                                    </DropdownMenu.Item>
+                                                    <DropdownMenu.Item key="block" destructive>
+                                                        <DropdownMenu.ItemTitle>Block @{authorHandle}</DropdownMenu.ItemTitle>
+                                                        <DropdownMenu.ItemIcon ios={{ name: 'nosign' }} />
+                                                    </DropdownMenu.Item>
+                                                </DropdownMenu.SubContent>
+                                            </DropdownMenu.Sub>
 
-                                    </DropdownMenu.Content>
-                                </DropdownMenu.Root>
-                            )}
+                                        </DropdownMenu.Content>
+                                    </DropdownMenu.Root>
+                                )}
                             </View>
 
                             <Text className="text-black dark:text-white mt-1 text-lg leading-6">{itemData.message}</Text>

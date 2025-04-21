@@ -27,7 +27,6 @@
     "viewCount": "2M",
     "category": "Premier League"
   },
-
   {
     "poster_id": "4",
     "posted_time": "1745134203",
@@ -39,7 +38,6 @@
     "view_count": "2M",
     "category": "Following"
   },
-  
   {
     "poster_id": "5",
     "posted_time": "1745134210",
@@ -51,7 +49,6 @@
     "view_count": "1.2M",
     "category": "Following"
   },
-  
   {
     "poster_id": "6",
     "posted_time": "1745154300",
@@ -63,7 +60,6 @@
     "view_count": "890K",
     "category": "Following"
   },
-  
   {
     "poster_id": "7",
     "posted_time": "1745173400",
@@ -75,7 +71,6 @@
     "view_count": "4.5M",
     "category": "Premier League"
   },
-  
   {
     "poster_id": "8",
     "posted_time": "1745174500",
@@ -87,7 +82,6 @@
     "view_count": "89K",
     "category": "RN/ React"
   },
-  
   {
     "poster_id": "9",
     "posted_time": "1745175600",
@@ -99,7 +93,6 @@
     "view_count": "45K",
     "category": "RN/ React"
   },
-  
   {
     "poster_id": "10",
     "posted_time": "1745105719",
@@ -110,8 +103,7 @@
     "reply_count": "573",
     "view_count": "252.4K",
     "category": "For you"
-},
-  
+  },
   {
     "poster_id": "11",
     "posted_time": "1745177800",
@@ -123,7 +115,6 @@
     "view_count": "178K",
     "category": "Design"
   },
-  
   {
     "poster_id": "10",
     "posted_time": "1745175900",
@@ -135,7 +126,6 @@
     "view_count": "379K",
     "category": "AI"
   },
-  
   {
     "poster_id": "6",
     "posted_time": "1745176100",
@@ -147,7 +137,6 @@
     "view_count": "789K",
     "category": "For you"
   },
-  
   {
     "poster_id": "8",
     "posted_time": "1745176300",
@@ -159,7 +148,6 @@
     "view_count": "112K",
     "category": "RN/ React"
   },
-  
   {
     "poster_id": "5",
     "posted_time": "1745176500",
@@ -171,19 +159,6 @@
     "view_count": "1.5M",
     "category": "For you"
   },
-  
-  {
-    "poster_id": "9",
-    "posted_time": "1745176700",
-    "message": "App.js Conf 2025 tickets now on sale! Early bird until June 1st. Can't wait to see everyone in Kraków for the best React Native conference in Europe! #AppJSConf2025",
-    "media_url": "https://pbs.twimg.com/media/FzGHQOtXwAE9DQm?format=jpg&name=large",
-    "like_count": "764",
-    "retweet_count": "187",
-    "reply_count": "43",
-    "view_count": "52K",
-    "category": "RN/ React"
-  },
-  
   {
     "poster_id": "10",
     "posted_time": "1745176900",
@@ -195,7 +170,6 @@
     "view_count": "658K",
     "category": "AI"
   },
-  
   {
     "poster_id": "2",
     "posted_time": "1745177100",

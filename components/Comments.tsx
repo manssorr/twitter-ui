@@ -35,8 +35,8 @@ export const dummyComments: CommentContent[] = [
     {
         commentId: 'comment1',
         contentId: 'post1',
-        authorName: 'Jane Smith',
-        authorHandle: 'janesmith',
+        authorName: 'LeBron Fanatic',
+        authorHandle: 'KingJamesLoyalty',
         authorImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
         postedTime: Date.now() - 1000 * 60 * 30, // 30 minutes ago
         message: 'This is a great post! I totally agree with your thoughts on this topic.',
@@ -44,8 +44,8 @@ export const dummyComments: CommentContent[] = [
     {
         commentId: 'comment2',
         contentId: 'post1',
-        authorName: 'John Doe',
-        authorHandle: 'johndoe',
+        authorName: 'Mike Kelly',
+        authorHandle: 'ChicagoBullsForever',
         authorImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
         postedTime: Date.now() - 1000 * 60 * 60 * 2, // 2 hours ago
         message: 'Interesting perspective! Have you considered the alternative approach?',
@@ -53,8 +53,8 @@ export const dummyComments: CommentContent[] = [
     {
         commentId: 'comment3',
         contentId: 'post1',
-        authorName: 'Tech Company',
-        authorHandle: 'techcompany',
+        authorName: 'JSGuy',
+        authorHandle: 'JSGuy',
         authorImageUrl: 'https://randomuser.me/api/portraits/lego/1.jpg',
         postedTime: Date.now() - 1000 * 60 * 60 * 5, // 5 hours ago
         message: 'We\'ve been working on similar solutions. Would love to connect and discuss further!',
@@ -63,8 +63,8 @@ export const dummyComments: CommentContent[] = [
     {
         commentId: 'comment4',
         contentId: 'post1',
-        authorName: 'Alex Johnson',
-        authorHandle: 'alexj',
+        authorName: 'Dave Rodriguez',
+        authorHandle: 'HotTakeDave',
         authorImageUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
         postedTime: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
         message: 'I had a different experience with this. Let me share what worked for me...',
@@ -73,7 +73,7 @@ export const dummyComments: CommentContent[] = [
         commentId: 'comment5',
         contentId: 'post1',
         authorName: 'Sarah Williams',
-        authorHandle: 'sarahw',
+        authorHandle: 'PatriotsSuperfan',
         authorImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
         postedTime: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
         message: 'Thanks for sharing! This helped me solve a problem I\'ve been stuck on.',

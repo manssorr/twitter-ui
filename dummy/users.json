@@ -18,8 +18,8 @@
     },
     {
         "id": "2",
-        "name": "UEFA Champions League",
-        "handle": "ChampionsLeague",
+        "name": "Champions League",
+        "handle": "UCL",
         "bio": "The home of the UEFA Champions League",
         "url": "championsleague.com",
         "followed_by": "12.3M",

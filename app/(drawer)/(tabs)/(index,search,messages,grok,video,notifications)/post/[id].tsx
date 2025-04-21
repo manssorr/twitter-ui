@@ -193,7 +193,7 @@ export default function PostDetailScreen() {
 
                 />
 
-                <View className="p-4 mt-2 mb-20">
+                <View className="px-4 mt-2 ">
 
                     <TouchableOpacity
                         onPress={handlePresentModalPress}
