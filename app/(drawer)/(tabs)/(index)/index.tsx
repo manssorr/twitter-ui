@@ -5,6 +5,7 @@ import {
     StyleSheet,
     Dimensions,
     FlatList,
+    TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FeedItem, FeedContent, findUserById } from '~/components/FeedItem';
@@ -96,6 +97,22 @@ const Header = () => {
     );
 };
 
+
+const AddPostButton = () => {
+    const insets = useSafeAreaInsets();
+    return (
+        <TouchableOpacity className="absolute bottom-6 right-6 bg-blue-500 rounded-full 
+        w-14 h-14 shadow-lg flex items-center justify-center z-10"
+            style={{
+                bottom: insets.bottom * 3,
+            }}
+        >
+            <Text className="text-white text-4xl">+</Text>
+        </TouchableOpacity>
+    );
+};
+
+
 // --- Main Screen Component ---
 export default function HomeScreen() {
     const router = useRouter();
@@ -177,6 +194,8 @@ export default function HomeScreen() {
 
     return (
         <BlurView style={styles.container} className="flex-1" intensity={80} tint={"light"}>
+
+            <AddPostButton />
             <Tabs.Container
                 headerHeight={90 + insets.top} // Adjust based on your header size
                 renderHeader={Header}

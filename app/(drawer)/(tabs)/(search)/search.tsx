@@ -11,6 +11,8 @@ import {
   StatusBar,
   ImageBackground, // Needed for featured section
 } from 'react-native';
+import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // --- Mock Data ---
 // Premier League relevant trending topics
@@ -54,16 +56,21 @@ const trendingData = [
   // Add more trends as needed
 ];
 
+const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
+
 // --- Components ---
 
 // Header Component for Explore Screen
-const ExploreHeader = ({ avatarUri }) => {
+const ExploreHeader = () => {
+  // Premier League Avatar Placeholder
+  const premierLeagueAvatar = 'https://placehold.co/80x80/6D28D9/EDE9FE?text=PL';
+  
   return (
     <View className="flex-row items-center space-x-3 px-4 py-2 bg-white border-b border-gray-200">
       {/* Left: User Avatar */}
       <TouchableOpacity>
         <Image
-          source={{ uri: avatarUri }}
+          source={{ uri: premierLeagueAvatar }}
           className="w-8 h-8 rounded-full"
           onError={(e) => console.log('Failed to load user avatar:', e.nativeEvent.error)}
         />
@@ -85,43 +92,6 @@ const ExploreHeader = ({ avatarUri }) => {
         <Text className="text-xl">⚙️</Text>
       </TouchableOpacity>
     </View>
-  );
-};
-
-// Tabs Component (Similar to Notifications, potentially needs horizontal scroll)
-const ExploreTabs = ({ activeTab, setActiveTab }) => {
-  const tabs = ['For you', 'Trending', 'News', 'Sports', 'Entertainment'];
-
-  return (
-    // Use ScrollView for horizontal scrolling if tabs overflow
-    <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="bg-white border-b border-gray-200"
-        contentContainerStyle={{ flexGrow: 1 }} // Ensure it tries to fill width
-    >
-        <View className="flex-row flex-grow">
-          {tabs.map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => setActiveTab(tab)}
-              // Adjust padding and potentially add minWidth if using horizontal scroll
-              className={`py-3 px-4 items-center flex-grow ${ // flex-grow distributes space
-                activeTab === tab ? 'border-b-2 border-blue-500' : ''
-              }`}
-              style={{ minWidth: 80 }} // Example minimum width per tab
-            >
-              <Text
-                className={`text-base whitespace-nowrap ${ // Prevent text wrapping
-                  activeTab === tab ? 'font-semibold text-blue-500' : 'text-gray-600'
-                }`}
-              >
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-    </ScrollView>
   );
 };
 
@@ -152,7 +122,6 @@ const FeaturedContent = () => {
     );
 };
 
-
 // Trending Item Component
 const TrendingItem = ({ item }) => {
   return (
@@ -175,62 +144,70 @@ const TrendingItem = ({ item }) => {
   );
 };
 
-
 // --- Main Screen Component ---
 export default function Search() {
-  // Default to 'Sports' tab for Premier League context
-  const [activeTab, setActiveTab] = useState('Sports');
-
-  // Premier League Avatar Placeholder
-  const premierLeagueAvatar = 'https://placehold.co/80x80/6D28D9/EDE9FE?text=PL';
-
-  // Filter content based on tab - Placeholder logic
-  // In a real app, you'd fetch different data per tab
-  const currentContent = activeTab === 'Trending' || activeTab === 'Sports' || activeTab === 'For you'
-    ? trendingData // Show PL trends for these tabs
-    : []; // Show nothing or different content for other tabs
+  const insets = useSafeAreaInsets();
+  
+  // Header component to be used in the collapsible view
+  const renderHeader = () => (
+    <ExploreHeader />
+  );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+      <Stack.Screen options={{ headerShown: false }} />
 
-      {/* Hide default header */}
-      <Stack.Screen options={{ title: 'Search', headerShown: false }} />
-
-      {/* Custom Header with Search */}
-      <ExploreHeader avatarUri={premierLeagueAvatar} />
-
-      {/* Tabs */}
-      <ExploreTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      {/* Scrollable Content Area */}
-      <ScrollView className="flex-1 bg-white">
-
-        {/* Show featured content only on certain tabs like 'For you' or 'Sports' */}
-        {(activeTab === 'For you' || activeTab === 'Sports') && <FeaturedContent />}
-
-        {/* Section Title (Optional) */}
-         <Text className="text-lg font-bold px-4 pt-4 pb-2 text-gray-900">
-           {activeTab === 'Trending' ? 'Premier League Trends' : 'For You'}
-         </Text>
-
-        {/* List of Trending Items or other content */}
-        {currentContent.length > 0 ? (
-          currentContent.map((item) => (
-            <TrendingItem key={item.id} item={item} />
-          ))
-        ) : (
-          // Message for empty tabs
-          <View className="items-center justify-center py-10">
-            <Text className="text-gray-500">No content available for {activeTab}.</Text>
-          </View>
+      <Tabs.Container
+        renderHeader={renderHeader}
+        pagerProps={{ scrollEnabled: true }}
+        renderTabBar={props => (
+          <MaterialTabBar
+            {...props}
+            indicatorStyle={{
+              backgroundColor: APP_PRIMARY_COLOR, height: 3, borderRadius: 50
+            }}
+            activeColor="black"
+            scrollEnabled={true}
+            style={{
+              paddingHorizontal: 16,
+              elevation: 0, shadowOpacity: 0,
+              borderBottomWidth: 1, borderBottomColor: '#f0f0f0'
+            }}
+            labelStyle={{
+              marginHorizontal: 10,
+              opacity: 1,
+              fontWeight: 'bold', textTransform: 'capitalize', height: 24,
+              color: '#606E79'
+            }}
+          />
         )}
-      </ScrollView>
+      >
+        <Tabs.Tab name="Trending">
+          <Tabs.ScrollView>
+            {/* Featured content at the top of the Trending tab */}
+            <FeaturedContent />
+            
+            {/* Section Title */}
+            <Text className="text-lg font-bold px-4 pt-2 pb-2 text-gray-900">
+              Premier League Trends
+            </Text>
+            
+            {/* Trending items list */}
+            {trendingData.map((item) => (
+              <TrendingItem key={item.id} item={item} />
+            ))}
+          </Tabs.ScrollView>
+        </Tabs.Tab>
 
-      {/* Optional: Floating Action Button */}
-      {/* <TouchableOpacity className="absolute bottom-6 right-6 bg-blue-500 rounded-full p-4 shadow-lg">
-        <Text className="text-white text-2xl">+</Text>
-      </TouchableOpacity> */}
-    </SafeAreaView>
+        <Tabs.Tab name="For You">
+          <Tabs.ScrollView>
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">Personalized content will appear here</Text>
+            </View>
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+      </Tabs.Container>
+    </View>
   );
 }
