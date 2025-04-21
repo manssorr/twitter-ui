@@ -81,7 +81,7 @@ export default function Grok() {
       style={{ marginBottom: insets.bottom + 50 }}
     >
 
-      <Stack.Screen options={{ headerShown: false }} />
+      {/* <Stack.Screen options={{ headerShown: false }} /> */}
       <View className="flex-1">
         <Header
           centerContent={

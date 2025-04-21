@@ -350,7 +350,7 @@ export default function Search() {
   return (
     <View className="flex-1 bg-white">
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      <Stack.Screen options={{ headerShown: false }} />
+      {/* <Stack.Screen options={{ headerShown: false }} /> */}
 
       <Tabs.Container
         renderHeader={renderHeader}

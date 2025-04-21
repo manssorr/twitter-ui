@@ -304,7 +304,7 @@ export default function Messages() {
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom * 3 }}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <Stack.Screen options={{ title: 'Messages', headerShown: false }} />
+      {/* <Stack.Screen options={{ title: 'Messages', headerShown: false }} /> */}
 
       <MessagesHeader />
       <SearchBar />
