@@ -142,7 +142,7 @@ const FeaturedContent = () => {
 
       <ImageBackground
         source={{ uri: featuredImageUrl }}
-        className="h-48 w-full justify-end p-4 relative"
+        className="h-[200px] w-full justify-end p-4 relative"
         resizeMode="cover"
         onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
       >
@@ -290,15 +290,15 @@ const storiesData = [
 
 const StoriesForYou = () => {
   return (
-    <View className="mb-4">
-      <Text className="text-2xl font-bold px-4 pt-2 pb-3 text-gray-900">
+    <View className="mb-4 mt-4">
+      <Text className="text-xl font-extrabold px-4 pt-2 pb-8 text-gray-900">
         Stories For You
       </Text>
 
       {storiesData.map((story, index) => (
         <TouchableOpacity key={story.id} className="mb-5">
           <View className="px-4">
-            <Text className="text-xl font-bold text-gray-900 mb-2">
+            <Text className="text-lg font-extrabold text-gray-900 mb-2">
               {story.title}
             </Text>
 
@@ -346,7 +346,7 @@ export default function Search() {
   );
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom * 3 }}>
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 20 }}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
 
