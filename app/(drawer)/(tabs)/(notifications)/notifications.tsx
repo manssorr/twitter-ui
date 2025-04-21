@@ -17,6 +17,7 @@ import SettingIcon from "~/assets/svg/aside/settings.svg"
 import HeartIcon from "~/assets/svg/like-filled.svg"
 import RetweetIcon from "~/assets/svg/notifications/repost.svg"
 import CommentIcon from "~/assets/svg/comment.svg"
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 // Import dummy users for avatars
 import usersData from "~/dummy/users.json";
@@ -35,6 +36,18 @@ const notificationsData = [
     isRead: false,
     timestamp: '2h',
   },
+  ,
+  {
+    id: '7',
+    type: 'reply',
+    mainUser: {
+      id: '11', // Figma
+    },
+    otherCount: 0,
+    postPreview: 'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
+    isRead: true,
+    timestamp: '1w',
+  },
   {
     id: '2',
     type: 'retweet',
@@ -42,7 +55,7 @@ const notificationsData = [
       id: '2', // UEFA Champions League
     },
     otherCount: 87,
-    postPreview: 'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League!',
+    postPreview: 'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League! Record 6 teams qualified in the group stage.',
     isRead: false,
     timestamp: '1d',
   },
@@ -52,7 +65,7 @@ const notificationsData = [
     mainUser: {
       id: '8', // Evan Bacon
     },
-    otherCount: 12,
+    otherCount: 898,
     isRead: true,
     timestamp: '2d',
   },
@@ -87,17 +100,6 @@ const notificationsData = [
     otherCount: 24,
     postPreview: 'Amazing to see how data science and AI are transforming football analysis in the Premier League.',
     isRead: false,
-    timestamp: '1w',
-  },
-  {
-    id: '7',
-    type: 'reply',
-    mainUser: {
-      id: '11', // Figma
-    },
-    otherCount: 0,
-    postPreview: 'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
-    isRead: true,
     timestamp: '1w',
   },
   {
@@ -179,11 +181,11 @@ const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?
         if (!user) return null;
 
         return (
-          <Image 
+          <Image
             key={userId}
             source={{ uri: user.profile_picture }}
-            className="w-9 h-9 rounded-full border-2 border-white"
-            style={{ marginLeft: index === 0 ? 0 : -10, zIndex: visibleUsers.length - index }}
+            className="w-10 h-10 rounded-full border-2 border-white"
+          // style={{ marginLeft: index === 0 ? 0 : -10, zIndex: visibleUsers.length - index }}
           />
         );
       })}
@@ -201,16 +203,16 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 
   // Generate array of user IDs for the avatar row (use main user + some others from usersData)
   const userIds = [mainUser.id];
-  
+
   // Add different users based on the notification type - only use Premier League related users
   // Get IDs 1-7 which are mostly football related accounts
   const footballUserIds = ['2', '3', '5', '7', '4', '6', '9'];
   const relevantUserIds = footballUserIds.filter(id => id !== mainUser.id);
-  
+
   // Randomly select some users to show (up to the other count, max 7)
   const othersToShow = Math.min(otherCount, 7);
   const selectedUserIds = relevantUserIds.slice(0, othersToShow);
-  
+
   userIds.push(...selectedUserIds);
 
   // Choose icon and action text based on type
@@ -220,23 +222,23 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 
   switch (type) {
     case 'like':
-      icon = <HeartIcon width={18} height={18} fill="#f91880" />;
+      icon = <HeartIcon width={20} height={20} fill="#f91880" />;
       iconColor = '#f91880';
       actionText = `liked your post`;
       break;
     case 'retweet':
-      icon = <RetweetIcon width={18} height={18} fill="#00ba7c" />;
+      icon = <RetweetIcon width={20} height={20} fill="#00ba7c" />;
       iconColor = '#00ba7c';
       actionText = `retweeted your post`;
       break;
     case 'follow':
-      icon = null; // No icon for follow notifications
+      icon = <FontAwesome5 name="user-alt" size={20} color="#1d9bf0" />;
       actionText = `followed you`;
       break;
     case 'reply':
-      icon = <CommentIcon width={18} height={18} fill="#1d9bf0" />;
+      icon = <CommentIcon width={20} height={20} fill="#1d9bf0" />;
       iconColor = '#1d9bf0';
-      actionText = `replied to your post`;
+      actionText = ` replied to your post`;
       break;
   }
 
@@ -255,7 +257,7 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
         <AvatarRow userIds={userIds} />
 
         {/* Action Text */}
-        <Text className="text-base mb-1">
+        <Text className="text-lg mb-1">
           <Text className="font-semibold">{user.name}</Text>
           {otherCount > 0 && (
             <Text className="text-gray-700"> and {formatNumber(otherCount)} others </Text>
@@ -265,13 +267,13 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 
         {/* Post Preview (for likes and retweets) */}
         {postPreview && type !== 'follow' && (
-          <Text className="text-sm text-gray-600 mb-1" numberOfLines={2} ellipsizeMode="tail">
+          <Text className="text-lg text-gray-600 mb-1" numberOfLines={5} ellipsizeMode="tail">
             {postPreview}
           </Text>
         )}
 
         {/* Timestamp */}
-        <Text className="text-xs text-gray-500 mt-1">{timestamp}</Text>
+        <Text className="text-lg text-gray-500 mt-1">{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -294,7 +296,7 @@ export default function Notifications() {
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <Tabs.Container
         renderHeader={renderHeader}
         pagerProps={{ scrollEnabled: true }}
@@ -341,7 +343,7 @@ export default function Notifications() {
             ))}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        
+
         <Tabs.Tab name="Mentions">
           <Tabs.ScrollView>
             <View className="p-6 items-center justify-center">
@@ -349,7 +351,7 @@ export default function Notifications() {
             </View>
           </Tabs.ScrollView>
         </Tabs.Tab>
-        
+
         <Tabs.Tab name="Verified">
           <Tabs.ScrollView>
             {notificationsData.filter(n => {
