@@ -110,7 +110,7 @@ function CustomDrawerContent(props: any) {
       {/* --- 1. Fixed Header (Profile Section) --- */}
       {/* This View is outside the ScrollView */}
 
-      <View className="px-7 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{}}>
+      <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{  }}>
 
         <View className="flex-1">
           <TouchableOpacity onPress={() => router.push('/profile')} className="mr-4 mb-1">
@@ -163,7 +163,7 @@ function CustomDrawerContent(props: any) {
             label="Profile"
             labelStyle={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}
             onPress={() => router.push('/profile')}
-            style={{}}
+            style={{}} 
           />
           <DrawerItem
             icon={({ color, size }) => <X width={size} height={size} fill={color} />}
@@ -223,9 +223,9 @@ function CustomDrawerContent(props: any) {
 
         </View>
 
-        <View className="h-px bg-gray-200 my-2 mx-5" />
+        <View className="h-px bg-gray-200 my-2 mx-5" /> 
 
-        <View>
+        <View> 
           <DrawerItem
             icon={({ color, size }) => <Grok width={size} height={size} fill={color} />}
             label="Download Grok"
@@ -252,12 +252,14 @@ function CustomDrawerContent(props: any) {
 
       {/* --- 3. Fixed Footer --- */}
       {/* Added bottom safe area padding */}
-      <View className="px-8 pt-4 py-2 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
+      <View className="px-5 py-2 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
         <View className="flex-row justify-between">
           <TouchableOpacity>
             <Feather name="moon" size={22} color="black" />
           </TouchableOpacity>
-
+          <TouchableOpacity>
+            <SimpleLineIcons name="bubble" size={22} color="black" />
+          </TouchableOpacity>
         </View>
       </View>
 

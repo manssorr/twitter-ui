@@ -149,24 +149,16 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     Extrapolate.CLAMP
   ));
 
-  // Modified banner vertical shift style with improved overscroll physics
+  // Modified banner shift style to maintain position
   const bannerVerticalShiftStyle = useAnimatedStyle(() => {
     const effectiveScroll = isChangingTab.value ?
       Math.min(0, scrollOffset.value) :
       scrollOffset.value;
 
-    // Add overscroll resistance factor - makes overscroll more "sticky"
-    const overscrollFactor = 0.85; // Controls stickiness (higher = stickier)
-    
-    // Apply a non-linear transformation to overscroll values for more natural physics
-    const transformedScroll = effectiveScroll < 0 
-      ? effectiveScroll * overscrollFactor * (1 - Math.exp(effectiveScroll / 500))
-      : effectiveScroll;
-
     return {
       transform: [{
         translateY: interpolate(
-          transformedScroll,
+          effectiveScroll,
           [0, BANNER_BOTTOM_MARGIN],
           [0, -BANNER_BOTTOM_MARGIN],
           Extrapolate.CLAMP
@@ -174,26 +166,6 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
       }],
     };
   });
-
-  // Improved parallax scale style with better overscroll handling
-  const parallaxScaleStyle = useAnimatedStyle(() => {
-    // Enhanced scaling with increased "stickiness" during overscroll
-    const overscrollBoost = 1.2; // Increase parallax effect during overscroll
-    
-    const scale = interpolate(
-      scrollOffset.value, 
-      [0, -(windowHeight + bannerTotalHeight.value)], 
-      [1, windowHeight / (bannerTotalHeight.value / overscrollBoost)], 
-      Extrapolate.CLAMP
-    );
-    
-    return { 
-      transform: [
-        { scaleY: scale }, 
-        { scaleX: scale }
-      ] 
-    };
-  }, [windowHeight]);
 
   // Other animation styles remain the same
   const profileRowVerticalShiftStyle = useAnimatedStyle(() => ({
@@ -206,6 +178,10 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     const imageTranslateY = interpolate(profileImageCurrentScale.value, [HEADER_PROFILE_IMAGE_START_SCALE, HEADER_PROFILE_IMAGE_END_SCALE], [0, HEADER_PROFILE_IMAGE_SIZE_VALUE / 2.5], Extrapolate.CLAMP);
     return { transform: [{ scale: profileImageCurrentScale.value }, { translateY: imageTranslateY }] };
   });
+  const parallaxScaleStyle = useAnimatedStyle(() => {
+    const scale = interpolate(scrollOffset.value, [0, -(windowHeight + bannerTotalHeight.value)], [1, windowHeight / bannerTotalHeight.value], Extrapolate.CLAMP);
+    return { transform: [{ scaleY: scale }, { scaleX: scale }] };
+  }, [windowHeight]);
 
   // Create a derived value to ensure activity indicator shows during transitions
   const isNearRefreshThreshold = useDerivedValue(() => {
@@ -280,18 +256,13 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
   // Animate scroll back to top when refreshing finishes with improved handling
   useEffect(() => {
     if (!refreshing && listRef.current && Math.round(scrollOffset.value) < 0) {
-      // Add a small delay to ensure smooth transition
-      const timeout = setTimeout(() => {
-        // Use optional chaining to safely access scrollToLocation
-        listRef.current?.scrollToLocation?.({
-          sectionIndex: 0,
-          itemIndex: 0,
-          viewOffset: 0,
-          animated: true,
-        });
-      }, 100);
-      
-      return () => clearTimeout(timeout);
+      // Use optional chaining to safely access scrollToLocation
+      listRef.current?.scrollToLocation?.({
+        sectionIndex: 0,
+        itemIndex: 0,
+        viewOffset: 0,
+        animated: true,
+      });
     }
   }, [refreshing, listRef, scrollOffset]);
 
@@ -615,22 +586,7 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      // Apply a slight damping effect to make overscroll feel more natural
-      const damping = event.contentOffset.y < 0 ? 0.95 : 1;
-      scrollPosition.value = event.contentOffset.y * damping;
-    },
-    onBeginDrag: (event) => {
-      // Track initial touch position for better overscroll handling
-      'worklet';
       scrollPosition.value = event.contentOffset.y;
-    },
-    onEndDrag: (event) => {
-      // Improve bounce-back behavior for small overscrolls
-      'worklet';
-      if (event.contentOffset.y > -50 && event.contentOffset.y < 0) {
-        // Let the natural spring animation handle small overscrolls
-        // This improves the "stickiness" feeling
-      }
     },
   });
 
@@ -639,12 +595,14 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
       <StatusBar style="light" />
       <ScrollingListWithHeader
         NavigationBarComponent={(props) => <ProfileHeader {...props} user={user} refreshing={refreshing} />}
+
         ExpandedHeaderComponent={(props) => <ProfileDetailsHeader {...props} user={user} />}
         sections={feedSections}
         ignoreLeftPadding
         ignoreRightPadding
         expandedHeaderCollapseThreshold={0.25}
         style={{ flex: 1, backgroundColor: 'white' }}
+
         contentContainerStyle={{ paddingBottom: bottomInset, flexGrow: 1, backgroundColor: colorScheme === 'light' ? 'white' : 'black' }}
         renderItem={({ item }: { item: FeedContent }) => <FeedItem itemData={item} />}
         stickySectionHeadersEnabled
@@ -681,9 +639,6 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
             refreshing={refreshing}
             onRefresh={handleRefresh}
             progressViewOffset={100} // Add appropriate offset for header
-            progressBackgroundColor="transparent"
-            colors={[APP_PRIMARY_COLOR]}
-            tintColor={APP_PRIMARY_COLOR}
           />
         }
         ref={listRef}
