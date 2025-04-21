@@ -110,7 +110,7 @@ function CustomDrawerContent(props: any) {
       {/* --- 1. Fixed Header (Profile Section) --- */}
       {/* This View is outside the ScrollView */}
 
-      <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{  }}>
+      <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{}}>
 
         <View className="flex-1">
           <TouchableOpacity onPress={() => router.push('/profile')} className="mr-4 mb-1">
@@ -163,7 +163,7 @@ function CustomDrawerContent(props: any) {
             label="Profile"
             labelStyle={{ fontSize: 18, fontWeight: 'bold', color: '#000' }}
             onPress={() => router.push('/profile')}
-            style={{}} 
+            style={{}}
           />
           <DrawerItem
             icon={({ color, size }) => <X width={size} height={size} fill={color} />}
@@ -223,9 +223,9 @@ function CustomDrawerContent(props: any) {
 
         </View>
 
-        <View className="h-px bg-gray-200 my-2 mx-5" /> 
+        <View className="h-px bg-gray-200 my-2 mx-5" />
 
-        <View> 
+        <View>
           <DrawerItem
             icon={({ color, size }) => <Grok width={size} height={size} fill={color} />}
             label="Download Grok"
@@ -283,7 +283,18 @@ function CustomDrawerContent(props: any) {
         }}
       >
         <BottomSheetView style={styles.contentContainer}>
-          <Text className="text-xl font-bold text-black mb-4 px-4">Accounts</Text>
+
+          <View className="flex-row items-center justify-center mb-4">
+
+            <TouchableOpacity onPress={() => {
+              bottomSheetModalRef.current?.dismiss();
+              router.push('/edit-accounts');
+            }} className="absolute  left-4">
+              <Text className="text-xl ">Edit</Text>
+            </TouchableOpacity>
+
+            <Text className="text-xl font-bold text-black  px-4">Accounts</Text>
+          </View>
 
           {/* List of authorized accounts only */}
           {authorizedUsers.map((user) => (
@@ -319,18 +330,14 @@ function CustomDrawerContent(props: any) {
           {/* Add account and Manage accounts buttons */}
           <View className="mt-2 border-t border-gray-200 pt-2 px-4">
             <TouchableOpacity className="py-3 flex-row items-center">
-              <Feather name="plus-circle" size={20} color="#1DA1F2" />
-              <Text className="text-base font-semibold text-blue-500 ml-3">Add an existing account</Text>
+              <Text className="text-base font-semibold text-blue-500 ml-3">Create a new account</Text>
             </TouchableOpacity>
             <TouchableOpacity
               className="py-3 flex-row items-center"
-              onPress={() => {
-                bottomSheetModalRef.current?.dismiss();
-                router.push('/edit-accounts');
-              }}
+
             >
               <Feather name="settings" size={20} color="#1DA1F2" />
-              <Text className="text-base font-semibold text-blue-500 ml-3">Manage accounts</Text>
+              <Text className="text-base font-semibold text-blue-500 ml-3">Add an Existing Account</Text>
             </TouchableOpacity>
           </View>
         </BottomSheetView>
@@ -392,6 +399,7 @@ function DrawerLayout() {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
+    marginBottom: 80
   },
 });
 

@@ -16,6 +16,7 @@ import {
     BottomSheetBackdrop // Added for the backdrop
 } from '@gorhom/bottom-sheet';
 import { Feather } from '@expo/vector-icons';
+import * as DropdownMenu from 'zeego/dropdown-menu'; // <-- Add DropdownMenu import
 
 // Define the possible sort types
 type SortType = 'relevant' | 'recent' | 'liked';
@@ -27,21 +28,74 @@ const sortOptions: Record<SortType, string> = {
     liked: 'Most liked replies',
 };
 
-export const MoreContextIcons = ({ size = "lg" }: { size?: 'sm' | 'lg' }) => {
+// Update MoreContextIcons to accept username and use DropdownMenu
+export const MoreContextIcons = ({ size = "lg", username = "unknown_user" }: { size?: 'sm' | 'lg', username?: string }) => {
     const router = useRouter();
     return (
         <View className="flex-row items-center gap-3  ">
             <TouchableOpacity onPress={() => { router.back() }}>
                 <Grok width={size === 'sm' ? 18 : 22} height={size === 'sm' ? 18 : 22} fill={'#536471'} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => { router.back() }}>
-                <Feather name="more-horizontal" size={size === 'sm' ? 18 : 22} color={'#536471'} />
-            </TouchableOpacity>
+            <DropdownMenu.Root>
+                <DropdownMenu.Trigger>
+                    <TouchableOpacity>
+                        <Feather name="more-horizontal" size={size === 'sm' ? 18 : 22} color={'#536471'} />
+                    </TouchableOpacity>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                    <DropdownMenu.Item key="interactions">
+                        <DropdownMenu.ItemTitle>View post interactions</DropdownMenu.ItemTitle>
+                        <DropdownMenu.ItemIcon
+                            ios={{ name: 'chart.bar.xaxis' }}
+                        />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="report">
+                        <DropdownMenu.ItemTitle>Report post</DropdownMenu.ItemTitle>
+                        <DropdownMenu.ItemIcon
+                            ios={{ name: 'flag' }}
+                        />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="community-note">
+                        <DropdownMenu.ItemTitle>Request community note</DropdownMenu.ItemTitle>
+                        <DropdownMenu.ItemIcon
+                            ios={{ name: 'note.text' }}
+                        />
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item key="offline">
+                        <DropdownMenu.ItemTitle>Add to offline</DropdownMenu.ItemTitle>
+                        <DropdownMenu.ItemIcon
+                            ios={{ name: 'arrow.down.circle' }}
+                        />
+                    </DropdownMenu.Item>
+
+                    <DropdownMenu.Sub>
+                        <DropdownMenu.SubTrigger key="user-actions">
+                            <DropdownMenu.ItemTitle>@{username}</DropdownMenu.ItemTitle>
+                            <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
+                        </DropdownMenu.SubTrigger>
+                        <DropdownMenu.SubContent>
+                            <DropdownMenu.Item key="add-remove">
+                                <DropdownMenu.ItemTitle>Add/remove @{username} from list</DropdownMenu.ItemTitle>
+                                <DropdownMenu.ItemIcon ios={{ name: 'list.bullet' }} />
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Item key="mute">
+                                <DropdownMenu.ItemTitle>Mute @{username}</DropdownMenu.ItemTitle>
+                                <DropdownMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
+                            </DropdownMenu.Item>
+                            <DropdownMenu.Item key="block" destructive>
+                                <DropdownMenu.ItemTitle>Block @{username}</DropdownMenu.ItemTitle>
+                                <DropdownMenu.ItemIcon ios={{ name: 'nosign' }} />
+                            </DropdownMenu.Item>
+                        </DropdownMenu.SubContent>
+                    </DropdownMenu.Sub>
+                </DropdownMenu.Content>
+            </DropdownMenu.Root>
         </View>
     );
 };
 
-const PostHeader = () => {
+// Update PostHeader to pass the username
+const PostHeader = ({ username }: { username?: string }) => {
     const insets = useSafeAreaInsets();
     const router = useRouter();
     return (
@@ -54,12 +108,17 @@ const PostHeader = () => {
             <Text className="text-xl font-bold text-black dark:text-white">Post</Text>
 
             <View className="absolute right-4">
-                <MoreContextIcons />
+                <MoreContextIcons username={username} /> 
             </View>
         </View>
     );
 };
 
+const findUserById = (id: string) => {
+    // This function should be implemented to find a user by id
+    // For now, it just returns a dummy user
+    return { handle: 'dummy_handle' };
+};
 
 export default function PostDetailScreen() {
     const params = useLocalSearchParams();
@@ -119,6 +178,13 @@ export default function PostDetailScreen() {
         return post as FeedContent | undefined;
     }, [postId]);
 
+    // Extract author handle for PostHeader
+    const authorHandle = useMemo(() => {
+        if (!findPost) return undefined;
+        const user = findUserById(findPost.poster_id);
+        return user?.handle || findPost.authorHandle; // Fallback to old format
+    }, [findPost]);
+
     const handleNavigateToProfile = (handle: string) => {
         router.push(`/profile/${handle}`);
     };
@@ -143,18 +209,17 @@ export default function PostDetailScreen() {
             >
                 <Stack.Screen options={{ title: 'Post' }} />
 
-                <PostHeader />
+                <PostHeader username={authorHandle} /> 
 
                 {/* Render the main post */}
                 <FeedItem
                     itemData={findPost}
                     detailView={true}
-                // Ensure profile navigation is handled if needed
                 />
 
                 {/* --- Replies Section Header with Sort Trigger --- */}
                 <View className="p-4 mt-2 border-t border-neutral-200 dark:border-neutral-800 mb-20">
-                    {/* This TouchableOpacity acts as the button to open the sheet */}
+                  
                     <TouchableOpacity
                         onPress={handlePresentModalPress} // Opens the sheet on press
                         className="flex-row items-center mb-3"

@@ -23,8 +23,8 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { EngagementActions } from './EngagementActions';
 import users from '~/dummy/users.json';
-import { MoreContextIcons } from "~/app/(drawer)/(tabs)/(index,search,messages,grok,video,notifications)/post/[id]"
 import * as ContextMenu from 'zeego/context-menu';
+import * as DropdownMenu from 'zeego/dropdown-menu';
 
 // Initialize dayjs plugins
 dayjs.extend(relativeTime);
@@ -200,10 +200,64 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                             />
                                         )}
                                         <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
-                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
+                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400"> · {formatTime(itemData.posted_time, false)}</Text>
                                     </View>
                                 </TouchableOpacity>
-                                <MoreContextIcons size="sm" />
+                                <DropdownMenu.Root>
+                                    <DropdownMenu.Trigger>
+                                        <TouchableOpacity className="p-1 -m-1">
+                                            <Feather name="more-horizontal" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                                        </TouchableOpacity>
+                                    </DropdownMenu.Trigger>
+                                    <DropdownMenu.Content>
+                                        <DropdownMenu.Item key="interactions">
+                                            <DropdownMenu.ItemTitle>View post interactions</DropdownMenu.ItemTitle>
+                                            <DropdownMenu.ItemIcon
+                                                ios={{ name: 'chart.bar.xaxis' }}
+                                            />
+                                        </DropdownMenu.Item>
+                                        <DropdownMenu.Item key="report">
+                                            <DropdownMenu.ItemTitle>Report post</DropdownMenu.ItemTitle>
+                                            <DropdownMenu.ItemIcon
+                                                ios={{ name: 'flag' }}
+                                            />
+                                        </DropdownMenu.Item>
+                                        <DropdownMenu.Item key="community-note">
+                                            <DropdownMenu.ItemTitle>Request community note</DropdownMenu.ItemTitle>
+                                            <DropdownMenu.ItemIcon
+                                                ios={{ name: 'note.text' }}
+                                            />
+                                        </DropdownMenu.Item>
+                                        <DropdownMenu.Item key="offline">
+                                            <DropdownMenu.ItemTitle>Add to offline</DropdownMenu.ItemTitle>
+                                            <DropdownMenu.ItemIcon
+                                                ios={{ name: 'arrow.down.circle' }}
+                                            />
+                                        </DropdownMenu.Item>
+
+                                        <DropdownMenu.Sub>
+                                            <DropdownMenu.SubTrigger key="user-actions">
+                                                <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
+                                                <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
+                                            </DropdownMenu.SubTrigger>
+                                            <DropdownMenu.SubContent>
+                                                <DropdownMenu.Item key="add-remove">
+                                                    <DropdownMenu.ItemTitle>Add/remove @{authorHandle} from list</DropdownMenu.ItemTitle>
+                                                    <DropdownMenu.ItemIcon ios={{ name: 'list.bullet' }} />
+                                                </DropdownMenu.Item>
+                                                <DropdownMenu.Item key="mute">
+                                                    <DropdownMenu.ItemTitle>Mute @{authorHandle}</DropdownMenu.ItemTitle>
+                                                    <DropdownMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
+                                                </DropdownMenu.Item>
+                                                <DropdownMenu.Item key="block" destructive>
+                                                    <DropdownMenu.ItemTitle>Block @{authorHandle}</DropdownMenu.ItemTitle>
+                                                    <DropdownMenu.ItemIcon ios={{ name: 'nosign' }} />
+                                                </DropdownMenu.Item>
+                                            </DropdownMenu.SubContent>
+                                        </DropdownMenu.Sub>
+
+                                    </DropdownMenu.Content>
+                                </DropdownMenu.Root>
                             </View>
 
                             <Text className="text-black dark:text-white mt-1 text-lg leading-6">{itemData.message}</Text>
@@ -224,7 +278,6 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                 </TouchableOpacity>
             </ContextMenu.Trigger>
             <ContextMenu.Content>
-                {/* Primary actions */}
                 <ContextMenu.Item key="view-post" onSelect={goToPost}>
                     <ContextMenu.ItemTitle>View post</ContextMenu.ItemTitle>
                     <ContextMenu.ItemIcon ios={{ name: 'doc.text' }} />
@@ -248,7 +301,6 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                     <ContextMenu.ItemIcon ios={{ name: 'person.badge.plus' }} />
                 </ContextMenu.Item>
 
-                {/* Follow-up actions as a Submenu instead of Group */}
                 <ContextMenu.Sub>
                     <ContextMenu.SubTrigger key="follow-up-trigger">
                         <ContextMenu.ItemTitle>More actions</ContextMenu.ItemTitle>
@@ -337,7 +389,6 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
                 <FollowButton />
             </View>
 
-            {/* Third row: Content Block */}
             <View className="mt-2">
                 <Text className="text-lg text-black dark:text-white">{itemData.message}</Text>
 

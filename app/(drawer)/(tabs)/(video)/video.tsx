@@ -1,10 +1,3 @@
-// Required Dependencies:
-// npx expo install expo-video @shopify/flash-list react-native-vector-icons expo expo-linear-gradient
-// Make sure expo is installed: npx expo install expo
-// npx pod-install ios (for iOS)
-// Configure app.json/app.config.js for background playback/PiP if needed (see expo-video docs)
-
-// Import necessary modules from React and React Native
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
@@ -17,125 +10,166 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-
-// Import FlashList for optimized list rendering
 import { FlashList } from '@shopify/flash-list';
-
-// Import expo-video components and hooks
-// Note: We will compare status using strings directly to avoid potential import issues with VideoPlayerStatus
 import { VideoView, useVideoPlayer } from 'expo-video';
-import { useEvent } from 'expo'; // Import useEvent hook from expo
-
-// Import icons (using FontAwesome as an example)
+import { useEvent } from 'expo';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
-// Import LinearGradient for subtle background effect
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Fontisto from '@expo/vector-icons/Fontisto';
 
-import SettingsIcon from "~/assets/svg/video/settings.svg";
-import P2PIcon from "~/assets/svg/video/p2p.svg";
-import AudioIcon from "~/assets/svg/video/audio.svg";
+import SettingsIcon from '~/assets/svg/video/settings.svg'; // Ensure these paths are correct
+import P2PIcon from '~/assets/svg/video/p2p.svg'; // Ensure these paths are correct
+import AudioIcon from '~/assets/svg/video/audio.svg'; // Ensure these paths are correct
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 
+import Comment from '~/assets/svg/comment.svg'; // Ensure these paths are correct
+import Repost from '~/assets/svg/repost.svg'; // Ensure these paths are correct
+import Save from '~/assets/svg/save.svg'; // Ensure these paths are correct
+import Views from '~/assets/svg/views.svg'; // Ensure these paths are correct
+import LikeButton from '~/components/LikeButton'; // Ensure this path is correct
 
-
-import Comment from "~/assets/svg/comment.svg";
-import Repost from "~/assets/svg/repost.svg";
-import Save from "~/assets/svg/save.svg";
-import Views from "~/assets/svg/views.svg";
-import LikeButton from '~/components/LikeButton';
-
-
-
-// Get screen dimensions
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
-// --- Sample Data ---
-// Added isFollowing placeholder
+
 const samplePosts = [
   {
-    videoId: '1',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', // Replace with your actual video URLs
-    poster: {
-      avatar: 'https://placehold.co/50x50/E91E63/white?text=A',
-      headerImage: 'https://placehold.co/400x100/cccccc/ffffff?text=Header+1',
-      name: 'Alice Wonderland',
-      username: 'alicew',
-      isFollowing: false, // Added placeholder
+    "videoId": "1k3xgqw",
+    "videoUrl": "https://v.redd.it/hr2t3u7a92we1/DASH_720.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/FF5722/white?text=7",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3xgqw",
+      "name": "77SidVid77",
+      "username": "77SidVid77",
+      "isFollowing": false
     },
-    title: 'Big Buck Bunny Adventures! Check out this amazing animation.',
-    postedTime: '9h ago', // Updated format
-    engagement: {
-      commentCount: 50, // Updated counts
-      retweetCount: 417,
-      likeCount: 5700, // 5.7k
-      viewCount: 345000, // 345k
-    },
+    "title": "Valverde's Volley Goal (Stand View)",
+    "postedTime": "2h ago",
+    "engagement": {
+      "commentCount": 44,
+      "retweetCount": 530,
+      "likeCount": 2649,
+      "viewCount": 132450
+    }
   },
   {
-    videoId: '2',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', // Replace with your actual video URLs
-    poster: {
-      avatar: 'https://placehold.co/50x50/3F51B5/white?text=B',
-      headerImage: 'https://placehold.co/400x100/cccccc/ffffff?text=Header+2',
-      name: 'Bob The Builder',
-      username: 'bobbuilds',
-      isFollowing: true,
+    "videoId": "1k3sgxg",
+    "videoUrl": "https://v.redd.it/4lag4v1a41we1/DASH_1080.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/607D8B/white?text=S",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3sgxg",
+      "name": "SirSlapBot",
+      "username": "SirSlapBot",
+      "isFollowing": true
     },
-    title: 'Elephants Dream - A classic short film with stunning visuals.',
-    postedTime: '1d ago',
-    engagement: {
-      commentCount: 300,
-      retweetCount: 120,
-      likeCount: 5200,
-      viewCount: 105000,
-    },
+    "title": "Trent Alexander-Arnold on Special Moments",
+    "postedTime": "6h ago",
+    "engagement": {
+      "commentCount": 322,
+      "retweetCount": 505,
+      "likeCount": 2523,
+      "viewCount": 126150
+    }
   },
   {
-    videoId: '3',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', // Replace with your actual video URLs
-    poster: {
-      avatar: 'https://placehold.co/50x50/4CAF50/white?text=C',
-      headerImage: 'https://placehold.co/400x100/cccccc/ffffff?text=Header+3',
-      name: 'Charlie Chaplin',
-      username: 'charliec',
-      isFollowing: false,
+    "videoId": "1k3irtu",
+    "videoUrl": "https://v.redd.it/aup4fk6ekyve1/DASH_720.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/795548/white?text=B",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3irtu",
+      "name": "_BigCIitPhobia_",
+      "username": "_BigCIitPhobia_",
+      "isFollowing": false
     },
-    title: 'For Bigger Blazes - Fun Times and cool effects!',
-    postedTime: '2d ago',
-    engagement: {
-      commentCount: 50,
-      retweetCount: 10,
-      likeCount: 800,
-      viewCount: 12000,
-    },
+    "title": "Old Trafford Vibes: Pitch Invader Hugs Security",
+    "postedTime": "15h ago",
+    "engagement": {
+      "commentCount": 75,
+      "retweetCount": 1228,
+      "likeCount": 6142,
+      "viewCount": 307100
+    }
   },
   {
-    videoId: '4',
-    videoUrl: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', // Replace with your actual video URLs
-    poster: {
-      avatar: 'https://placehold.co/50x50/FF9800/white?text=D',
-      headerImage: 'https://placehold.co/400x100/cccccc/ffffff?text=Header+4',
-      name: 'Diana Prince',
-      username: 'wonderdiana',
-      isFollowing: true,
+    "videoId": "1k3skev",
+    "videoUrl": "https://v.redd.it/rtodftfl41we1/DASH_480.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/9C27B0/white?text=T",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3skev",
+      "name": "TastefulAss",
+      "username": "TastefulAss",
+      "isFollowing": true
     },
-    title: 'Escaping the Ordinary - A thrilling adventure awaits.',
-    postedTime: '3d ago',
-    engagement: {
-      commentCount: 450,
-      retweetCount: 210,
-      likeCount: 9800,
-      viewCount: 250000,
-    },
+    "title": "Barca [4] - 1 Chelsea - Pina Goal (Putellas Assist)",
+    "postedTime": "6h ago",
+    "engagement": {
+      "commentCount": 39,
+      "retweetCount": 139,
+      "likeCount": 693,
+      "viewCount": 34650
+    }
   },
-];
+  {
+    "videoId": "1k3k52t",
+    "videoUrl": "https://v.redd.it/3j6fd5ilwyve1/DASH_1080.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/00BCD4/white?text=K",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3k52t",
+      "name": "-kousor",
+      "username": "-kousor",
+      "isFollowing": false
+    },
+    "title": "Arabic Commentary: Aston Villa's 4th Goal",
+    "postedTime": "13h ago",
+    "engagement": {
+      "commentCount": 92,
+      "retweetCount": 475,
+      "likeCount": 2374,
+      "viewCount": 118700
+    }
+  },
+  {
+    "videoId": "1k3wj7z",
+    "videoUrl": "https://v.redd.it/7kw26eoi12we1/DASH_480.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/03A9F4/white?text=E",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3wj7z",
+      "name": "EiMidagi",
+      "username": "EiMidagi",
+      "isFollowing": true
+    },
+    "title": "Vini Jr Trivela Cross",
+    "postedTime": "3h ago",
+    "engagement": {
+      "commentCount": 15,
+      "retweetCount": 65,
+      "likeCount": 324,
+      "viewCount": 16200
+    }
+  },
+  {
+    "videoId": "1k3zoeu",
+    "videoUrl": "https://v.redd.it/wfhtpcqis2we1/DASH_1080.mp4?source=fallback",
+    "poster": {
+      "avatar": "https://placehold.co/50x50/8BC34A/white?text=S",
+      "headerImage": "https://placehold.co/400x100/cccccc/ffffff?text=Header+1k3zoeu",
+      "name": "SirSlapBot",
+      "username": "SirSlapBot",
+      "isFollowing": false
+    },
+    "title": "Djokovic Reacts to Valverde Golazo",
+    "postedTime": "49m ago",
+    "engagement": {
+      "commentCount": 17,
+      "retweetCount": 32,
+      "likeCount": 161,
+      "viewCount": 8050
+    }
+  }
+]
 
-// Helper function to format seconds into MM:SS
 const formatTime = (seconds) => {
   if (isNaN(seconds) || seconds < 0) {
     return '00:00';
@@ -145,66 +179,46 @@ const formatTime = (seconds) => {
   return `${minutes < 10 ? '0' : ''}${minutes}:${secs < 10 ? '0' : ''}${secs}`;
 };
 
-
-// --- Video Item Component ---
-// Renders a single video post using expo-video with updated UI
 const VideoItem = React.memo(({ item, isVisible }) => {
-  const videoViewRef = useRef(null); // Ref for VideoView to call methods like fullscreen
+  const videoViewRef = useRef(null);
   const player = useVideoPlayer(item.videoUrl, (playerInstance) => {
     playerInstance.loop = true;
-    // Set time update interval to get progress updates (e.g., 4 times per second)
     playerInstance.timeUpdateEventInterval = 250;
   });
 
-  // State for mute status
   const [isMuted, setIsMuted] = useState(player?.muted ?? false);
 
-  // Get player status and events
   const { isPlaying } = useEvent(player, 'playingChange', { isPlaying: player.playing });
-  // Get status as a string directly
   const { status, error } = useEvent(player, 'statusChange', { status: player?.status });
-  // Get time updates
   const { currentTime, duration } = useEvent(player, 'timeUpdate', {
     currentTime: player?.currentTime ?? 0,
-    duration: player?.duration ?? 0, // Get duration as well
+    duration: player?.duration ?? 0,
   });
 
-  // --- Effects ---
-
-  // Control playback based on visibility
   useEffect(() => {
     if (!player) return;
     if (isVisible) {
       player.play();
     } else {
       player.pause();
-      // Resetting time might be desired or not, depending on UX preference
-      // player.currentTime = 0;
     }
   }, [isVisible, player]);
 
-  // Log errors
   useEffect(() => {
-    // Compare status directly with the string 'error'
     if (status === 'error' && error) {
-      console.error(`Video Error (${item.videoId}):`, error.message);
+      console.error(`Video Error (${item.videoId}):`, error.message, error); // Log the full error object
     }
   }, [status, error, item.videoId]);
 
-  // Sync local mute state with player's mute state
   useEffect(() => {
     if (player) {
       setIsMuted(player.muted);
     }
-    // Using player?.muted might cause issues if player becomes null then valid again
-    // Better to depend on the player object itself
   }, [player]);
 
 
   const insets = useSafeAreaInsets();
-  // --- Callbacks ---
 
-  // Toggle play/pause on video tap
   const togglePlayPause = useCallback(() => {
     if (!player) return;
     if (isPlaying) {
@@ -214,82 +228,63 @@ const VideoItem = React.memo(({ item, isVisible }) => {
     }
   }, [player, isPlaying]);
 
-  // Toggle mute
   const toggleMute = useCallback(() => {
     if (!player) return;
     const newMutedState = !isMuted;
     player.muted = newMutedState;
-    setIsMuted(newMutedState); // Update local state immediately for responsiveness
+    setIsMuted(newMutedState);
   }, [player, isMuted]);
 
-  // Placeholder for Follow action
   const handleFollow = useCallback(() => {
     console.log("Follow button pressed for:", item.poster.username);
-    // Add actual follow/unfollow logic here
   }, [item.poster.username]);
 
-  // Placeholder for More action
   const handleMoreOptions = useCallback(() => {
     console.log("More options pressed for:", item.videoId);
-    // Add action sheet or menu logic here
   }, [item.videoId]);
 
-  // --- Formatting ---
-
-  // Format large numbers (e.g., 1500 -> 1.5k)
   const formatCount = (count) => {
     if (count >= 1000000) {
       return (count / 1000000).toFixed(1) + 'm';
     } else if (count >= 1000) {
-      // Show one decimal place only if it's not .0
       const value = (count / 1000);
       return value % 1 === 0 ? value.toFixed(0) + 'k' : value.toFixed(1) + 'k';
     }
     return count;
   };
 
-  // Calculate progress for the bar
   const progress = duration > 0 ? currentTime / duration : 0;
 
   return (
     <View style={styles.videoContainer}>
-      {/* Touchable area for play/pause */}
       <TouchableOpacity activeOpacity={1} onPress={togglePlayPause} style={[StyleSheet.absoluteFill, { top: insets.top }]}>
         <VideoView
-          ref={videoViewRef} // Assign ref
+          ref={videoViewRef}
           player={player}
           style={styles.videoPlayer}
           contentFit="cover"
-          allowsFullscreen={false} // We'll add a custom button if needed
+          allowsFullscreen={false}
           allowsPictureInPicture={false}
           nativeControls={false}
+          onError={(e) => console.error(`VideoView Error (${item.videoId}):`, e.error)} // Added direct error handler
         />
       </TouchableOpacity>
 
-      {/* Loading Indicator: Compare status directly with the string 'loading' */}
       {status === 'loading' && (
         <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />
       )}
 
-      {/* Bottom Overlay with Gradient */}
       <LinearGradient
-        // Reduce gradient intensity slightly if needed
         colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.75)']}
         style={styles.overlayGradient}
       >
-
-
-        {/* Controls Row - Placeholders for most */}
-
         <View style={styles.controlsRow}>
-
-          <View className="flex-row items-center gap-2">
+          <View style={styles.timeDisplayContainer}>
             <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
             <Text style={styles.timeText}>/ {formatTime(duration)}</Text>
           </View>
 
-
-          <View className="flex-row items-center gap-2">
+          <View style={styles.iconControlsContainer}>
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Settings pressed")}>
               <SettingsIcon width={20} height={20} fill="#fff" />
             </TouchableOpacity>
@@ -297,32 +292,25 @@ const VideoItem = React.memo(({ item, isVisible }) => {
               <Fontisto name="airplay" size={16} color="#fff" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={toggleMute}>
-              <AudioIcon width={20} height={20} fill="#fff" />
+              <AudioIcon width={20} height={20} fill={isMuted ? '#aaa' : '#fff'} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={() => console.log("Fullscreen pressed")}>
               <P2PIcon width={20} height={20} fill="#fff" />
             </TouchableOpacity>
           </View>
-
         </View>
 
-
-        {/* Progress Bar Area */}
         <View style={styles.progressContainer}>
-
-          <FontAwesome name="play" size={20} color="#fff" />
-
-          {/* Wrap progress bar in a view to handle potential touch events if needed later */}
+          <TouchableOpacity onPress={togglePlayPause}>
+             <FontAwesome name={isPlaying ? "pause" : "play"} size={20} color="#fff" />
+          </TouchableOpacity>
           <View style={styles.progressBarTouchableArea}>
             <View style={styles.progressBarBackground}>
               <View style={[styles.progressBarFill, { width: `${progress * 100}%` }]} />
             </View>
           </View>
-
         </View>
 
-
-        {/* Poster Info Row */}
         <View style={styles.posterInfoRow}>
           <Image
             source={{ uri: item.poster.avatar }}
@@ -334,7 +322,6 @@ const VideoItem = React.memo(({ item, isVisible }) => {
             <Text style={styles.posterUsername} numberOfLines={1}>@{item.poster.username} · {item.postedTime}</Text>
           </View>
           <TouchableOpacity
-            // Add state logic here if needed for optimistic update
             style={[styles.followButton, item.poster.isFollowing ? styles.followingButton : {}]}
             onPress={handleFollow}
           >
@@ -347,50 +334,38 @@ const VideoItem = React.memo(({ item, isVisible }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Title/Caption */}
         <Text style={styles.title} numberOfLines={3}>{item.title}</Text>
 
-        {/* Engagement Row */}
         <View style={styles.engagementRow}>
           <TouchableOpacity style={styles.engagementButton}>
             <Comment width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.commentCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
-            {/* Using 'retweet' icon for shares */}
             <Repost width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.retweetCount)}</Text>
           </TouchableOpacity>
+          {/* Example of integrating LikeButton - adjust props as needed */}
+          <LikeButton initialLikes={item.engagement.likeCount} iconSize={16} textColor="#ccc" />
           <TouchableOpacity style={styles.engagementButton}>
-            <Icon name="heart-o" size={16} color="#ccc" />
-            <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.engagementButton}>
-            {/* Using 'bar-chart' icon for views */}
             <Views width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.viewCount)}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.engagementButton}>
             <Save width={16} height={16} fill="#ccc" />
-            {/* Bookmark count often not shown, or shown differently */}
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.engagementButton}>
             <Feather name="share" size={16} color="#ccc" />
-            {/* Bookmark count often not shown, or shown differently */}
           </TouchableOpacity>
-
         </View>
       </LinearGradient>
 
-      {/* Simple Play/Pause indicator: Compare status directly with the string 'readyToPlay' */}
       {!isPlaying && status === 'readyToPlay' && (
-        <View style={styles.playPauseIndicator}>
+        <View style={styles.playPauseIndicator} pointerEvents="none">
           <Icon name="play" size={60} color="rgba(255, 255, 255, 0.7)" />
         </View>
       )}
 
-      {/* Error Indicator: Compare status directly with the string 'error' */}
       {status === 'error' && (
         <View style={styles.playPauseIndicator}>
           <Icon name="exclamation-triangle" size={60} color="rgba(255, 0, 0, 0.7)" />
@@ -401,19 +376,21 @@ const VideoItem = React.memo(({ item, isVisible }) => {
   );
 });
 
-// --- Main Video Feed Component ---
-// (No changes needed here)
 const VideoFeed = () => {
   const viewableItems = useRef([]);
   const onViewableItemsChanged = useCallback(({ viewableItems: currentViewableItems }) => {
     viewableItems.current = currentViewableItems
-      .filter(item => item.key != null)
-      .map(item => item.key);
+      .filter(item => item.isViewable && item.item) // Ensure item exists and is viewable
+      .map(item => item.item.videoId); // Map to videoId
   }, []);
+
   const renderItem = useCallback(({ item }) => {
-    const isVisible = viewableItems.current.includes(item.videoId);
+    // Check if item and item.videoId exist before accessing
+    const isVisible = item?.videoId ? viewableItems.current.includes(item.videoId) : false;
+    if (!item) return null; // Render nothing if item is somehow null/undefined
     return <VideoItem item={item} isVisible={isVisible} />;
   }, []);
+
   const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 50 }).current;
 
   const router = useRouter();
@@ -421,9 +398,7 @@ const VideoFeed = () => {
 
   return (
     <View style={styles.container}>
-
-
-      <TouchableOpacity onPress={() => { router.back() }} className="absolute left-4 z-10" style={{ top: insets.top + 10 }}>
+      <TouchableOpacity onPress={() => { router.back() }} style={[styles.backButton, { top: insets.top + 10 }]}>
         <Feather name="arrow-left" size={22} color={'#fff'} />
       </TouchableOpacity>
 
@@ -438,16 +413,25 @@ const VideoFeed = () => {
         showsVerticalScrollIndicator={false}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        removeClippedSubviews={true} // Optimization
+        initialNumToRender={1} // Optimization
+        maxToRenderPerBatch={1} // Optimization
+        windowSize={3} // Optimization: Render items within 3 screens
       />
     </View>
   );
 };
 
-// --- Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  backButton: {
+     position: 'absolute',
+     left: 15,
+     zIndex: 10, // Ensure it's above the list
+     padding: 5, // Add padding for easier tapping
   },
   videoContainer: {
     width: SCREEN_WIDTH,
@@ -464,23 +448,26 @@ const styles = StyleSheet.create({
     bottom: 0,
     right: 0,
   },
-  // Gradient overlay for better text visibility at the bottom
   overlayGradient: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    paddingTop: 10, // Reduced padding
-    paddingBottom: Platform.OS === 'ios' ? 35 : 25, // Adjust bottom padding
+    paddingTop: 10,
+    paddingBottom: Platform.OS === 'ios' ? 35 : 25,
     paddingHorizontal: 15,
   },
-  // Progress Bar Styles
   progressContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10, // Increased space
+    marginBottom: 10,
     height: 20,
-    gap: 10
+    gap: 10,
+  },
+  timeDisplayContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   timeText: {
     color: '#fff',
@@ -489,11 +476,10 @@ const styles = StyleSheet.create({
     minWidth: 40,
     textAlign: 'center',
   },
-  // Added touchable area wrapper for potential seeking later
   progressBarTouchableArea: {
     flex: 1,
     marginHorizontal: 8,
-    paddingVertical: 5, // Add vertical padding for easier touch
+    paddingVertical: 5,
   },
   progressBarBackground: {
     height: 4,
@@ -506,18 +492,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 2,
   },
-  // Controls Row Styles
   controlsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // marginBottom: 15,
-    // paddingHorizontal: 30,
+    marginBottom: 5, // Reduced margin slightly
+  },
+  iconControlsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10, // Add gap between icons
   },
   controlButton: {
     padding: 5,
   },
-  // Poster Info Row Styles
   posterInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -553,30 +541,28 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   followingButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Semi-transparent background when following
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.5)',
   },
   followButtonText: {
-    color: '#000', // Black text for 'Follow'
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 13,
     textAlign: 'center',
   },
   followingButtonText: {
-    color: '#fff', // White text for 'Following'
+    color: '#fff',
   },
   moreButton: {
     padding: 5,
   },
-  // Title Style
   title: {
     color: '#fff',
     fontSize: 14,
     marginBottom: 15,
     lineHeight: 18,
   },
-  // Engagement Row Styles
   engagementRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -586,15 +572,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 5,
-    // Let space-between handle horizontal spacing
   },
   engagementText: {
     color: '#ccc',
     fontSize: 13,
-    marginLeft: 6, // Slightly more space
+    marginLeft: 6,
     fontWeight: '600',
   },
-  // Indicators
   loadingIndicator: {
     position: 'absolute',
   },
@@ -615,5 +599,4 @@ const styles = StyleSheet.create({
   }
 });
 
-// Export the main component
 export default VideoFeed;
