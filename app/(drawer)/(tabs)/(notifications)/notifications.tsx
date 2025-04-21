@@ -16,74 +16,98 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import SettingIcon from "~/assets/svg/aside/settings.svg"
 import HeartIcon from "~/assets/svg/like-filled.svg"
 import RetweetIcon from "~/assets/svg/notifications/repost.svg"
+import CommentIcon from "~/assets/svg/comment.svg"
 
 // Import dummy users for avatars
 import usersData from "~/dummy/users.json";
 
 // --- Mock Data ---
-// Updated with more Twitter-like notifications showing multiple followers and likes
+// Updated with Premier League perspective notifications
 const notificationsData = [
   {
     id: '1',
-    type: 'follow',
+    type: 'like',
     mainUser: {
-      id: '4', // Guillermo Rauch
+      id: '7', // Cristiano Ronaldo
     },
-    otherCount: 7,
+    otherCount: 143,
+    postPreview: 'Matchday 38: Every goal, every emotion, every moment. What a Premier League season it has been!',
     isRead: false,
     timestamp: '2h',
   },
   {
     id: '2',
-    type: 'like',
+    type: 'retweet',
     mainUser: {
-      id: '8', // Evan Bacon
+      id: '2', // UEFA Champions League
     },
-    otherCount: 243,
-    postPreview: 'Introducing Netflix on React Native!\n\nTwo apps. One\'s built in JavaScript. Can you guess which?',
+    otherCount: 87,
+    postPreview: 'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League!',
     isRead: false,
     timestamp: '1d',
   },
   {
     id: '3',
-    type: 'retweet',
+    type: 'follow',
     mainUser: {
-      id: '5', // Paul Graham
+      id: '8', // Evan Bacon
     },
-    otherCount: 52,
-    postPreview: 'Just released a new update for our Twitter UI clone. Check it out!',
+    otherCount: 12,
     isRead: true,
-    timestamp: '3d',
+    timestamp: '2d',
   },
   {
     id: '4',
-    type: 'follow',
+    type: 'reply',
     mainUser: {
-      id: '10', // Andrej Karpathy
+      id: '3', // Fantasy PL
     },
-    otherCount: 15,
+    otherCount: 0,
+    postPreview: 'Could you share the top point-scorers from this weekend\'s fixtures?',
     isRead: false,
-    timestamp: '1w',
+    timestamp: '3d',
   },
   {
     id: '5',
     type: 'like',
     mainUser: {
-      id: '7', // Cristiano Ronaldo
+      id: '6', // Andrew Huberman
     },
-    otherCount: 1287,
-    postPreview: 'Building with React Native has never been easier!',
+    otherCount: 523,
+    postPreview: 'Research suggests that Premier League footballers cover an average of 10-13km per match, with high-intensity sprints making up to 10% of that distance.',
     isRead: true,
-    timestamp: '2w',
+    timestamp: '4d',
   },
   {
     id: '6',
     type: 'retweet',
     mainUser: {
-      id: '6', // Andrew Huberman
+      id: '10', // Andrej Karpathy
     },
-    otherCount: 89,
-    postPreview: 'Here\'s how we implemented the Twitter-like UI in our app',
+    otherCount: 24,
+    postPreview: 'Amazing to see how data science and AI are transforming football analysis in the Premier League.',
+    isRead: false,
+    timestamp: '1w',
+  },
+  {
+    id: '7',
+    type: 'reply',
+    mainUser: {
+      id: '11', // Figma
+    },
+    otherCount: 0,
+    postPreview: 'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
+    isRead: true,
+    timestamp: '1w',
+  },
+  {
+    id: '8',
+    type: 'like',
+    mainUser: {
+      id: '9', // App.js Conf
+    },
+    otherCount: 36,
+    postPreview: 'The Premier League app is one of the best examples of cross-platform development we\'ve seen!',
     isRead: false,
     timestamp: '2w',
   },
@@ -178,12 +202,16 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
   // Generate array of user IDs for the avatar row (use main user + some others from usersData)
   const userIds = [mainUser.id];
   
-  // Add different users based on the notification type
-  const remainingUsers = usersData
-    .filter(u => u.id !== mainUser.id)
-    .slice(0, 7); // Get up to 7 other users
+  // Add different users based on the notification type - only use Premier League related users
+  // Get IDs 1-7 which are mostly football related accounts
+  const footballUserIds = ['2', '3', '5', '7', '4', '6', '9'];
+  const relevantUserIds = footballUserIds.filter(id => id !== mainUser.id);
   
-  userIds.push(...remainingUsers.map(u => u.id));
+  // Randomly select some users to show (up to the other count, max 7)
+  const othersToShow = Math.min(otherCount, 7);
+  const selectedUserIds = relevantUserIds.slice(0, othersToShow);
+  
+  userIds.push(...selectedUserIds);
 
   // Choose icon and action text based on type
   let icon = null;
@@ -204,6 +232,11 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
     case 'follow':
       icon = null; // No icon for follow notifications
       actionText = `followed you`;
+      break;
+    case 'reply':
+      icon = <CommentIcon width={18} height={18} fill="#1d9bf0" />;
+      iconColor = '#1d9bf0';
+      actionText = `replied to your post`;
       break;
   }
 
