@@ -30,7 +30,7 @@ const trendingData = [
     category: 'Premier League · Last night',
     topic: 'VAR Controversy Hits Anfield',
     posts: '95K posts',
-     image: 'https://placehold.co/150x100/F97316/FFFFFF?text=VAR', // Placeholder
+    image: 'https://placehold.co/150x100/F97316/FFFFFF?text=VAR', // Placeholder
   },
   {
     id: '3',
@@ -46,7 +46,7 @@ const trendingData = [
     posts: '250K posts',
     image: 'https://placehold.co/150x100/8B5CF6/FFFFFF?text=Transfer', // Placeholder
   },
-   {
+  {
     id: '5',
     category: 'Premier League · Live',
     topic: 'Weekend Fixtures Update',
@@ -64,7 +64,7 @@ const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 const ExploreHeader = () => {
   // Premier League Avatar Placeholder
   const premierLeagueAvatar = 'https://placehold.co/80x80/6D28D9/EDE9FE?text=PL';
-  
+
   return (
     <View className="flex-row items-center space-x-3 px-4 py-2 bg-white border-b border-gray-200">
       {/* Left: User Avatar */}
@@ -97,29 +97,29 @@ const ExploreHeader = () => {
 
 // Featured Content Component
 const FeaturedContent = () => {
-    // Placeholder image for Premier League featured content
-    const featuredImageUrl = 'https://placehold.co/600x300/3B82F6/FFFFFF?text=Premier+League+Highlights';
-    return (
-        <View className="mb-4">
-            <ImageBackground
-                source={{ uri: featuredImageUrl }}
-                className="h-48 w-full justify-end p-4" // Height and padding
-                resizeMode="cover" // Cover the area
-                onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
-            >
-                <Text className="text-white text-2xl font-bold shadow-lg">This Weekend's Action</Text>
-                <Text className="text-white text-sm shadow-md">Catch all the goals and highlights!</Text>
-                {/* Optional: Add overlay or gradient for better text visibility */}
-            </ImageBackground>
-            {/* Optional: Promoted/Sponsored Banner */}
-            <View className="flex-row items-center justify-between bg-blue-50 p-3 mt-1 border-t border-b border-blue-100">
-                <Text className="text-blue-800 font-semibold">PL Portal</Text>
-                <Text className="text-xs text-gray-500">Brought to you by <Text className="font-bold">Sponsor</Text></Text>
-                 {/* Replace with actual sponsor logo if available */}
-                <Image source={{uri: 'https://placehold.co/80x20/A5B4FC/1E3A8A?text=Sponsor'}} className="h-5 w-16" resizeMode="contain" />
-            </View>
-        </View>
-    );
+  // Placeholder image for Premier League featured content
+  const featuredImageUrl = 'https://placehold.co/600x300/3B82F6/FFFFFF?text=Premier+League+Highlights';
+  return (
+    <View className="mb-4">
+      <ImageBackground
+        source={{ uri: featuredImageUrl }}
+        className="h-48 w-full justify-end p-4" // Height and padding
+        resizeMode="cover" // Cover the area
+        onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
+      >
+        <Text className="text-white text-2xl font-bold shadow-lg">This Weekend's Action</Text>
+        <Text className="text-white text-sm shadow-md">Catch all the goals and highlights!</Text>
+        {/* Optional: Add overlay or gradient for better text visibility */}
+      </ImageBackground>
+      {/* Optional: Promoted/Sponsored Banner */}
+      <View className="flex-row items-center justify-between bg-blue-50 p-3 mt-1 border-t border-b border-blue-100">
+        <Text className="text-blue-800 font-semibold">PL Portal</Text>
+        <Text className="text-xs text-gray-500">Brought to you by <Text className="font-bold">Sponsor</Text></Text>
+        {/* Replace with actual sponsor logo if available */}
+        <Image source={{ uri: 'https://placehold.co/80x20/A5B4FC/1E3A8A?text=Sponsor' }} className="h-5 w-16" resizeMode="contain" />
+      </View>
+    </View>
+  );
 };
 
 // Trending Item Component
@@ -134,11 +134,11 @@ const TrendingItem = ({ item }) => {
       </View>
       {/* Right: Optional Image */}
       {item.image && (
-         <Image
-            source={{ uri: item.image }}
-            className="w-16 h-16 rounded-lg" // Adjust size as needed
-            onError={(e) => console.log(`Failed to load trend image for ${item.topic}:`, e.nativeEvent.error)}
-         />
+        <Image
+          source={{ uri: item.image }}
+          className="w-16 h-16 rounded-lg" // Adjust size as needed
+          onError={(e) => console.log(`Failed to load trend image for ${item.topic}:`, e.nativeEvent.error)}
+        />
       )}
     </TouchableOpacity>
   );
@@ -147,7 +147,7 @@ const TrendingItem = ({ item }) => {
 // --- Main Screen Component ---
 export default function Search() {
   const insets = useSafeAreaInsets();
-  
+
   // Header component to be used in the collapsible view
   const renderHeader = () => (
     <ExploreHeader />
@@ -183,16 +183,31 @@ export default function Search() {
           />
         )}
       >
-        <Tabs.Tab name="Trending">
+
+
+        <Tabs.Tab name="For You">
           <Tabs.ScrollView>
+
             {/* Featured content at the top of the Trending tab */}
             <FeaturedContent />
-            
+
             {/* Section Title */}
             <Text className="text-lg font-bold px-4 pt-2 pb-2 text-gray-900">
               Premier League Trends
             </Text>
-            
+
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">Personalized content will appear here</Text>
+            </View>
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+
+
+
+        <Tabs.Tab name="Trending">
+          <Tabs.ScrollView>
+
+
             {/* Trending items list */}
             {trendingData.map((item) => (
               <TrendingItem key={item.id} item={item} />
@@ -200,14 +215,45 @@ export default function Search() {
           </Tabs.ScrollView>
         </Tabs.Tab>
 
-        <Tabs.Tab name="For You">
+
+
+
+        <Tabs.Tab name="News">
           <Tabs.ScrollView>
             <View className="p-6 items-center justify-center">
-              <Text className="text-gray-500">Personalized content will appear here</Text>
+              <Text className="text-gray-500">News content will appear here</Text>
+            </View>
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Sports">
+          <Tabs.ScrollView>
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">Sports content will appear here</Text>
+            </View>
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Entertainment">
+          <Tabs.ScrollView>
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">Entertainment content will appear here</Text>
+            </View>
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Saved">
+          <Tabs.ScrollView>
+            <View className="p-6 items-center justify-center">
+              <Text className="text-gray-500">Saved content will appear here</Text>
             </View>
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
+
+
+
+
+
+
+
     </View>
   );
 }
