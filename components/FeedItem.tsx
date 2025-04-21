@@ -50,30 +50,30 @@ export const PROFILE_IMAGE_SIZE_MAP = { ...PROFILE_IMAGE_DIMENSIONS };
 export interface FeedContent {
     contentId?: string;
     poster_id: string;
-    authorName?: string;    
-    authorHandle?: string;  
-    authorImageUrl?: string; 
-    posted_time: number;    
+    authorName?: string;
+    authorHandle?: string;
+    authorImageUrl?: string;
+    posted_time: number;
     message: string;
-    media_url?: string;     
-    like_count?: number;    
-    retweet_count?: number; 
-    reply_count?: number;   
-    view_count?: string;    
+    media_url?: string;
+    like_count?: number;
+    retweet_count?: number;
+    reply_count?: number;
+    view_count?: string;
     is_organization?: boolean;
-    category?: string;      
+    category?: string;
 }
 
 
 const formatTime = (timestamp: number, isDetailView: boolean): string => {
-    
+
     const time = dayjs(timestamp * 1000);
 
     if (isDetailView) {
-        
+
         return time.format('h:mm A · MMM D, YYYY');
     } else {
-        
+
         const now = dayjs();
         const diffInSeconds = now.diff(time, 'second');
 
@@ -150,7 +150,7 @@ export const findUserById = (id: string) => {
 
 interface FeedItemProps {
     itemData: FeedContent;
-    onPress?: () => void; 
+    onPress?: () => void;
     detailView?: boolean;
 }
 
@@ -158,10 +158,10 @@ interface FeedItemProps {
 export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
 
-    
+
     const userInfo = findUserById(itemData.poster_id);
 
-    
+
     const authorName = itemData.authorName || userInfo?.name || 'Unknown';
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
@@ -170,7 +170,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
     const router = useRouter();
 
-    
+
     const goToPost = () => {
         const postId = itemData.contentId;
         if (postId) {
@@ -199,7 +199,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                                 onError={(e) => console.log('Failed to load verified badge:', e.nativeEvent.error)}
                                             />
                                         )}
-                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
+                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1 ml-1">@{authorHandle}</Text>
                                         <Text className="text-lg text-neutral-500 dark:text-neutral-400"> · {formatTime(itemData.posted_time, false)}</Text>
                                     </View>
                                 </TouchableOpacity>
@@ -207,7 +207,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                 {!detailView && (
                                     <DropdownMenu.Root>
                                         <DropdownMenu.Trigger>
-                                            <TouchableOpacity className="p-1 -m-1">
+                                            <TouchableOpacity className="p-1 -m-1 opacity-70">
                                                 <Feather name="more-horizontal" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
                                             </TouchableOpacity>
                                         </DropdownMenu.Trigger>
@@ -240,7 +240,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                             <DropdownMenu.Sub>
                                                 <DropdownMenu.SubTrigger key="user-actions">
                                                     <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
-                                                    
+
                                                 </DropdownMenu.SubTrigger>
                                                 <DropdownMenu.SubContent>
                                                     <DropdownMenu.Item key="add-remove">
@@ -339,10 +339,10 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
 
-    
+
     const userInfo = findUserById(itemData.poster_id);
 
-    
+
     const authorName = itemData.authorName || userInfo?.name || 'Unknown';
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
@@ -351,7 +351,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
 
     const router = useRouter();
 
-    
+
     const goToPost = () => {
         const postId = itemData.contentId;
         if (postId) {
@@ -364,7 +364,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
     return (
         <View className="px-4 dark:border-neutral-800 ">
 
-            
+
             <View className="flex-row justify-between items-center mb-3">
                 <View className="flex-row items-center">
                     <ProfileImage
@@ -380,11 +380,11 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
                             {verified_badge && (
                                 <Image
                                     source={{ uri: verified_badge }}
-                                    className="w-4 h-4"
+                                    className="w-4 h-4 mr-1"
                                     onError={(e) => console.log('Failed to load verified badge:', e.nativeEvent.error)}
                                 />
                             )}
-                            <Text className="text-lg text-neutral-500 dark:text-neutral-400 -mt-1">@{authorHandle}</Text>
+                            <Text className="text-lg text-neutral-500 dark:text-neutral-400  ml-1">@{authorHandle}</Text>
                         </View>
                     </TouchableOpacity>
                 </View>

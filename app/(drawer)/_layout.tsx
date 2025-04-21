@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  StyleSheet 
+  StyleSheet
 } from 'react-native';
 import {
   DrawerContentScrollView,
@@ -51,7 +51,7 @@ function CustomDrawerContent(props: any) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authorizedUsers, setAuthorizedUsers] = useState<any[]>([]);
 
-  
+
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['50%'], []);
 
@@ -63,13 +63,13 @@ function CustomDrawerContent(props: any) {
     console.log('handleSheetChanges', index);
   }, []);
 
-  
+
   const handleSelectAccount = useCallback((userId: string) => {
     setCurrentUserId(userId);
     bottomSheetModalRef.current?.dismiss();
   }, [setCurrentUserId]);
 
-  
+
   useEffect(() => {
     const filteredUsers = users.filter(user =>
       authorizedAccounts.includes(user.id)
@@ -78,7 +78,7 @@ function CustomDrawerContent(props: any) {
   }, []);
 
   useEffect(() => {
-    
+
     if (currentUserId) {
       const user = users.find(user => user.id === currentUserId);
       if (user) {
@@ -87,7 +87,7 @@ function CustomDrawerContent(props: any) {
     }
   }, [currentUserId]);
 
-  
+
   useEffect(() => {
     if (!currentUser && authorizedUsers.length > 0) {
       setCurrentUser(authorizedUsers[0]);
@@ -95,7 +95,7 @@ function CustomDrawerContent(props: any) {
     }
   }, [authorizedUsers, currentUser, setCurrentUserId]);
 
-  
+
   const userName = currentUser?.name || 'Twitter User';
   const userHandle = currentUser?.handle ? `@${currentUser.handle}` : '@user';
   const followingCount = currentUser?.following_count || 0;
@@ -105,10 +105,10 @@ function CustomDrawerContent(props: any) {
   const isVerified = currentUser?.is_verified || false;
 
   return (
-    
+
     <SafeAreaView className="flex-1 flex-col bg-white">
-      
-      
+
+
 
       <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{}}>
 
@@ -150,7 +150,7 @@ function CustomDrawerContent(props: any) {
         </TouchableOpacity>
       </View>
 
-      
+
       <DrawerContentScrollView
         {...props}
         className="flex-shrink flex-grow"
@@ -250,20 +250,18 @@ function CustomDrawerContent(props: any) {
         </View>
       </DrawerContentScrollView>
 
-      
-      
-      <View className="px-5 py-2 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
+
+
+      <View className="px-8 pt-4 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
         <View className="flex-row justify-between">
           <TouchableOpacity>
             <Feather name="moon" size={22} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity>
-            <SimpleLineIcons name="bubble" size={22} color="black" />
-          </TouchableOpacity>
+
         </View>
       </View>
 
-      
+
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -296,7 +294,7 @@ function CustomDrawerContent(props: any) {
             <Text className="text-xl font-bold text-black  px-4">Accounts</Text>
           </View>
 
-          
+
           {authorizedUsers.map((user) => (
             <TouchableOpacity
               key={user.id}
@@ -327,7 +325,7 @@ function CustomDrawerContent(props: any) {
             </TouchableOpacity>
           ))}
 
-          
+
           <View className="mt-2 border-t border-gray-200 pt-2 px-4">
             <TouchableOpacity className="py-3 flex-row items-center">
               <Text className="text-base font-semibold text-blue-500 ml-3">Create a new account</Text>
@@ -365,7 +363,7 @@ function DrawerLayout() {
         headerShown: false,
         swipeEnabled: allowedDrawerRoutes.includes(pathname[3] || ''),
         swipeEdgeWidth: width,
-        
+
 
         overlayColor: '#adadad8c',
         drawerStyle: {
@@ -374,8 +372,8 @@ function DrawerLayout() {
       }}
     >
 
-      
-      
+
+
       <Drawer.Screen name="index" options={{ headerTitle: 'Home' /*, headerShown: false */ }} />
       <Drawer.Screen name="(tabs)" options={{ headerTitle: 'Tabs' /*, headerShown: false */ }} />
       <Drawer.Screen name="profile" options={{ headerTitle: 'Profile' /*, headerShown: false */ }} />

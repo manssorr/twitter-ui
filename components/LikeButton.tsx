@@ -266,6 +266,7 @@ const styles = StyleSheet.create({
         height: 35,
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: -8
     },
     iconAbsolute: {
         position: 'absolute',

@@ -17,16 +17,17 @@ import users from '~/dummy/users.json';
 import { StyledExpoImage } from "~/components/Image";
 import X from "~/assets/svg/aside/x.svg";
 import { BlurView } from 'expo-blur';
+import { AntDesign } from '@expo/vector-icons';
 
 
-const APP_PRIMARY_COLOR = '#1DA1F2'; 
+const APP_PRIMARY_COLOR = '#1DA1F2';
 
 
-const categoryTabs = ['For you', 'Following', 'React & Expo', 'Al', 'Premier League', 'Design'];
+const categoryTabs = ['For you', 'Following', 'Premier League', 'Design', 'React & Expo', 'Al'];
 
 
 const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
-    
+
     if (typeof item.poster_id === 'string') {
         return {
             contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
@@ -42,9 +43,9 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             category: item.category || 'For you'
         };
     }
-    
+
     else if (typeof item.authorName === 'string') {
-        
+
         const matchingUser = users.find(user => user.name === item.authorName);
         const userId = matchingUser ? matchingUser.id : '0';
 
@@ -65,11 +66,11 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             category: item.category || 'For you'
         };
     }
-    
+
     else {
         return {
             contentId: `post-unknown-${Date.now()}`,
-            poster_id: '0', 
+            poster_id: '0',
             posted_time: Date.now(),
             message: 'Unknown post format',
             media_url: undefined,
@@ -107,7 +108,7 @@ const AddPostButton = () => {
                 bottom: insets.bottom * 3,
             }}
         >
-            <Text className="text-white text-4xl">+</Text>
+            <AntDesign name="plus" size={24} color="#ffffff" />
         </TouchableOpacity>
     );
 };
@@ -122,23 +123,23 @@ export default function HomeScreen() {
         router.push(`/post/${postId}`);
     };
 
-    
+
     const feedItemsByCategory = useMemo(() => {
         const itemsByCategory: Record<string, FeedContent[]> = {};
 
-        
+
         categoryTabs.forEach(category => {
             itemsByCategory[category] = [];
         });
 
-        
+
         itemsByCategory['For you'] = [...processedFeedItems].sort((a, b) => {
             const timeA = typeof a.posted_time === 'number' ? a.posted_time : parseInt(String(a.posted_time), 10);
             const timeB = typeof b.posted_time === 'number' ? b.posted_time : parseInt(String(b.posted_time), 10);
-            return timeB - timeA; 
+            return timeB - timeA;
         });
 
-        
+
         processedFeedItems.forEach(item => {
             if (item.category && item.category !== 'For you') {
                 if (itemsByCategory[item.category]) {
@@ -150,12 +151,12 @@ export default function HomeScreen() {
         return itemsByCategory;
     }, []);
 
-    
+
     const renderTab = useCallback((tabName: string) => {
-        
+
         const tabPosts = feedItemsByCategory[tabName] || [];
 
-        
+
         if (tabPosts.length === 0) {
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
@@ -175,7 +176,7 @@ export default function HomeScreen() {
                 data={tabPosts}
                 renderItem={renderFeedItem}
                 keyExtractor={(item) => {
-                    
+
                     return `${tabName}-${item.contentId || `post-${item.poster_id}-${item.posted_time}`}`;
                 }}
                 contentContainerStyle={{
@@ -185,7 +186,7 @@ export default function HomeScreen() {
         );
     }, [insets.bottom, feedItemsByCategory]);
 
-    
+
     const renderTabBar = (props: any) => (
         <MaterialTabBar
             {...props}
@@ -206,7 +207,7 @@ export default function HomeScreen() {
                 fontSize: 15,
                 color: '#606E79'
             }}
-            
+
         />
     );
 
@@ -215,7 +216,7 @@ export default function HomeScreen() {
 
             <AddPostButton />
             <Tabs.Container
-                
+
                 renderHeader={Header}
                 renderTabBar={renderTabBar}
                 pagerProps={{ scrollEnabled: true }}
