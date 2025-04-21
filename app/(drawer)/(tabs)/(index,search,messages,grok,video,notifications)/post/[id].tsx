@@ -67,7 +67,7 @@ export const MoreContextIcons = ({ size = "lg", username = "unknown_user" }: { s
                     <DropdownMenu.Sub>
                         <DropdownMenu.SubTrigger key="user-actions">
                             <DropdownMenu.ItemTitle>@{username}</DropdownMenu.ItemTitle>
-                            <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
+                            {/* <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} /> */}
                         </DropdownMenu.SubTrigger>
                         <DropdownMenu.SubContent>
                             <DropdownMenu.Item key="add-remove">

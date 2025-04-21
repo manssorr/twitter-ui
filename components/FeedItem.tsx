@@ -240,7 +240,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                             <DropdownMenu.Sub>
                                                 <DropdownMenu.SubTrigger key="user-actions">
                                                     <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
-                                                    <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} />
+                                                    {/* <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} /> */}
                                                 </DropdownMenu.SubTrigger>
                                                 <DropdownMenu.SubContent>
                                                     <DropdownMenu.Item key="add-remove">
@@ -306,8 +306,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
                 <ContextMenu.Sub>
                     <ContextMenu.SubTrigger key="follow-up-trigger">
-                        <ContextMenu.ItemTitle>More actions</ContextMenu.ItemTitle>
-                        <ContextMenu.ItemIcon ios={{ name: 'ellipsis.circle' }} />
+                        <ContextMenu.ItemTitle>More @{authorHandle}</ContextMenu.ItemTitle>
                     </ContextMenu.SubTrigger>
                     <ContextMenu.SubContent>
                         <ContextMenu.Item key="interactions" onSelect={() => console.log('View Interactions', itemData.contentId)}>
