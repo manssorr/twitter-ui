@@ -302,7 +302,7 @@ const VideoItem = React.memo(({ item, isVisible }) => {
 
         <View style={styles.progressContainer}>
           <TouchableOpacity onPress={togglePlayPause}>
-             <FontAwesome name={isPlaying ? "pause" : "play"} size={20} color="#fff" />
+            <FontAwesome name={isPlaying ? "pause" : "play"} size={20} color="#fff" />
           </TouchableOpacity>
           <View style={styles.progressBarTouchableArea}>
             <View style={styles.progressBarBackground}>
@@ -345,8 +345,12 @@ const VideoItem = React.memo(({ item, isVisible }) => {
             <Repost width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.retweetCount)}</Text>
           </TouchableOpacity>
-          {/* Example of integrating LikeButton - adjust props as needed */}
-          <LikeButton initialLikes={item.engagement.likeCount} iconSize={16} textColor="#ccc" />
+
+          <TouchableOpacity style={styles.engagementButton}>
+            <LikeButton textColor="#fff" iconColor="#fff" initialLikes={item.engagement.likeCount} iconSize={16} />
+            <Text style={styles.engagementText}>{formatCount(item.engagement.likeCount)}</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.engagementButton}>
             <Views width={16} height={16} fill="#ccc" />
             <Text style={styles.engagementText}>{formatCount(item.engagement.viewCount)}</Text>
@@ -428,10 +432,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   backButton: {
-     position: 'absolute',
-     left: 15,
-     zIndex: 10, // Ensure it's above the list
-     padding: 5, // Add padding for easier tapping
+    position: 'absolute',
+    left: 15,
+    zIndex: 10, // Ensure it's above the list
+    padding: 5, // Add padding for easier tapping
   },
   videoContainer: {
     width: SCREEN_WIDTH,
@@ -499,9 +503,9 @@ const styles = StyleSheet.create({
     marginBottom: 5, // Reduced margin slightly
   },
   iconControlsContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10, // Add gap between icons
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10, // Add gap between icons
   },
   controlButton: {
     padding: 5,
@@ -571,7 +575,7 @@ const styles = StyleSheet.create({
   engagementButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
+    // paddingVertical: 5,
   },
   engagementText: {
     color: '#ccc',
