@@ -342,11 +342,13 @@ export default function Search() {
 
   // Header component to be used in the collapsible view
   const renderHeader = () => (
-    <ExploreHeader />
+    <View style={{ paddingTop: insets.top }} className="bg-white w-full">
+      <ExploreHeader />
+    </View>
   );
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 20 }}>
+    <View className="flex-1 bg-white">
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
 
@@ -382,6 +384,9 @@ export default function Search() {
           elevation: 0,
           shadowOpacity: 0,
         }}
+
+              minHeaderHeight={-100}
+
 
       >
 
