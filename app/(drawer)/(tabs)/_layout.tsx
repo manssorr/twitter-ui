@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 
 import { TabBarIcon } from '~/components/TabBarIcon';
@@ -65,6 +65,7 @@ export default function TabLayout() {
         ],
       })}
     >
+
 
       <Tabs.Screen
         name="(index)"

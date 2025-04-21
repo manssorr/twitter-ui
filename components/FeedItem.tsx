@@ -24,7 +24,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { EngagementActions } from './EngagementActions';
 import users from '~/dummy/users.json';
 import { MoreContextIcons } from "~/app/(drawer)/(tabs)/(index,search,messages,grok,video,notifications)/post/[id]"
-
+import * as ContextMenu from 'zeego/context-menu';
 
 // Initialize dayjs plugins
 dayjs.extend(relativeTime);
@@ -108,7 +108,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
     }
 
     return (
-        <View className={`py-1.5 ${is_organization ? '' : 'rounded-full'}  ${className} bg-white`}>
+        <View className={`py-1.5 ${is_organization ? '' : 'rounded-full'}  ${className} `}>
             {isLoading && (
                 <View
                     style={dimensionStyle}
@@ -167,47 +167,139 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
     const isOrganization = itemData.is_organization || userInfo?.is_organization || false;
 
-    // Regular feed item layout (horizontal layout)
-    if (!detailView) {
-        return (
-            <TouchableOpacity onPress={onPress} className="p-1 pb-4 pr-4 border-b border-neutral-200 dark:border-neutral-800">
-                <View className="flex-row">
-                    <ProfileImage source={{ uri: authorImageUrl }} displaySize="s" is_organization={isOrganization} />
-                    <View className="ml-1 flex-1">
+    const router = useRouter();
 
-                        <View className="flex-row items-center justify-between">
-                            <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
-                                <View className="flex-row items-center">
-                                    <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
-                                    <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
-                                    <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
-                                </View>
-                            </TouchableOpacity>
-                            <MoreContextIcons size="sm" />
-                        </View>
+    // Function to navigate to post detail
+    const goToPost = () => {
+        const postId = itemData.contentId;
+        if (postId) {
+            router.push(`/post/${postId}`);
+        } else {
+            console.warn("Post ID is missing, cannot navigate");
+        }
+    };
 
-                        <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
-                        {itemData.media_url && (
-                            <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}> 
-                                <Galeria.Image>
-                                    <Image
-                                        source={{ uri: itemData.media_url }}
-                                        className="w-full aspect-[4/4] mt-2 rounded-lg"
-                                        contentFit="cover"
-                                    />
-                                </Galeria.Image>
-                            </Galeria>
-                        )}
-                        <EngagementActions itemData={itemData} detailView={false}/>
-                    </View>
-                </View>
-            </TouchableOpacity>
-        );
-    }
-
-    // Detail view layout (vertical layout with different structure)
     return (
-        <View className="px-3 dark:border-neutral-800">
+        <ContextMenu.Root>
+            <ContextMenu.Trigger asChild>
+                <TouchableOpacity onPress={onPress} className="p-1 py-2 pr-4 border-b border-neutral-200 dark:border-neutral-800">
+                    <View className="flex-row">
+                        <ProfileImage source={{ uri: authorImageUrl }} displaySize="s" is_organization={isOrganization} />
+                        <View className="ml-1 flex-1">
+
+                            <View className="flex-row items-center justify-between">
+                                <TouchableOpacity onPress={() => router.push(`/profile/${authorHandle}`)}>
+                                    <View className="flex-row items-center">
+                                        <Text className=" text-lg font-bold text-black dark:text-white mr-1">{authorName}</Text>
+                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400 mr-1">@{authorHandle}</Text>
+                                        <Text className="text-lg text-neutral-500 dark:text-neutral-400">· {formatTime(itemData.posted_time, false)}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                                <MoreContextIcons size="sm" />
+                            </View>
+
+                            <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
+                            {itemData.media_url && (
+                                <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}> 
+                                    <Galeria.Image>
+                                        <Image
+                                            source={{ uri: itemData.media_url }}
+                                            className="w-full aspect-[4/4] mt-2 rounded-lg"
+                                            contentFit="cover"
+                                        />
+                                    </Galeria.Image>
+                                </Galeria>
+                            )}
+                            <EngagementActions itemData={itemData} detailView={false}/>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+            </ContextMenu.Trigger>
+            <ContextMenu.Content>
+                {/* Primary actions */}
+                <ContextMenu.Item key="view-post" onSelect={goToPost}>
+                    <ContextMenu.ItemTitle>View post</ContextMenu.ItemTitle>
+                    <ContextMenu.ItemIcon ios={{ name: 'doc.text' }} />
+                </ContextMenu.Item>
+                
+                <ContextMenu.Item key="report" destructive onSelect={() => console.log('Report post', itemData.contentId)}>
+                    <ContextMenu.ItemTitle>Report post</ContextMenu.ItemTitle>
+                    <ContextMenu.ItemIcon ios={{ name: 'flag' }} />
+                </ContextMenu.Item>
+                
+                <ContextMenu.Item key="community-note" onSelect={() => console.log('Request Community Note', itemData.contentId)}>
+                    <ContextMenu.ItemTitle>Request community note</ContextMenu.ItemTitle>
+                    <ContextMenu.ItemIcon ios={{ name: 'note.text' }} />
+                </ContextMenu.Item>
+                
+                <ContextMenu.Separator />
+                <ContextMenu.Label>{authorName} @{authorHandle}</ContextMenu.Label>
+                
+                <ContextMenu.Item key="follow" onSelect={() => console.log('Follow/Unfollow', userInfo?.id)}>
+                    <ContextMenu.ItemTitle>Follow @{authorHandle}</ContextMenu.ItemTitle>
+                    <ContextMenu.ItemIcon ios={{ name: 'person.badge.plus' }} />
+                </ContextMenu.Item>
+                
+                {/* Follow-up actions as a Submenu instead of Group */}
+                <ContextMenu.Sub>
+                    <ContextMenu.SubTrigger key="follow-up-trigger">
+                        <ContextMenu.ItemTitle>More actions</ContextMenu.ItemTitle>
+                        <ContextMenu.ItemIcon ios={{ name: 'ellipsis.circle' }} />
+                    </ContextMenu.SubTrigger>
+                    <ContextMenu.SubContent>
+                        <ContextMenu.Item key="interactions" onSelect={() => console.log('View Interactions', itemData.contentId)}>
+                            <ContextMenu.ItemTitle>Interactions</ContextMenu.ItemTitle>
+                            <ContextMenu.ItemIcon ios={{ name: 'bubble.left.and.bubble.right' }} />
+                        </ContextMenu.Item>
+                        
+                        <ContextMenu.Item key="add-to-lists" onSelect={() => console.log('Add to Lists', userInfo?.id)}>
+                            <ContextMenu.ItemTitle>Add to Lists</ContextMenu.ItemTitle>
+                            <ContextMenu.ItemIcon ios={{ name: 'list.bullet' }} />
+                        </ContextMenu.Item>
+                        
+                        <ContextMenu.Item key="block" destructive onSelect={() => console.log('Block User', userInfo?.id)}>
+                            <ContextMenu.ItemTitle>Block @{authorHandle}</ContextMenu.ItemTitle>
+                            <ContextMenu.ItemIcon ios={{ name: 'nosign' }} />
+                        </ContextMenu.Item>
+                        
+                        <ContextMenu.Item key="mute" onSelect={() => console.log('Mute User', userInfo?.id)}>
+                            <ContextMenu.ItemTitle>Mute @{authorHandle}</ContextMenu.ItemTitle>
+                            <ContextMenu.ItemIcon ios={{ name: 'speaker.slash' }} />
+                        </ContextMenu.Item>
+                    </ContextMenu.SubContent>
+                </ContextMenu.Sub>
+            </ContextMenu.Content>
+        </ContextMenu.Root>
+    );
+};
+
+// Detail view layout (vertical layout with different structure)
+export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
+    const { colorScheme } = useColorScheme();
+
+    // Get user information based on poster_id
+    const userInfo = findUserById(itemData.poster_id);
+
+    // Use direct properties if available (for backward compatibility) or get from userInfo
+    const authorName = itemData.authorName || userInfo?.name || 'Unknown';
+    const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
+    const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
+    const isOrganization = itemData.is_organization || userInfo?.is_organization || false;
+
+    const router = useRouter();
+
+    // Function to navigate to post detail
+    const goToPost = () => {
+        const postId = itemData.contentId;
+        if (postId) {
+            router.push(`/post/${postId}`);
+        } else {
+            console.warn("Post ID is missing, cannot navigate");
+        }
+    };
+
+    return (
+        <View className="px-3 dark:border-neutral-800 ">
 
             {/* Second row: Name, Username and Follow Button */}
             <View className="flex-row justify-between items-center mb-3">

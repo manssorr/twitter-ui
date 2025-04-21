@@ -367,6 +367,7 @@ function DrawerLayout() {
         }
       }}
     >
+
       {/* Screen definitions remain the same */}
       {/* You might want headerShown: false on screens if you handle headers elsewhere */}
       <Drawer.Screen name="index" options={{ headerTitle: 'Home' /*, headerShown: false */ }} />

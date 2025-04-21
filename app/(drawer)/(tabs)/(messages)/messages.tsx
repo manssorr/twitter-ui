@@ -27,7 +27,7 @@ const initialMessagesData = [
     username: '@SkyFootball',
     time: '1h',
     lastMessage: 'Great highlights package from yesterday! Can we get clearance to use a few clips?',
-    avatar: 'https://placehold.co/100x100/C6F6D5/2F855A?text=Sky', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1605131756310614017/05qwHae-_400x400.jpg', // Placeholder
     isYou: false,
   },
   {
