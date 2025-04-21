@@ -6,13 +6,13 @@ import Save from "~/assets/svg/save.svg";
 import Views from "~/assets/svg/views.svg";
 import LikeButton from './LikeButton';
 import { Feather } from '@expo/vector-icons';
-// Reusable Engagement Actions Component
+
 export const EngagementActions = ({ detailView ,    itemData }: { detailView?: boolean, itemData: FeedContent }) => {
     const { colorScheme } = useColorScheme();
     const iconColor = colorScheme === 'dark' ? '#8b98a5' : '#536471';
     const textColor = "text-sm text-neutral-600 dark:text-neutral-400";
 
-    // return <Text>{JSON.stringify(itemData)}</Text>
+    
 
     return (
         <View className="flex-row items-center justify-between mt-2">

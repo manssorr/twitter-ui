@@ -5,7 +5,7 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  StyleSheet // Added for bottom sheet styles
+  StyleSheet 
 } from 'react-native';
 import {
   DrawerContentScrollView,
@@ -16,7 +16,7 @@ import { Link, useRouter, usePathname, useSegments } from 'expo-router';
 import { Drawer } from 'expo-router/drawer';
 import { BlurView } from 'expo-blur';
 
-// Import Bottom Sheet components
+
 import {
   BottomSheetModal,
   BottomSheetView,
@@ -30,7 +30,7 @@ import { useStore } from '../../store/store';
 import users from '../../dummy/users.json';
 import authorizedAccounts from '../../dummy/authorized_accounts.json';
 
-// SVG imports
+
 import Bookmarks from "~/assets/svg/aside/bookmarks.svg"
 import Lists from "~/assets/svg/aside/lists.svg"
 import Monetization from "~/assets/svg/aside/monetization.svg"
@@ -42,7 +42,7 @@ import Grok from "~/assets/svg/tabs/grok.svg"
 import X from "~/assets/svg/aside/x.svg"
 import Spaces from "~/assets/svg/aside/spaces.svg"
 
-// --- Custom Drawer Content Component ---
+
 function CustomDrawerContent(props: any) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -51,7 +51,7 @@ function CustomDrawerContent(props: any) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authorizedUsers, setAuthorizedUsers] = useState<any[]>([]);
 
-  // Bottom Sheet Refs and setup
+  
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['50%'], []);
 
@@ -63,13 +63,13 @@ function CustomDrawerContent(props: any) {
     console.log('handleSheetChanges', index);
   }, []);
 
-  // Handle account selection
+  
   const handleSelectAccount = useCallback((userId: string) => {
     setCurrentUserId(userId);
     bottomSheetModalRef.current?.dismiss();
   }, [setCurrentUserId]);
 
-  // Filter users based on authorized accounts
+  
   useEffect(() => {
     const filteredUsers = users.filter(user =>
       authorizedAccounts.includes(user.id)
@@ -78,7 +78,7 @@ function CustomDrawerContent(props: any) {
   }, []);
 
   useEffect(() => {
-    // Find the user with the matching ID
+    
     if (currentUserId) {
       const user = users.find(user => user.id === currentUserId);
       if (user) {
@@ -87,7 +87,7 @@ function CustomDrawerContent(props: any) {
     }
   }, [currentUserId]);
 
-  // Set default user if none is selected
+  
   useEffect(() => {
     if (!currentUser && authorizedUsers.length > 0) {
       setCurrentUser(authorizedUsers[0]);
@@ -95,7 +95,7 @@ function CustomDrawerContent(props: any) {
     }
   }, [authorizedUsers, currentUser, setCurrentUserId]);
 
-  // Use the current user data or default placeholder
+  
   const userName = currentUser?.name || 'Twitter User';
   const userHandle = currentUser?.handle ? `@${currentUser.handle}` : '@user';
   const followingCount = currentUser?.following_count || 0;
@@ -105,10 +105,10 @@ function CustomDrawerContent(props: any) {
   const isVerified = currentUser?.is_verified || false;
 
   return (
-    // Use SafeAreaView and flex-1 for the main container
+    
     <SafeAreaView className="flex-1 flex-col bg-white">
-      {/* --- 1. Fixed Header (Profile Section) --- */}
-      {/* This View is outside the ScrollView */}
+      
+      
 
       <View className="px-5 pt-5 pb-4 flex-row items-start border-b border-b-gray-200" style={{}}>
 
@@ -150,7 +150,7 @@ function CustomDrawerContent(props: any) {
         </TouchableOpacity>
       </View>
 
-      {/* --- 2. Scrollable Middle Section --- */}
+      
       <DrawerContentScrollView
         {...props}
         className="flex-shrink flex-grow"
@@ -250,8 +250,8 @@ function CustomDrawerContent(props: any) {
         </View>
       </DrawerContentScrollView>
 
-      {/* --- 3. Fixed Footer --- */}
-      {/* Added bottom safe area padding */}
+      
+      
       <View className="px-5 py-2 border-t border-gray-200" style={{ paddingBottom: insets.bottom > 0 ? insets.bottom : 20 }}>
         <View className="flex-row justify-between">
           <TouchableOpacity>
@@ -263,7 +263,7 @@ function CustomDrawerContent(props: any) {
         </View>
       </View>
 
-      {/* --- Bottom Sheet Modal for Account Switching --- */}
+      
       <BottomSheetModal
         ref={bottomSheetModalRef}
         index={0}
@@ -296,7 +296,7 @@ function CustomDrawerContent(props: any) {
             <Text className="text-xl font-bold text-black  px-4">Accounts</Text>
           </View>
 
-          {/* List of authorized accounts only */}
+          
           {authorizedUsers.map((user) => (
             <TouchableOpacity
               key={user.id}
@@ -327,7 +327,7 @@ function CustomDrawerContent(props: any) {
             </TouchableOpacity>
           ))}
 
-          {/* Add account and Manage accounts buttons */}
+          
           <View className="mt-2 border-t border-gray-200 pt-2 px-4">
             <TouchableOpacity className="py-3 flex-row items-center">
               <Text className="text-base font-semibold text-blue-500 ml-3">Create a new account</Text>
@@ -345,7 +345,7 @@ function CustomDrawerContent(props: any) {
   );
 }
 
-// --- Main Drawer Layout ---
+
 function DrawerLayout() {
   const { width } = useWindowDimensions();
   const pathname = useSegments();
@@ -365,7 +365,7 @@ function DrawerLayout() {
         headerShown: false,
         swipeEnabled: allowedDrawerRoutes.includes(pathname[3] || ''),
         swipeEdgeWidth: width,
-        // swipeEdgeWidth: width,
+        
 
         overlayColor: '#adadad8c',
         drawerStyle: {
@@ -374,8 +374,8 @@ function DrawerLayout() {
       }}
     >
 
-      {/* Screen definitions remain the same */}
-      {/* You might want headerShown: false on screens if you handle headers elsewhere */}
+      
+      
       <Drawer.Screen name="index" options={{ headerTitle: 'Home' /*, headerShown: false */ }} />
       <Drawer.Screen name="(tabs)" options={{ headerTitle: 'Tabs' /*, headerShown: false */ }} />
       <Drawer.Screen name="profile" options={{ headerTitle: 'Profile' /*, headerShown: false */ }} />

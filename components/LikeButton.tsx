@@ -12,7 +12,7 @@ import Animated, {
 import Like from "~/assets/svg/like.svg"
 import LikeFilled from "~/assets/svg/like-filled.svg"
 
-// Confetti particle component
+
 const ConfettiParticle = ({ 
     delay,
     x, 
@@ -37,11 +37,11 @@ const ConfettiParticle = ({
 
     useEffect(() => {
         if (show) {
-            // Start with a delay based on the white circle expansion
+            
             opacity.value = withDelay(delay + 300, withTiming(1, { duration: 50 }));
             scale.value = withDelay(delay + 300, withTiming(1, { duration: 100 }));
             
-            // Move outward from center
+            
             translateX.value = withDelay(delay + 300, withTiming(x, { 
                 duration,
                 easing: Easing.bezier(0.1, 0.8, 0.2, 1)
@@ -51,7 +51,7 @@ const ConfettiParticle = ({
                 easing: Easing.bezier(0.1, 0.8, 0.2, 1)
             }));
             
-            // Fade out as it moves outward
+            
             opacity.value = withDelay(delay + 300 + 150, withTiming(0, { 
                 duration: duration - 150 
             }));
@@ -95,13 +95,13 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
     const [showConfetti, setShowConfetti] = useState(false);
     const [currentIconColor, setCurrentIconColor] = useState(iconColor);
     
-    // Animation control values
-    const unlikedIconScale = useSharedValue(1);
-    const redCircleScale = useSharedValue(0);  // Plain red circle
-    const whiteCircleScale = useSharedValue(0); // White background circle
-    const likedIconScale = useSharedValue(0);   // Heart icon inside white circle
     
-    // Define animated styles
+    const unlikedIconScale = useSharedValue(1);
+    const redCircleScale = useSharedValue(0);  
+    const whiteCircleScale = useSharedValue(0); 
+    const likedIconScale = useSharedValue(0);   
+    
+    
     const unlikedIconStyle = useAnimatedStyle(() => ({
         transform: [{ scale: unlikedIconScale.value }],
         opacity: unlikedIconScale.value,
@@ -127,69 +127,69 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
         setIsLiked(willBeLiked);
         
         if (willBeLiked) {
-            // Update icon color for liked state
+            
             setCurrentIconColor("#f91880");
             
-            // Step 1: Animate the unliked icon scaling down (even faster)
+            
             unlikedIconScale.value = withTiming(0, { 
-                duration: 35, // 30% faster than 50ms
+                duration: 35, 
                 easing: Easing.bezier(0.25, 0.1, 0.25, 1)
             });
             
-            // Step 2: After icon scales down, show and expand the plain red circle
+            
             setTimeout(() => {
-                // Use withTiming for a smooth but FAST expansion of red circle
+                
                 redCircleScale.value = withTiming(1.05, {
-                    duration: 70, // 30% faster than 100ms
+                    duration: 70, 
                     easing: Easing.bezier(0.2, 0.8, 0.2, 1)
                 });
                 
-                // Step 3: Start white circle animation sooner
+                
                 setTimeout(() => {
-                    // Trigger confetti
+                    
                     setShowConfetti(true);
                     
-                    // Show and expand the white circle quickly
+                    
                     whiteCircleScale.value = withTiming(1, {
-                        duration: 60, // 30% faster than 90ms
+                        duration: 60, 
                         easing: Easing.bezier(0.1, 0.8, 0.2, 1)
                     });
                     
-                    // Show the heart icon very quickly after white circle starts
+                    
                     setTimeout(() => {
-                        // Heart icon animation - KEEPING THE MAIN PART THE SAME as requested
+                        
                         likedIconScale.value = withSequence(
                             withTiming(0.8, { duration: 10 }),  
-                            withTiming(1, { duration: 150 }),   // Keep heart animation same speed
+                            withTiming(1, { duration: 150 }),   
                             withTiming(1.05, { duration: 60 }), 
                             withTiming(1, { duration: 80 })     
                         );
-                    }, 20); // 30% faster than 30ms
+                    }, 20); 
                     
-                    // Hide the red circle faster
+                    
                     setTimeout(() => {
-                        redCircleScale.value = withTiming(0, { duration: 50 }); // 30% faster than 70ms
+                        redCircleScale.value = withTiming(0, { duration: 50 }); 
                         
-                        // Reset confetti state after animation completes
+                        
                         setTimeout(() => {
                             setShowConfetti(false);
-                        }, 140); // 30% faster than 200ms
-                    }, 105); // 30% faster than 150ms
-                }, 70); // 30% faster than 100ms
-            }, 35); // 30% faster than 50ms
+                        }, 140); 
+                    }, 105); 
+                }, 70); 
+            }, 35); 
         } else {
-            // When unliking, quickly transition back
+            
             setShowConfetti(false);
-            // Reset icon color to original when unliking
+            
             setCurrentIconColor(iconColor);
-            unlikedIconScale.value = withTiming(1, { duration: 70 }); // 30% faster than 100ms
+            unlikedIconScale.value = withTiming(1, { duration: 70 }); 
             likedIconScale.value = 0;
             redCircleScale.value = 0;
             whiteCircleScale.value = 0;
         }
     };
     
-    // Confetti data - colors and positions
+    
     const confettiParticles = [
         { delay: 0, x: -20, y: -20, size: 4, color: '#91D2FA' },
         { delay: 20, x: 0, y: -25, size: 5, color: '#9FC7FA' },
@@ -199,7 +199,7 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
         { delay: 25, x: 0, y: 25, size: 4, color: '#8CE8C3' },
         { delay: 35, x: -20, y: 20, size: 4, color: '#F48EA7' },
         { delay: 15, x: -25, y: 0, size: 5, color: '#CC8EF5' },
-        // Additional particles for more density
+        
         { delay: 5, x: -15, y: -22, size: 3, color: '#9FC7FA' },
         { delay: 22, x: 15, y: -22, size: 3, color: '#F48EA7' },
         { delay: 38, x: 22, y: 15, size: 3, color: '#9CD8C3' },
@@ -213,17 +213,17 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
             activeOpacity={0.7}
         >
             <View style={styles.iconContainer}>
-                {/* Plain red circle that expands first */}
+                
                 <Animated.View style={[styles.circleContainer, redCircleStyle]}>
                     <View style={[styles.circle, { backgroundColor: '#f91880' }]} />
                 </Animated.View>
                 
-                {/* White circle that contains the liked icon */}
+                
                 <Animated.View style={[styles.circleContainer, whiteCircleStyle]}>
                     <View style={[styles.circle, { backgroundColor: 'white' }]} />
                 </Animated.View>
                 
-                {/* Confetti particles */}
+                
                 {confettiParticles.map((particle, index) => (
                     <ConfettiParticle
                         key={index}
@@ -236,12 +236,12 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
                     />
                 ))}
                 
-                {/* Unliked icon */}
+                
                 <Animated.View style={[styles.iconAbsolute, unlikedIconStyle]}>
                     <Like width={18} height={18} fill={currentIconColor} />
                 </Animated.View>
                 
-                {/* Liked icon */}
+                
                 <Animated.View style={[styles.iconAbsolute, likedIconStyle]}>
                     <LikeFilled width={18} height={18} fill={"#f91880"} />
                 </Animated.View>

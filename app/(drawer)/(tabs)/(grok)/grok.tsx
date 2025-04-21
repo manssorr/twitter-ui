@@ -7,19 +7,19 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
-  StatusBar, // Import StatusBar
-  Platform, // Import Platform
+  StatusBar, 
+  Platform, 
 } from 'react-native';
 import { Stack } from 'expo-router';
-// Assuming you have an icon library like lucide-react-native or react-native-vector-icons
-// If not, you can replace these with text or simple Views
-// Example using lucide-react-native (install it: npm install lucide-react-native)
-// import { History, Edit, Paperclip, Zap, Lightbulb, Mic } from 'lucide-react-native';
+
+
+
+
 import Feather from '@expo/vector-icons/Feather';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// --- Reusable Header Component ---
+
 interface HeaderProps {
   title: string;
   rightContent?: React.ReactNode;
@@ -29,20 +29,20 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, rightContent, centerContent }) => {
   return (
     <View className="flex-row items-center justify-center px-4 py-3  pb-8">
-      {/* User Avatar Placeholder */}
+      
       <View className="flex-row items-center absolute left-4">
         <TouchableOpacity className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-          {/* Replace with actual Image component if you have a user avatar URL */}
+          
           <Text className="text-gray-600 text-xs">U</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Title */}
+      
       <View className="flex-1 absolute center">
         {centerContent}
       </View>
 
-      {/* Right Content */}
+      
       <View className="flex-row items-center absolute right-4">
         {rightContent}
       </View>
@@ -51,9 +51,9 @@ const Header: React.FC<HeaderProps> = ({ title, rightContent, centerContent }) =
   );
 };
 
-// --- Feature Card Component ---
+
 interface FeatureCardProps {
-  icon: React.ReactNode; // Allow passing icon components
+  icon: React.ReactNode; 
   title: string;
   description: string;
 }
@@ -81,7 +81,7 @@ export default function Grok() {
       style={{ marginBottom: insets.bottom + 50 }}
     >
 
-      {/* <Stack.Screen options={{ headerShown: false }} /> */}
+      
       <View className="flex-1">
         <Header
           centerContent={
@@ -102,20 +102,20 @@ export default function Grok() {
           }
         />
         <ScrollView
-          className="flex-1 px-4 pt-4" // Add padding for content
-          contentContainerStyle={{ paddingBottom: 20 }} // Ensure space above the footer
-        // Add RefreshControl here if needed for pull-to-refresh
-        // refreshControl={
-        //   <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        // }
+          className="flex-1 px-4 pt-4" 
+          contentContainerStyle={{ paddingBottom: 20 }} 
+        
+        
+        
+        
         >
-          {/* Introductory Text */}
+          
           <Text className="text-2xl font-extrabold mb-2 text-black">Grok 3 is here.</Text>
           <Text className="text-base text-gray-600 mb-6 ">
             Try our new features: DeepSearch, Think, and Edit Image
           </Text>
 
-          {/* Feature Cards */}
+          
           <FeatureCard
             icon={<MaterialCommunityIcons name="text-box-search-outline" size={16} color="black" />}
             title="DeepSearch"
@@ -134,7 +134,7 @@ export default function Grok() {
 
         </ScrollView>
 
-        {/* Fixed Footer Input Area */}
+        
         <View className="px-4 py-3  border-t border-gray-100">
           <View className="flex-row items-center bg-gray-200 rounded-2xl p-2 py-6">
 
@@ -148,7 +148,7 @@ export default function Grok() {
 
 
               <View className="flex-row items-center justify-between">
-                {/* Placeholder for the swirl icon */}
+                
 
                 <View className="flex-row items-center gap-2">
                   <TouchableOpacity className="p-1.5 bg-gray-300 rounded-xl">

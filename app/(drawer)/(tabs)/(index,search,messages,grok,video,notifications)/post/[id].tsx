@@ -67,7 +67,7 @@ export const MoreContextIcons = ({ size = "lg", username = "unknown_user" }: { s
                     <DropdownMenu.Sub>
                         <DropdownMenu.SubTrigger key="user-actions">
                             <DropdownMenu.ItemTitle>@{username}</DropdownMenu.ItemTitle>
-                            {/* <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} /> */}
+                            
                         </DropdownMenu.SubTrigger>
                         <DropdownMenu.SubContent>
                             <DropdownMenu.Item key="add-remove">
@@ -172,7 +172,7 @@ export default function PostDetailScreen() {
     if (!findPost) {
         return (
             <View className="flex-1 justify-center items-center bg-white dark:bg-black" style={{ paddingTop: insets.top }}>
-                {/* <Stack.Screen options={{ title: 'Post Not Found' }} /> */}
+                
                 <Text className="text-neutral-500 dark:text-neutral-400">Could not find the requested post (ID: {postId}).</Text>
             </View>
         );
@@ -185,7 +185,7 @@ export default function PostDetailScreen() {
                 style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
                 contentContainerStyle={{ flexGrow: 1 }}
             >
-                {/* <Stack.Screen options={{ title: 'Post' }} /> */}
+                
 
                 <PostHeader username={authorHandle} />
 

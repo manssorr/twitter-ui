@@ -18,15 +18,15 @@ import { StyledExpoImage } from "~/components/Image";
 import X from "~/assets/svg/aside/x.svg";
 import { BlurView } from 'expo-blur';
 
-// --- Constants ---
-const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 
-// Define category tabs with proper grouping
+const APP_PRIMARY_COLOR = '#1DA1F2'; 
+
+
 const categoryTabs = ['For you', 'Following', 'React & Expo', 'Al', 'Premier League', 'Design'];
 
-// Safely normalize post data with explicit type handling
+
 const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
-    // Explicitly handle new post format (with poster_id)
+    
     if (typeof item.poster_id === 'string') {
         return {
             contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
@@ -42,9 +42,9 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             category: item.category || 'For you'
         };
     }
-    // Handle legacy format (with authorName, authorHandle, etc.)
+    
     else if (typeof item.authorName === 'string') {
-        // Try to find the user ID by matching name
+        
         const matchingUser = users.find(user => user.name === item.authorName);
         const userId = matchingUser ? matchingUser.id : '0';
 
@@ -65,11 +65,11 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
             category: item.category || 'For you'
         };
     }
-    // Fallback for any unrecognized format
+    
     else {
         return {
             contentId: `post-unknown-${Date.now()}`,
-            poster_id: '0', // Default placeholder ID
+            poster_id: '0', 
             posted_time: Date.now(),
             message: 'Unknown post format',
             media_url: undefined,
@@ -82,7 +82,7 @@ const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedC
     }
 });
 
-// --- Header Component ---
+
 const Header = () => {
     const currentUser = users[0];
     const insets = useSafeAreaInsets();
@@ -113,7 +113,7 @@ const AddPostButton = () => {
 };
 
 
-// --- Main Screen Component ---
+
 export default function HomeScreen() {
     const router = useRouter();
     const insets = useSafeAreaInsets();
@@ -122,23 +122,23 @@ export default function HomeScreen() {
         router.push(`/post/${postId}`);
     };
 
-    // Create filtered feed items based on category
+    
     const feedItemsByCategory = useMemo(() => {
         const itemsByCategory: Record<string, FeedContent[]> = {};
 
-        // Initialize with empty arrays for each category
+        
         categoryTabs.forEach(category => {
             itemsByCategory[category] = [];
         });
 
-        // Special case for "For you" - include ALL posts sorted by post time (newest first)
+        
         itemsByCategory['For you'] = [...processedFeedItems].sort((a, b) => {
             const timeA = typeof a.posted_time === 'number' ? a.posted_time : parseInt(String(a.posted_time), 10);
             const timeB = typeof b.posted_time === 'number' ? b.posted_time : parseInt(String(b.posted_time), 10);
-            return timeB - timeA; // Descending order (newest first)
+            return timeB - timeA; 
         });
 
-        // Filter other categories
+        
         processedFeedItems.forEach(item => {
             if (item.category && item.category !== 'For you') {
                 if (itemsByCategory[item.category]) {
@@ -150,12 +150,12 @@ export default function HomeScreen() {
         return itemsByCategory;
     }, []);
 
-    // Render function for each tab
+    
     const renderTab = useCallback((tabName: string) => {
-        // Get posts for this category tab
+        
         const tabPosts = feedItemsByCategory[tabName] || [];
 
-        // Empty state if no posts available
+        
         if (tabPosts.length === 0) {
             return (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
@@ -175,7 +175,7 @@ export default function HomeScreen() {
                 data={tabPosts}
                 renderItem={renderFeedItem}
                 keyExtractor={(item) => {
-                    // Create unique keys by adding the tab name to avoid duplicates across tabs
+                    
                     return `${tabName}-${item.contentId || `post-${item.poster_id}-${item.posted_time}`}`;
                 }}
                 contentContainerStyle={{
@@ -185,7 +185,7 @@ export default function HomeScreen() {
         );
     }, [insets.bottom, feedItemsByCategory]);
 
-    // Custom tab bar
+    
     const renderTabBar = (props: any) => (
         <MaterialTabBar
             {...props}
@@ -215,7 +215,7 @@ export default function HomeScreen() {
 
             <AddPostButton />
             <Tabs.Container
-                // headerHeight={90 + insets.top} // Adjust based on your header size
+                
                 renderHeader={Header}
                 renderTabBar={renderTabBar}
                 pagerProps={{ scrollEnabled: true }}
@@ -239,7 +239,7 @@ export default function HomeScreen() {
     );
 }
 
-// --- Styles ---
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,

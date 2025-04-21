@@ -7,7 +7,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import AnimatedSplash from "react-native-animated-splash-screen";
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
+  
   initialRouteName: '(drawer)',
 };
 
@@ -15,7 +15,7 @@ export default function RootLayout() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Simulate loading task
+    
     setTimeout(() => {
       setIsLoaded(true);
     }, 1000);

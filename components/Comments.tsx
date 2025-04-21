@@ -15,22 +15,22 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { EngagementActions } from '~/components/EngagementActions';
 import { MoreContextIcons } from "~/app/(drawer)/(tabs)/(index,search,messages,grok,video,notifications)/post/[id]"
 
-// Initialize dayjs plugins
+
 dayjs.extend(relativeTime);
 
-// Interface for Comment Content
+
 export interface CommentContent {
     commentId: string;
-    contentId: string; // ID of the post this comment belongs to
+    contentId: string; 
     authorName: string;
     authorHandle: string;
     authorImageUrl: string;
-    postedTime: number; // timestamp
+    postedTime: number; 
     message: string;
     is_organization?: boolean;
 }
 
-// Dummy comments data
+
 export const dummyComments: CommentContent[] = [
     {
         commentId: 'comment1',
@@ -38,7 +38,7 @@ export const dummyComments: CommentContent[] = [
         authorName: 'LeBron Fanatic',
         authorHandle: 'KingJamesLoyalty',
         authorImageUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
-        postedTime: Date.now() - 1000 * 60 * 30, // 30 minutes ago
+        postedTime: Date.now() - 1000 * 60 * 30, 
         message: 'This is a great post! I totally agree with your thoughts on this topic.',
     },
     {
@@ -47,7 +47,7 @@ export const dummyComments: CommentContent[] = [
         authorName: 'Mike Kelly',
         authorHandle: 'ChicagoBullsForever',
         authorImageUrl: 'https://randomuser.me/api/portraits/men/1.jpg',
-        postedTime: Date.now() - 1000 * 60 * 60 * 2, // 2 hours ago
+        postedTime: Date.now() - 1000 * 60 * 60 * 2, 
         message: 'Interesting perspective! Have you considered the alternative approach?',
     },
     {
@@ -56,7 +56,7 @@ export const dummyComments: CommentContent[] = [
         authorName: 'JSGuy',
         authorHandle: 'JSGuy',
         authorImageUrl: 'https://randomuser.me/api/portraits/lego/1.jpg',
-        postedTime: Date.now() - 1000 * 60 * 60 * 5, // 5 hours ago
+        postedTime: Date.now() - 1000 * 60 * 60 * 5, 
         message: 'We\'ve been working on similar solutions. Would love to connect and discuss further!',
         is_organization: true,
     },
@@ -66,7 +66,7 @@ export const dummyComments: CommentContent[] = [
         authorName: 'Dave Rodriguez',
         authorHandle: 'HotTakeDave',
         authorImageUrl: 'https://randomuser.me/api/portraits/men/2.jpg',
-        postedTime: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
+        postedTime: Date.now() - 1000 * 60 * 60 * 24, 
         message: 'I had a different experience with this. Let me share what worked for me...',
     },
     {
@@ -75,12 +75,12 @@ export const dummyComments: CommentContent[] = [
         authorName: 'Sarah Williams',
         authorHandle: 'PatriotsSuperfan',
         authorImageUrl: 'https://randomuser.me/api/portraits/women/2.jpg',
-        postedTime: Date.now() - 1000 * 60 * 60 * 24 * 2, // 2 days ago
+        postedTime: Date.now() - 1000 * 60 * 60 * 24 * 2, 
         message: 'Thanks for sharing! This helped me solve a problem I\'ve been stuck on.',
     }
 ];
 
-// Utility function to format time
+
 const formatTime = (timestamp: number): string => {
     const time = dayjs(timestamp);
     const now = dayjs();
@@ -97,30 +97,30 @@ const formatTime = (timestamp: number): string => {
     }
 };
 
-// Engagement actions for comments (simplified version)
-// const CommentEngagementActions = () => {
-//     const { colorScheme } = useColorScheme();
-//     const iconColor = colorScheme === 'dark' ? '#8b98a5' : '#536471';
-//     const textColor = "text-sm text-neutral-600 dark:text-neutral-400";
 
-//     return (
-//         <View className="flex-row items-center gap-8 mt-1">
-//             <TouchableOpacity className="flex-row items-center gap-1.5">
-//                 <Comment width={16} height={16} fill={iconColor} />
-//                 <Text className={textColor}>12</Text>
-//             </TouchableOpacity>
 
-//             <LikeButton iconColor={iconColor} textColor={textColor} />
-//         </View>
-//     );
-// };
 
-// Props for CommentItem
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 interface CommentItemProps {
     commentData: CommentContent;
 }
 
-// Single Comment Item Component
+
 export const CommentItem: React.FC<CommentItemProps> = ({ commentData }) => {
     return (
         <View className="p-1  pt-2 border-b border-neutral-100 dark:border-neutral-800">
@@ -142,7 +142,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({ commentData }) => {
                         <MoreContextIcons size="sm" />
                     </View>
                     <Text className="text-black dark:text-white mt-1">{commentData.message}</Text>
-                    {/* <CommentEngagementActions /> */}
+                    
                     <EngagementActions />
                 </View>
             </View>
@@ -150,18 +150,18 @@ export const CommentItem: React.FC<CommentItemProps> = ({ commentData }) => {
     );
 };
 
-// Props for Comments component
+
 interface CommentsProps {
     postId: string;
     comments?: CommentContent[];
 }
 
-// Main Comments Component
+
 const Comments: React.FC<CommentsProps> = ({ postId, comments = dummyComments }) => {
-    // Filter comments by postId if needed
-    // const filteredComments = comments.filter(comment => 
-    //     comment.contentId === postId || postId === 'all'
-    // );
+    
+    
+    
+    
     const filteredComments = comments;
 
     return (

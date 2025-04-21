@@ -46,16 +46,16 @@ import Share from "~/assets/svg/share.svg"
 import Views from "~/assets/svg/views.svg"
 import Category from "~/assets/svg/category.svg"
 import Grok from "~/assets/svg/tabs/grok.svg";
-// Import the refactored component and type
+
 import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP, findUserById } from '~/components/FeedItem';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import users from '~/dummy/users.json';
 import sampleFeedItems from '~/dummy/posts.json';
 import Messages from "~/assets/svg/tabs/messages.svg"
 
-const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
-const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
-const BANNER_BOTTOM_MARGIN = 60; // Margin at the bottom of the banner
+const PULL_TO_REFRESH_THRESHOLD = 70; 
+const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; 
+const BANNER_BOTTOM_MARGIN = 60; 
 const HEADER_PROFILE_IMAGE_SIZE = 'm';
 const HEADER_PROFILE_IMAGE_SIZE_VALUE = 100;
 const HEADER_PROFILE_IMAGE_START_SCALE = 1;
@@ -97,15 +97,15 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
   const bannerTotalHeight = useSharedValue(110 + BANNER_BOTTOM_MARGIN);
   const listRef = useRef<any>(null);
   const pullToRefreshThreshold = PULL_TO_REFRESH_THRESHOLD;
-  // Store the previous scroll offset value before refresh
+  
   const prevScrollOffsetBeforeRefresh = useSharedValue(0);
-  // Track if we're in the middle of a tab change
+  
   const isChangingTab = useSharedValue(false);
   const hasReachedThreshold = useSharedValue(false);
 
-  // Modified blur overlay style that maintains state after refresh
+  
   const blurOverlayStyle = useAnimatedStyle(() => {
-    // Use max value between current scroll and previous to maintain blur during refresh
+    
     const effectiveScrollOffset = isChangingTab.value ?
       Math.max(50, Math.abs(scrollOffset.value)) :
       Math.abs(scrollOffset.value);
@@ -122,21 +122,21 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
 
   useEffect(() => {
     if (!refreshing) {
-      // Reset the flag after refresh completes
-      // The timeout ensures this happens after scroll animations finish
+      
+      
       setTimeout(() => {
         hasReachedThreshold.value = false;
-      }, 500); // Longer timeout to ensure animation completes
+      }, 500); 
     }
   }, [refreshing]);
 
   useAnimatedReaction(
     () => scrollOffset.value,
     (currentValue, previousValue) => {
-      // Reset threshold tracking when scroll returns to top after refresh completes
+      
       if (currentValue >= 0 && !refreshing && hasReachedThreshold.value) {
-        // We can't call setTimeout from a worklet, so we need a small delay
-        // This ensures the flag is reset when the user starts a new pull
+        
+        
         hasReachedThreshold.value = false;
       }
     }
@@ -149,7 +149,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     Extrapolate.CLAMP
   ));
 
-  // Modified banner shift style to maintain position
+  
   const bannerVerticalShiftStyle = useAnimatedStyle(() => {
     const effectiveScroll = isChangingTab.value ?
       Math.min(0, scrollOffset.value) :
@@ -167,7 +167,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     };
   });
 
-  // Other animation styles remain the same
+  
   const profileRowVerticalShiftStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: -scrollOffset.value + BANNER_BOTTOM_MARGIN / 2 }],
   }));
@@ -183,27 +183,27 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     return { transform: [{ scaleY: scale }, { scaleX: scale }] };
   }, [windowHeight]);
 
-  // Create a derived value to ensure activity indicator shows during transitions
+  
   const isNearRefreshThreshold = useDerivedValue(() => {
     return scrollOffset.value < 0 && -scrollOffset.value >= pullToRefreshThreshold * 0.85;
   });
 
-  // Style for the activity indicator - ensure it shows during transitions
+  
   const activityIndicatorStyle = useAnimatedStyle(() => {
-    // Show indicator during refreshing OR when close to threshold
-    // This ensures there's no gap between arrow disappearing and indicator appearing
+    
+    
     const showIndicator = refreshing || isNearRefreshThreshold.value;
 
-    // Ensure immediate visibility during transitions
+    
     return {
       opacity: showIndicator ? 1 : 0,
       position: 'absolute',
     };
   });
 
-  // Arrow style - create slight overlap with activity indicator
+  
   const arrowStyle = useAnimatedStyle(() => {
-    // Hide arrow when refreshing or after reaching near threshold
+    
     if (refreshing || (hasReachedThreshold.value && scrollOffset.value < 0)) {
       return {
         opacity: 0,
@@ -211,7 +211,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
       };
     }
 
-    // Mark threshold slightly earlier to ensure overlap with indicator
+    
     if (scrollOffset.value < 0 && -scrollOffset.value >= pullToRefreshThreshold * 0.85) {
       hasReachedThreshold.value = true;
       return {
@@ -220,7 +220,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
       };
     }
 
-    // Show arrow during initial pull
+    
     const showArrow = scrollOffset.value < 0 &&
       -scrollOffset.value < pullToRefreshThreshold * 0.85 &&
       !hasReachedThreshold.value;
@@ -231,32 +231,32 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     };
   });
 
-  // Before refreshing, store the current scroll offset
+  
   const handleRefreshStart = useCallback(() => {
     prevScrollOffsetBeforeRefresh.value = scrollOffset.value;
   }, [scrollOffset, prevScrollOffsetBeforeRefresh]);
 
-  // Handle refresh end
+  
   const handleRefreshEnd = useCallback(() => {
   }, []);
 
-  // Track component mounting/unmounting for tab changes
+  
   useEffect(() => {
     return () => {
-      // When component is about to unmount (like during tab change)
+      
       isChangingTab.value = true;
     };
   }, [isChangingTab]);
 
-  // Reset the tab change flag when component mounts
+  
   useEffect(() => {
     isChangingTab.value = false;
   }, [isChangingTab]);
 
-  // Animate scroll back to top when refreshing finishes with improved handling
+  
   useEffect(() => {
     if (!refreshing && listRef.current && Math.round(scrollOffset.value) < 0) {
-      // Use optional chaining to safely access scrollToLocation
+      
       listRef.current?.scrollToLocation?.({
         sectionIndex: 0,
         itemIndex: 0,
@@ -313,7 +313,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
 
 
 
-        {/* Pull-to-Refresh Indicator Area */}
+        
         <Animated.View
           style={[
             scrollingListStyles.refreshIndicatorContainer,
@@ -521,20 +521,20 @@ export default function UserProfileScreen() {
   const scrollPosition = useSharedValue(0);
   const router = useRouter();
 
-  // Get the handle parameter from the URL
+  
   const params = useLocalSearchParams();
   const userHandle = params.id as string;
 
-  // Find the user in users.json by handle
+  
   const user = useMemo(() => {
     return users.find((user) => user.handle.toLowerCase() === userHandle.toLowerCase()) || users[0];
   }, [userHandle]);
 
-  // Process and filter the posts from posts.json for this user
+  
   const userPosts = useMemo(() => {
-    // Process all feed items similar to index.tsx
+    
     const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
-      // Explicitly handle new post format (with poster_id)
+      
       if (typeof item.poster_id === 'string') {
         return {
           contentId: item.contentId || `post-${item.poster_id}-${Date.now()}`,
@@ -550,9 +550,9 @@ export default function UserProfileScreen() {
           category: item.category || 'For you'
         };
       }
-      // Handle legacy format (with authorName, authorHandle, etc.)
+      
       else if (typeof item.authorName === 'string') {
-        // Try to find the user ID by matching name
+        
         const matchingUser = users.find(user => user.name === item.authorName);
         const userId = matchingUser ? matchingUser.id : '0';
 
@@ -573,11 +573,11 @@ export default function UserProfileScreen() {
           category: item.category || 'For you'
         };
       }
-      // Fallback for any unrecognized format
+      
       else {
         return {
           contentId: `post-unknown-${Date.now()}`,
-          poster_id: '0', // Default placeholder ID
+          poster_id: '0', 
           posted_time: Date.now(),
           message: 'Unknown post format',
           media_url: undefined,
@@ -590,13 +590,13 @@ export default function UserProfileScreen() {
       }
     });
 
-    // Filter posts for the current user
+    
     return processedFeedItems
       .filter(post => post.poster_id === user.id)
       .sort((a, b) => {
         const timeA = typeof a.posted_time === 'number' ? a.posted_time : parseInt(String(a.posted_time), 10);
         const timeB = typeof b.posted_time === 'number' ? b.posted_time : parseInt(String(b.posted_time), 10);
-        return timeB - timeA; // Descending order (newest first)
+        return timeB - timeA; 
       });
   }, [user.id]);
 
@@ -604,7 +604,7 @@ export default function UserProfileScreen() {
     {
       title: 'Feed',
       data: userPosts.length > 0 ? userPosts : [
-        // Fallback post if no posts found for this user
+        
         {
           contentId: 'post-empty',
           poster_id: user.id,
@@ -689,7 +689,7 @@ export default function UserProfileScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
-            progressViewOffset={100} // Add appropriate offset for header
+            progressViewOffset={100} 
           />
         }
         ref={listRef}

@@ -26,10 +26,10 @@ import users from '~/dummy/users.json';
 import * as ContextMenu from 'zeego/context-menu';
 import * as DropdownMenu from 'zeego/dropdown-menu';
 
-// Initialize dayjs plugins
+
 dayjs.extend(relativeTime);
 
-// Types and Constants moved from profile/[id].tsx
+
 type ProfileImageSize = 'xxs' | 'xs' | 's' | 'm' | 'l';
 type ProfileImageProps = ImageProps & { displaySize?: ProfileImageSize; className?: string, is_organization?: boolean };
 type ProfileImageReducerState = { isLoading: boolean; hasError: boolean };
@@ -46,34 +46,34 @@ const PROFILE_IMAGE_DIMENSIONS: Record<ProfileImageSize, number> = {
 
 export const PROFILE_IMAGE_SIZE_MAP = { ...PROFILE_IMAGE_DIMENSIONS };
 
-// Interface for Feed Content
+
 export interface FeedContent {
     contentId?: string;
     poster_id: string;
-    authorName?: string;    // Optional for backward compatibility
-    authorHandle?: string;  // Optional for backward compatibility
-    authorImageUrl?: string; // Optional for backward compatibility
-    posted_time: number;    // Changed from postedTime for consistency
+    authorName?: string;    
+    authorHandle?: string;  
+    authorImageUrl?: string; 
+    posted_time: number;    
     message: string;
-    media_url?: string;     // Changed from mediaUrl for consistency
-    like_count?: number;    // Changed for consistency
-    retweet_count?: number; // Changed for consistency
-    reply_count?: number;   // Changed for consistency
-    view_count?: string;    // Changed for consistency
+    media_url?: string;     
+    like_count?: number;    
+    retweet_count?: number; 
+    reply_count?: number;   
+    view_count?: string;    
     is_organization?: boolean;
-    category?: string;      // Added for category-based filtering
+    category?: string;      
 }
 
-// Utility function to format time based on the view
+
 const formatTime = (timestamp: number, isDetailView: boolean): string => {
-    // Multiply by 1000 to convert Unix seconds to milliseconds
+    
     const time = dayjs(timestamp * 1000);
 
     if (isDetailView) {
-        // For detailed view, show full date and time
+        
         return time.format('h:mm A · MMM D, YYYY');
     } else {
-        // For regular view, show relative time (1d, 2h, 45m, etc.)
+        
         const now = dayjs();
         const diffInSeconds = now.diff(time, 'second');
 
@@ -89,7 +89,7 @@ const formatTime = (timestamp: number, isDetailView: boolean): string => {
     }
 };
 
-// Reusable Profile Image Component
+
 export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize = 's', className = '', is_organization = false, ...imageProps }) => {
     const [{ isLoading, hasError }, dispatch] = useReducer<ProfileImageReducer>(
         (state, action) => {
@@ -129,7 +129,7 @@ export const ProfileImage: React.FC<ProfileImageProps> = ({ style, displaySize =
     );
 };
 
-// Follow Button Component
+
 const FollowButton = () => {
     const { colorScheme } = useColorScheme();
     return (
@@ -142,26 +142,26 @@ const FollowButton = () => {
     );
 };
 
-// Find user by ID from users array
+
 export const findUserById = (id: string) => {
     return users.find(user => user.id === id);
 };
 
-// Props for FeedItem
+
 interface FeedItemProps {
     itemData: FeedContent;
-    onPress?: () => void; // Optional onPress handler for navigation
+    onPress?: () => void; 
     detailView?: boolean;
 }
 
-// Reusable Feed Item Component
+
 export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
 
-    // Get user information based on poster_id
+    
     const userInfo = findUserById(itemData.poster_id);
 
-    // Use direct properties if available (for backward compatibility) or get from userInfo
+    
     const authorName = itemData.authorName || userInfo?.name || 'Unknown';
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
@@ -170,7 +170,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
     const router = useRouter();
 
-    // Function to navigate to post detail
+    
     const goToPost = () => {
         const postId = itemData.contentId;
         if (postId) {
@@ -240,7 +240,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                             <DropdownMenu.Sub>
                                                 <DropdownMenu.SubTrigger key="user-actions">
                                                     <DropdownMenu.ItemTitle>@{authorHandle}</DropdownMenu.ItemTitle>
-                                                    {/* <DropdownMenu.ItemIcon ios={{ name: 'chevron.right' }} /> */}
+                                                    
                                                 </DropdownMenu.SubTrigger>
                                                 <DropdownMenu.SubContent>
                                                     <DropdownMenu.Item key="add-remove">
@@ -335,14 +335,14 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
     );
 };
 
-// Detail view layout (vertical layout with different structure)
+
 export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress, detailView }) => {
     const { colorScheme } = useColorScheme();
 
-    // Get user information based on poster_id
+    
     const userInfo = findUserById(itemData.poster_id);
 
-    // Use direct properties if available (for backward compatibility) or get from userInfo
+    
     const authorName = itemData.authorName || userInfo?.name || 'Unknown';
     const authorHandle = itemData.authorHandle || userInfo?.handle || 'unknown';
     const authorImageUrl = itemData.authorImageUrl || userInfo?.profile_picture || '';
@@ -351,7 +351,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
 
     const router = useRouter();
 
-    // Function to navigate to post detail
+    
     const goToPost = () => {
         const postId = itemData.contentId;
         if (postId) {
@@ -364,7 +364,7 @@ export const FeedItemDetailView: React.FC<FeedItemProps> = ({ itemData, onPress,
     return (
         <View className="px-4 dark:border-neutral-800 ">
 
-            {/* Second row: Name, Username and Follow Button */}
+            
             <View className="flex-row justify-between items-center mb-3">
                 <View className="flex-row items-center">
                     <ProfileImage

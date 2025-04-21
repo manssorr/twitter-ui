@@ -19,17 +19,17 @@ import RetweetIcon from "~/assets/svg/notifications/repost.svg"
 import CommentIcon from "~/assets/svg/comment.svg"
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
-// Import dummy users for avatars
+
 import usersData from "~/dummy/users.json";
 
-// --- Mock Data ---
-// Updated with Premier League perspective notifications
+
+
 const notificationsData = [
   {
     id: '1',
     type: 'like',
     mainUser: {
-      id: '7', // Cristiano Ronaldo
+      id: '7', 
     },
     otherCount: 143,
     postPreview: 'Matchday 38: Every goal, every emotion, every moment. What a Premier League season it has been!',
@@ -41,7 +41,7 @@ const notificationsData = [
     id: '7',
     type: 'reply',
     mainUser: {
-      id: '11', // Figma
+      id: '11', 
     },
     otherCount: 0,
     postPreview: 'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
@@ -52,7 +52,7 @@ const notificationsData = [
     id: '2',
     type: 'retweet',
     mainUser: {
-      id: '2', // UEFA Champions League
+      id: '2', 
     },
     otherCount: 87,
     postPreview: 'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League! Record 6 teams qualified in the group stage.',
@@ -63,7 +63,7 @@ const notificationsData = [
     id: '3',
     type: 'follow',
     mainUser: {
-      id: '8', // Evan Bacon
+      id: '8', 
     },
     otherCount: 898,
     isRead: true,
@@ -73,7 +73,7 @@ const notificationsData = [
     id: '4',
     type: 'reply',
     mainUser: {
-      id: '3', // Fantasy PL
+      id: '3', 
     },
     otherCount: 0,
     postPreview: 'Could you share the top point-scorers from this weekend\'s fixtures?',
@@ -84,7 +84,7 @@ const notificationsData = [
     id: '5',
     type: 'like',
     mainUser: {
-      id: '6', // Andrew Huberman
+      id: '6', 
     },
     otherCount: 523,
     postPreview: 'Research suggests that Premier League footballers cover an average of 10-13km per match, with high-intensity sprints making up to 10% of that distance.',
@@ -95,7 +95,7 @@ const notificationsData = [
     id: '6',
     type: 'retweet',
     mainUser: {
-      id: '10', // Andrej Karpathy
+      id: '10', 
     },
     otherCount: 24,
     postPreview: 'Amazing to see how data science and AI are transforming football analysis in the Premier League.',
@@ -106,7 +106,7 @@ const notificationsData = [
     id: '8',
     type: 'like',
     mainUser: {
-      id: '9', // App.js Conf
+      id: '9', 
     },
     otherCount: 36,
     postPreview: 'The Premier League app is one of the best examples of cross-platform development we\'ve seen!',
@@ -115,9 +115,9 @@ const notificationsData = [
   },
 ];
 
-const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
+const APP_PRIMARY_COLOR = '#1DA1F2'; 
 
-// --- Helper Function to Format Numbers ---
+
 const formatNumber = (num: number) => {
   if (num >= 1000000) {
     return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -128,9 +128,9 @@ const formatNumber = (num: number) => {
   return num.toString();
 };
 
-// --- Components ---
 
-// Reusable Header Component (Adapted from Messages)
+
+
 const ScreenHeader = ({ title, avatarUri }: { title: string; avatarUri: string }) => {
   return (
     <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
@@ -148,10 +148,10 @@ const ScreenHeader = ({ title, avatarUri }: { title: string; avatarUri: string }
   );
 };
 
-// Custom MaterialTabItem component
+
 const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   const { name, index, indexDecimal, onPress, label } = props;
-  // Check if this tab is active (when index matches the position)
+  
   const isActive = Math.round(indexDecimal.value) === index;
 
   return (
@@ -168,15 +168,15 @@ const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   );
 };
 
-// AvatarRow Component for multiple avatars
+
 const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?: number }) => {
-  // Limit the number of avatars to show
+  
   const visibleUsers = userIds.slice(0, maxVisible);
 
   return (
     <View className="flex-row my-2">
       {visibleUsers.map((userId, index) => {
-        // Find user data from usersData
+        
         const user = usersData.find(u => u.id === userId);
         if (!user) return null;
 
@@ -185,7 +185,7 @@ const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?
             key={userId}
             source={{ uri: user.profile_picture }}
             className="w-10 h-10 rounded-full border-2 border-white"
-          // style={{ marginLeft: index === 0 ? 0 : -10, zIndex: visibleUsers.length - index }}
+          
           />
         );
       })}
@@ -193,29 +193,29 @@ const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?
   );
 };
 
-// Notification Item Component
+
 const NotificationItem = ({ notification }: { notification: typeof notificationsData[0] }) => {
   const { type, mainUser, otherCount, postPreview, isRead, timestamp } = notification;
 
-  // Get the main user details
+  
   const user = usersData.find(u => u.id === mainUser.id);
   if (!user) return null;
 
-  // Generate array of user IDs for the avatar row (use main user + some others from usersData)
+  
   const userIds = [mainUser.id];
 
-  // Add different users based on the notification type - only use Premier League related users
-  // Get IDs 1-7 which are mostly football related accounts
+  
+  
   const footballUserIds = ['2', '3', '5', '7', '4', '6', '9'];
   const relevantUserIds = footballUserIds.filter(id => id !== mainUser.id);
 
-  // Randomly select some users to show (up to the other count, max 7)
+  
   const othersToShow = Math.min(otherCount, 7);
   const selectedUserIds = relevantUserIds.slice(0, othersToShow);
 
   userIds.push(...selectedUserIds);
 
-  // Choose icon and action text based on type
+  
   let icon = null;
   let iconColor = '#000';
   let actionText = '';
@@ -244,19 +244,19 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
 
   return (
     <TouchableOpacity className={`flex-row px-4 py-3 ${isRead ? 'bg-white' : 'bg-gray-50'} border-b border-gray-100`}>
-      {/* Left: Icon (if applicable) */}
+      
       {icon && (
         <View style={{ width: 24 }} className="mr-3 mt-2 items-center">
           {icon}
         </View>
       )}
 
-      {/* Right: Notification Details */}
+      
       <View className="flex-1">
-        {/* Avatar Row for all notification types */}
+        
         <AvatarRow userIds={userIds} />
 
-        {/* Action Text */}
+        
         <Text className="text-lg mb-1">
           <Text className="font-semibold">{user.name}</Text>
           {otherCount > 0 && (
@@ -265,23 +265,23 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
           <Text className="text-gray-700">{actionText}</Text>
         </Text>
 
-        {/* Post Preview (for likes and retweets) */}
+        
         {postPreview && type !== 'follow' && (
           <Text className="text-lg text-gray-600 mb-1" numberOfLines={5} ellipsizeMode="tail">
             {postPreview}
           </Text>
         )}
 
-        {/* Timestamp */}
+        
         <Text className="text-lg text-gray-500 mt-1">{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
-// --- Main Screen Component ---
+
 export default function Notifications() {
-  // Header component to be used in the collapsible view
+  
 
 
   const insets = useSafeAreaInsets();
@@ -297,7 +297,7 @@ export default function Notifications() {
   return (
     <View className="flex-1 bg-white" >
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      {/* <Stack.Screen options={{ headerShown: false }} /> */}
+      
 
       <Tabs.Container
         renderHeader={renderHeader}

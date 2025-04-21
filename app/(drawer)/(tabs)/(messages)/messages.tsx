@@ -1,16 +1,16 @@
 import { Stack } from 'expo-router';
-import React, { useState } from 'react'; // Import useState
+import React, { useState } from 'react'; 
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar, // Import StatusBar
-  StyleSheet, // Import StyleSheet for styles not easily handled by Tailwind
-  Dimensions, // To potentially calculate swipe distances
+  StatusBar, 
+  StyleSheet, 
+  Dimensions, 
 } from 'react-native';
-import { SwipeListView } from 'react-native-swipe-list-view'; // Import SwipeListView
+import { SwipeListView } from 'react-native-swipe-list-view'; 
 import Pin from "~/assets/svg/chat/pin.svg"
 import Report from "~/assets/svg/chat/report.svg"
 import Delete from "~/assets/svg/chat/delete.svg"
@@ -21,17 +21,17 @@ import SettingIcon from "~/assets/svg/aside/settings.svg"
 import { Image } from 'expo-image'
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-// --- Mock Data ---
-// (Keep your messagesData array as it is)
+
+
 const initialMessagesData = [
   {
     id: '1',
-    key: '1', // SwipeListView often uses 'key' by default, good practice to include it
+    key: '1', 
     name: 'Sky Sports Football',
     username: '@SkyFootball',
     time: '1h',
     lastMessage: 'Great highlights package from yesterday! Can we get clearance to use a few clips?',
-    avatar: 'https://pbs.twimg.com/profile_images/1605131756310614017/05qwHae-_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1605131756310614017/05qwHae-_400x400.jpg', 
     isYou: false,
     is_read: false
   },
@@ -42,7 +42,7 @@ const initialMessagesData = [
     username: '@ManUtd',
     time: '3h',
     lastMessage: 'You: Thanks for sending over the updated squad list for the website.',
-    avatar: 'https://pbs.twimg.com/profile_images/1889603596309639168/KSBuQ9vL_400x400.png', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1889603596309639168/KSBuQ9vL_400x400.png', 
     isYou: true,
     is_read: true
   },
@@ -53,7 +53,7 @@ const initialMessagesData = [
     username: '@OfficialFPL',
     time: '2d',
     lastMessage: 'You: Reminder to get the Gameweek 30 deadline graphic ready by tomorrow EOD.',
-    avatar: 'https://pbs.twimg.com/profile_images/1670723481837633538/H-tSt31R_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1670723481837633538/H-tSt31R_400x400.jpg', 
     isYou: true,
     is_read: true
   },
@@ -64,7 +64,7 @@ const initialMessagesData = [
     username: '@LFC',
     time: '2d',
     lastMessage: "Just confirming the kick-off time adjustment for the match on the 25th.",
-    avatar: 'https://pbs.twimg.com/profile_images/1856268307868844032/lbdn4-vK_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1856268307868844032/lbdn4-vK_400x400.jpg', 
     isYou: false,
     is_read: false
   },
@@ -75,7 +75,7 @@ const initialMessagesData = [
     username: '@Arsenal',
     time: '4d',
     lastMessage: "You: Approved the submitted matchday photos. Look great!",
-    avatar: 'https://pbs.twimg.com/profile_images/1913143252741505026/vdNyLcu3_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1913143252741505026/vdNyLcu3_400x400.jpg', 
     isYou: true,  
     is_read: true
   },
@@ -86,7 +86,7 @@ const initialMessagesData = [
     username: '@BBCSport',
     time: '5d',
     lastMessage: "Following up on the interview request for the Chief Executive.",
-    avatar: 'https://pbs.twimg.com/profile_images/1486488950680215553/Rc0iOmOY_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1486488950680215553/Rc0iOmOY_400x400.jpg', 
     isYou: false,
     is_read: false
   },
@@ -97,17 +97,17 @@ const initialMessagesData = [
     username: '@WWE',
     time: '2d',
     lastMessage: 'Reminder to get the Gameweek 30 deadline graphic ready by tomorrow EOD.',
-    avatar: 'https://pbs.twimg.com/profile_images/1383079031805972485/3sWoMX-R_400x400.jpg', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1383079031805972485/3sWoMX-R_400x400.jpg', 
     isYou: true,
     is_read: false
   },
-  // Add more messages as needed
+  
 ];
 
 
-// --- Components ---
 
-// Header Component (Keep as is)
+
+
 const MessagesHeader = () => {
 
   return (
@@ -126,7 +126,7 @@ const MessagesHeader = () => {
   );
 };
 
-// Search Bar Component (Keep as is)
+
 const SearchBar = () => {
   return (
     <View className="px-4 py-2 bg-white border-b border-gray-300">
@@ -142,7 +142,7 @@ const SearchBar = () => {
   );
 };
 
-// Message Requests Component (Keep as is)
+
 const MessageRequests = () => {
   return (
     <TouchableOpacity className="flex-row items-center px-4 py-3 bg-white gap-3 ">
@@ -157,15 +157,15 @@ const MessageRequests = () => {
   );
 };
 
-// Message Item Component (Visible Row) - Slightly adapted for renderItem
+
 const MessageItem = ({ data }) => {
-  const { item } = data; // Destructure item from data passed by SwipeListView
+  const { item } = data; 
   return (
-    // Ensure the row has a background color so it hides the buttons underneath
+    
     <TouchableOpacity
-      activeOpacity={1} // Prevent opacity change on press if desired
+      activeOpacity={1} 
       className="flex-row items-start px-4 py-3 bg-white"
-      // Add onPress for navigation or other actions if needed
+      
       onPress={() => console.log('Pressed message:', item.name)}
     >
 
@@ -192,11 +192,11 @@ const MessageItem = ({ data }) => {
   );
 };
 
-// Hidden Item Component (Action Buttons)
+
 const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDelete }) => {
   const { item } = data;
 
-  // Function to close the row (optional, useful after action)
+  
   const closeRow = () => {
     if (rowMap[item.key]) {
       rowMap[item.key].closeRow();
@@ -205,25 +205,25 @@ const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDele
 
   return (
     <View style={styles.rowBack}>
-      {/* Left Action (Swipe Left-to-Right reveals this) */}
+      
       <TouchableOpacity
         onPress={() => {
           onPin(item.id);
-          // closeRow(); // Optionally close row after action
+          
         }}
         className="flex-column items-center gap-3 border-r border-gray-200 w-20"
       >
         <Pin width={24} height={24} fill="#000" />
         <Text className="text-gray-700 text-sm">Pin</Text>
-        {/* Add Pin Icon here if you have one */}
+        
       </TouchableOpacity>
 
-      {/* Right Actions (Swipe Right-to-Left reveals these) */}
+      
       <View style={[styles.backRightBtnContainer]}>
         <TouchableOpacity
           onPress={() => {
             onReport(item.id);
-            // closeRow();
+            
           }}
           className="flex-column items-center gap-3 border-r border-gray-200 w-20"
         >
@@ -233,7 +233,7 @@ const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDele
         <TouchableOpacity
           onPress={() => {
             onSnooze(item.id);
-            // closeRow();
+            
           }}
           className="flex-column items-center gap-3 border-r border-gray-200 w-20"
         >
@@ -243,7 +243,7 @@ const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDele
         <TouchableOpacity
           onPress={() => {
             onDelete(item.id);
-            // No need to close row if it's being deleted
+            
           }}
           className="flex-column items-center gap-3 w-20"
         >
@@ -256,35 +256,35 @@ const HiddenItemWithActions = ({ data, rowMap, onPin, onReport, onSnooze, onDele
 };
 
 
-// --- Main Screen Component ---
+
 export default function Messages() {
-  // Use state to manage messages if you want to delete items
+  
   const [messages, setMessages] = useState(initialMessagesData);
 
-  // --- Action Handlers ---
+  
   const handlePin = (id) => {
     console.log('Pin message:', id);
-    // Add your pin logic here (e.g., update state, API call)
+    
   };
 
   const handleReport = (id) => {
     console.log('Report message:', id);
-    // Add your report logic here
+    
   };
 
   const handleSnooze = (id) => {
     console.log('Snooze message:', id);
-    // Add your snooze logic here
+    
   };
 
   const handleDelete = (id) => {
     console.log('Delete message:', id);
-    // Example: Update state to remove the message
+    
     setMessages(prevMessages => prevMessages.filter(message => message.id !== id));
-    // Add API call for deletion if needed
+    
   };
 
-  // Render Hidden Item wrapper to pass handlers
+  
   const renderHiddenItem = (data, rowMap) => (
     <HiddenItemWithActions
       data={data}
@@ -297,39 +297,39 @@ export default function Messages() {
   );
 
   const insets = useSafeAreaInsets();
-  // Calculate swipe distances (adjust these values as needed)
-  const swipeRightOpenValue = 240; // Width for Report + Snooze + Delete (e.g., 3 * 80)
-  const swipeLeftOpenValue = 80;   // Width for Pin
+  
+  const swipeRightOpenValue = 240; 
+  const swipeLeftOpenValue = 80;   
 
   return (
     <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom * 3 }}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      {/* <Stack.Screen options={{ title: 'Messages', headerShown: false }} /> */}
+      
 
       <MessagesHeader />
       <SearchBar />
 
-      {/* Message Requests Section - Keep outside the SwipeListView */}
+      
 
-      {/* Use SwipeListView instead of ScrollView + map */}
+      
       <SwipeListView
-        data={messages} // Use state variable
-        renderItem={(data, rowMap) => ( // Pass rowMap if needed by MessageItem, usually not
+        data={messages} 
+        renderItem={(data, rowMap) => ( 
           <MessageItem data={data} />
         )}
-        renderHiddenItem={renderHiddenItem} // Render the hidden buttons
-        // Swipe right-to-left configuration
-        rightOpenValue={-swipeRightOpenValue} // Negative value for right actions
-        stopRightSwipe={-swipeRightOpenValue - 20} // Stop slightly beyond the buttons
-        // Swipe left-to-right configuration
+        renderHiddenItem={renderHiddenItem} 
+        
+        rightOpenValue={-swipeRightOpenValue} 
+        stopRightSwipe={-swipeRightOpenValue - 20} 
+        
         leftOpenValue={swipeLeftOpenValue}
-        stopLeftSwipe={swipeLeftOpenValue + 20} // Stop slightly beyond the button
-        keyExtractor={(item) => item.key} // Use the key extractor
-        // Optional: Disable swipes if needed
-        // disableRightSwipe={true} // Disables left-to-right swipe
-        // disableLeftSwipe={true} // Disables right-to-left swipe
-        className="flex-1 bg-white" // Apply styling to the list container
-        // Optional: Add ListFooterComponent, ListHeaderComponent etc. like FlatList
+        stopLeftSwipe={swipeLeftOpenValue + 20} 
+        keyExtractor={(item) => item.key} 
+        
+        
+        
+        className="flex-1 bg-white" 
+        
         ListHeaderComponent={MessageRequests}
       />
 
@@ -337,25 +337,25 @@ export default function Messages() {
   );
 }
 
-// --- Styles ---
-// Use StyleSheet for complex layouts or where Tailwind might be cumbersome
+
+
 const styles = StyleSheet.create({
   rowBack: {
     alignItems: 'center',
-    // backgroundColor: '#DDD', // Background visible during swipe
+    
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between', // Space between left and right actions
-    // paddingLeft: 15, // Keep this 0 if left button aligns edge-to-edge
-    // paddingRight: 0, // Keep this 0 if right buttons align edge-to-edge
+    justifyContent: 'space-between', 
+    
+    
   },
   backRightBtnContainer: {
-    flexDirection: 'row', // Arrange right buttons horizontally
-    // gap: 40,
-    // justifyContent: 'center',
-    alignItems: 'center', // Align vertically if needed
-    // justifyContent: 'flex-end', // Align to the right
-    // height: '100%', // Make container fill height if buttons need vertical centering
+    flexDirection: 'row', 
+    
+    
+    alignItems: 'center', 
+    
+    
   },
 
 });

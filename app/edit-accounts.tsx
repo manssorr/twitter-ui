@@ -17,7 +17,7 @@ import { Feather } from '@expo/vector-icons';
 import Sortable from 'react-native-sortables';
 import { useRouter } from 'expo-router';
 
-// Define the user type
+
 type User = {
   id: string;
   name: string;
@@ -27,22 +27,22 @@ type User = {
   verified_badge: string;
 };
 
-// Define props for AccountItem
+
 type AccountItemProps = {
   item: User;
   currentUserId: string | null;
 };
 
-// Memoized item component with proper handle
+
 const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
   return (
     <View style={styles.accountItem}>
-      {/* Subtract icon on the left side with red border */}
+      
       <View style={styles.subtractContainer}>
         <Feather name="minus" size={16} color="white" />
       </View>
 
-      {/* Account info */}
+      
       <Image
         source={{ uri: item.profile_picture }}
         style={styles.profileImage}
@@ -63,7 +63,7 @@ const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
         <Text style={styles.handleText}>@{item.handle}</Text>
       </View>
 
-      {/* Drag handle on the right side */}
+      
       <Sortable.Handle>
         <View style={styles.handleContainer}>
           <Feather name="menu" size={22} color="#767676" />
@@ -73,17 +73,17 @@ const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
   );
 });
 
-// Component for the edit accounts screen
+
 export default function EditAccountsScreen() {
   const insets = useSafeAreaInsets();
   const { currentUserId } = useStore();
   const router = useRouter();
-  // State for the ordered list of accounts
+  
   const [orderedAccounts, setOrderedAccounts] = useState<User[]>([]);
 
-  // Load accounts on initial render
+  
   useEffect(() => {
-    // Get all authorized users
+    
     const authorizedUsers = users.filter(user =>
       authorizedAccounts.includes(user.id)
     );
@@ -91,12 +91,12 @@ export default function EditAccountsScreen() {
     setOrderedAccounts(authorizedUsers);
   }, []);
 
-  // Handle saving the new order
+  
   const handleSaveOrder = () => {
     router.back();
   };
 
-  // Define renderItem callback for the Grid
+  
   const renderItem = useCallback(({ item }: { item: User }) => (
     <AccountItem
       key={item.id}
@@ -105,7 +105,7 @@ export default function EditAccountsScreen() {
     />
   ), [currentUserId]);
 
-  // Handle drag end 
+  
   const handleDragEnd = (params: any) => {
     console.log('Sortable.Grid onDragEnd params:', params);
     if (params.from !== undefined && params.to !== undefined) {
@@ -132,7 +132,7 @@ export default function EditAccountsScreen() {
         <Text style={styles.headerTitle}>Accounts</Text>
       </View>
 
-      {/* Sortable Grid with columns=1 */}
+      
       <View style={styles.gridContainer}>
         <Sortable.Grid
           data={orderedAccounts}
@@ -149,7 +149,7 @@ export default function EditAccountsScreen() {
   );
 }
 
-// Add StyleSheet for better organization and consistency
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

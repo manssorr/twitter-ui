@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ImageBackground, // Needed for featured section
+  ImageBackground, 
 } from 'react-native';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,8 +18,8 @@ import SearchIcon from "~/assets/svg/tabs/search.svg"
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// --- Mock Data ---
-// Updated trending topics to match Twitter format
+
+
 const trendingData = [
   {
     id: '1',
@@ -98,9 +98,9 @@ const trendingData = [
   }
 ];
 
-const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
+const APP_PRIMARY_COLOR = '#1DA1F2'; 
 
-// --- Components ---
+
 
 const ExploreHeader = () => {
   return (
@@ -133,9 +133,9 @@ const ExploreHeader = () => {
 };
 
 
-// Featured Content Component
+
 const FeaturedContent = () => {
-  // Placeholder image for Premier League featured content
+  
   const featuredImageUrl = 'https://pbs.twimg.com/semantic_core_img/1844526946882879503/orUmRvLL?format=jpg&name=900x900';
   return (
     <View className="mb-2">
@@ -163,11 +163,11 @@ const FeaturedContent = () => {
 
 
 
-      {/* Optional: Promoted/Sponsored Banner */}
+      
       <ImageBackground
         source={{ uri: 'https://pbs.twimg.com/media/GjiSI34aIAUxqvk?format=png&name=900x900' }}
-        className="h-24  justify-end p-5 mt-3 mx-2 rounded-lg overflow-hidden flex-row justify-between" // Height and padding
-        resizeMode="cover" // Cover the area
+        className="h-24  justify-end p-5 mt-3 mx-2 rounded-lg overflow-hidden flex-row justify-between" 
+        resizeMode="cover" 
         onError={(e) => console.log('Failed to load featured image:', e.nativeEvent.error)}
       >
         <View>
@@ -179,7 +179,7 @@ const FeaturedContent = () => {
 
           <View className="flex-row items-center gap-2">
             <Text className="text-base text-white">Brought to you by <Text className="font-bold">Sponsor</Text></Text>
-            {/* Replace with actual sponsor logo if available */}
+            
             <Image source={{ uri: 'https://pbs.twimg.com/media/Gjxr_4DXAAAWFR8?format=png&name=900x900' }} className="h-5 w-16" resizeMode="contain" />
 
           </View>
@@ -197,34 +197,34 @@ const FeaturedContent = () => {
   );
 };
 
-// Trending Item Component - Updated to match Twitter design
+
 const TrendingItem = ({ item }) => {
   return (
     <TouchableOpacity className="flex-row px-4 py-3 bg-white border-b border-gray-100">
-      {/* Left side content with rank (if available) */}
+      
       <View className="flex-1">
-        {/* Top row: Category */}
+        
         <View className="flex-row items-center">
           {item.rank && (
             <Text className="text-sm text-gray-500 mr-2">{item.rank} ·</Text>
           )}
           <Text className="text-sm text-gray-500">{item.category}</Text>
 
-          {/* Optional menu icon on the right */}
+          
           <Text className="ml-auto text-gray-400">···</Text>
         </View>
 
-        {/* Main topic - larger and bolder */}
+        
         <Text className="text-lg font-bold text-gray-900 mt-0.5">
           {item.topic}
         </Text>
 
-        {/* Post count - smaller size */}
+        
         <Text className="text-sm text-gray-500 mt-0.5">
           {item.posts}
         </Text>
 
-        {/* Trending with section - if available */}
+        
         {item.trendingWith && item.trendingWith.length > 0 && (
           <Text className="text-base text-gray-500 mt-0.5">
             Trending with <Text className="text-gray-800">{item.trendingWith}</Text>
@@ -236,7 +236,7 @@ const TrendingItem = ({ item }) => {
 };
 
 
-// Mock data for Stories
+
 const storiesData = [
   {
     id: '1',
@@ -303,7 +303,7 @@ const StoriesForYou = () => {
             </Text>
 
             <View className="flex-row items-center mb-1">
-              {/* Profile images row */}
+              
               <View className="flex-row mr-3">
                 {story.profileImages.map((img, imgIndex) => (
                   <Image
@@ -314,7 +314,7 @@ const StoriesForYou = () => {
                       marginLeft: imgIndex > 0 ? -12 : 0,
                       borderWidth: 2,
                       borderColor: 'white',
-                      zIndex: 3 - imgIndex, // Higher z-index for first images
+                      zIndex: 3 - imgIndex, 
                     }}
                   />
                 ))}
@@ -326,7 +326,7 @@ const StoriesForYou = () => {
             </View>
           </View>
 
-          {/* Add a divider except for the last item */}
+          
           {index < storiesData.length - 1 && (
             <View className="h-[0.5px] bg-gray-200 w-full mt-4" />
           )}
@@ -336,11 +336,11 @@ const StoriesForYou = () => {
   );
 };
 
-// --- Main Screen Component ---
+
 export default function Search() {
   const insets = useSafeAreaInsets();
 
-  // Header component to be used in the collapsible view
+  
   const renderHeader = () => (
     <View style={{ paddingTop: insets.top }} className="bg-white w-full">
       <ExploreHeader />
@@ -350,7 +350,7 @@ export default function Search() {
   return (
     <View className="flex-1 bg-white">
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      {/* <Stack.Screen options={{ headerShown: false }} /> */}
+      
 
       <Tabs.Container
         renderHeader={renderHeader}
@@ -394,7 +394,7 @@ export default function Search() {
         <Tabs.Tab name="For You">
           <Tabs.ScrollView>
 
-            {/* Featured content at the top of the Trending tab */}
+            
             <FeaturedContent />
 
             <StoriesForYou />
@@ -407,7 +407,7 @@ export default function Search() {
           <Tabs.ScrollView>
 
 
-            {/* Trending items list */}
+            
             {trendingData.map((item) => (
               <TrendingItem key={item.id} item={item} />
             ))}

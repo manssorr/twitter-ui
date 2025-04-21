@@ -29,7 +29,7 @@ const TabBarBackground = () => {
     Platform.OS === 'ios'
       ? {
         tint: isDark ? 'systemThickMaterialDark' : 'systemThickMaterialLight',
-        // intensity: isClipPostOrClipTab ? 100 : 50,
+        
         intensity: 40,
         style: StyleSheet.absoluteFill,
       }
