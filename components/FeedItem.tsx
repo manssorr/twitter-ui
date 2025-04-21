@@ -206,7 +206,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                 <MoreContextIcons size="sm" />
                             </View>
 
-                            <Text className="text-black dark:text-white mt-1">{itemData.message}</Text>
+                            <Text className="text-black dark:text-white mt-1 text-lg leading-6">{itemData.message}</Text>
                             {itemData.media_url && (
                                 <Galeria urls={[itemData.media_url].filter(url => !!url) as string[]}>
                                     <Galeria.Image>
