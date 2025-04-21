@@ -50,6 +50,8 @@ import Grok from "~/assets/svg/tabs/grok.svg";
 import { FeedItem, FeedContent, ProfileImage, PROFILE_IMAGE_SIZE_MAP } from '~/components/FeedItem';
 import { useLocalSearchParams } from 'expo-router';
 import users from '~/dummy/users.json';
+import Messages from "~/assets/svg/tabs/messages.svg"
+
 
 const PULL_TO_REFRESH_THRESHOLD = 70; // Pixels to pull down to trigger refresh
 const PULL_TO_REFRESH_VISIBLE_THRESHOLD = 10; // Pixels to pull down before arrow starts appearing
@@ -83,9 +85,9 @@ interface User {
   is_organization: boolean;
 }
 
-const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: { 
-  navBarVisibility: any; 
-  scrollOffset: any; 
+const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
+  navBarVisibility: any;
+  scrollOffset: any;
   refreshing: any;
   user: User;
 }) => {
@@ -104,15 +106,15 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
   // Modified blur overlay style that maintains state after refresh
   const blurOverlayStyle = useAnimatedStyle(() => {
     // Use max value between current scroll and previous to maintain blur during refresh
-    const effectiveScrollOffset = isChangingTab.value ? 
-      Math.max(50, Math.abs(scrollOffset.value)) : 
+    const effectiveScrollOffset = isChangingTab.value ?
+      Math.max(50, Math.abs(scrollOffset.value)) :
       Math.abs(scrollOffset.value);
-    
+
     return {
       opacity: interpolate(
-        effectiveScrollOffset, 
-        [0, 50], 
-        [0, 1], 
+        effectiveScrollOffset,
+        [0, 50],
+        [0, 1],
         Extrapolate.CLAMP
       ),
     };
@@ -141,26 +143,26 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
   );
 
   const profileImageCurrentScale = useDerivedValue(() => interpolate(
-    scrollOffset.value, 
-    [0, BANNER_BOTTOM_MARGIN], 
-    [HEADER_PROFILE_IMAGE_START_SCALE, HEADER_PROFILE_IMAGE_END_SCALE], 
+    scrollOffset.value,
+    [0, BANNER_BOTTOM_MARGIN],
+    [HEADER_PROFILE_IMAGE_START_SCALE, HEADER_PROFILE_IMAGE_END_SCALE],
     Extrapolate.CLAMP
   ));
 
   // Modified banner shift style to maintain position
   const bannerVerticalShiftStyle = useAnimatedStyle(() => {
-    const effectiveScroll = isChangingTab.value ? 
-      Math.min(0, scrollOffset.value) : 
+    const effectiveScroll = isChangingTab.value ?
+      Math.min(0, scrollOffset.value) :
       scrollOffset.value;
-      
+
     return {
-      transform: [{ 
+      transform: [{
         translateY: interpolate(
-          effectiveScroll, 
-          [0, BANNER_BOTTOM_MARGIN], 
-          [0, -BANNER_BOTTOM_MARGIN], 
+          effectiveScroll,
+          [0, BANNER_BOTTOM_MARGIN],
+          [0, -BANNER_BOTTOM_MARGIN],
           Extrapolate.CLAMP
-        ) 
+        )
       }],
     };
   });
@@ -191,7 +193,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
     // Show indicator during refreshing OR when close to threshold
     // This ensures there's no gap between arrow disappearing and indicator appearing
     const showIndicator = refreshing || isNearRefreshThreshold.value;
-    
+
     // Ensure immediate visibility during transitions
     return {
       opacity: showIndicator ? 1 : 0,
@@ -217,12 +219,12 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
         position: 'absolute',
       };
     }
-    
+
     // Show arrow during initial pull
-    const showArrow = scrollOffset.value < 0 && 
-                     -scrollOffset.value < pullToRefreshThreshold * 0.85 && 
-                     !hasReachedThreshold.value;
-                     
+    const showArrow = scrollOffset.value < 0 &&
+      -scrollOffset.value < pullToRefreshThreshold * 0.85 &&
+      !hasReachedThreshold.value;
+
     return {
       opacity: showArrow ? 1 : 0,
       position: 'absolute',
@@ -273,7 +275,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
         >
           <View style={{ marginBottom: -BANNER_BOTTOM_MARGIN }}>
 
-            
+
             {canUseBlurEffect ? (
               <Animated.View style={[StyleSheet.absoluteFill, { zIndex: 1 }, blurOverlayStyle]}>
                 <BlurView style={StyleSheet.absoluteFill} intensity={60} tint="dark" />
@@ -285,20 +287,20 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
               />
             )}
 
-      
+
             <Image
               source={{ uri: user.header_picture }}
               contentFit="cover"
               contentPosition="center"
               style={[
-                { width: windowWidth }, 
+                { width: windowWidth },
                 { height: bannerTotalHeight.value, minHeight: 110 + BANNER_BOTTOM_MARGIN }
               ]}
               className="h-full w-full"
             />
 
 
-            
+
           </View>
 
 
@@ -307,24 +309,24 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
         </Animated.View>
 
 
-        
 
-            {/* Pull-to-Refresh Indicator Area */}
-    <Animated.View 
-      style={[
-        scrollingListStyles.refreshIndicatorContainer, 
-        { top: safeAreaTop + 20 }
-      ]}
-    >
-        
+
+        {/* Pull-to-Refresh Indicator Area */}
+        <Animated.View
+          style={[
+            scrollingListStyles.refreshIndicatorContainer,
+            { top: safeAreaTop + 20 }
+          ]}
+        >
+
           <Animated.View style={arrowStyle}>
             <Feather name="arrow-down" size={24} color="#ffffff" />
           </Animated.View>
           <Animated.View style={activityIndicatorStyle}>
             <ActivityIndicator size="small" color="#ffffff" />
           </Animated.View>
-       
-      </Animated.View>
+
+        </Animated.View>
 
 
 
@@ -336,7 +338,7 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
 
 
 
-      
+
 
 
 
@@ -348,11 +350,11 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
           <View className="flex-row gap-1.5">
 
 
-<TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
+            <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
               <Grok width={20} height={17} fill="white" />
             </TouchableOpacity>
 
-   
+
             <TouchableOpacity className="bg-black/50 dark:bg-white/20 rounded-full p-2">
               <Feather color="white" name="search" size={20} />
             </TouchableOpacity>
@@ -396,15 +398,23 @@ const ProfileHeader = ({ navBarVisibility, scrollOffset, refreshing, user }: {
                 displaySize={HEADER_PROFILE_IMAGE_SIZE}
                 source={{ uri: user.profile_picture }}
                 style={{
-                  padding:10,
+                  padding: 10,
                   backgroundColor: 'white'
                 }}
               />
             </TouchableOpacity>
           </Animated.View>
-          <TouchableOpacity className="absolute bottom-0 right-0 py-1 px-3 bg-transparent rounded-full border border-neutral-400/50 dark:border-neutral-600/50 flex flex-start  ">
-            <Text className="text-base font-bold text-black dark:text-white">Edit Profile</Text>
-          </TouchableOpacity>
+          {user.id == 1 || user.id == 2 ? (
+            <TouchableOpacity className="absolute bottom-0 right-0 py-1 px-3 bg-transparent rounded-full border border-neutral-400/50 dark:border-neutral-600/50 flex flex-start  ">
+              <Text className="text-base font-bold text-black dark:text-white">Edit Profile</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity className="absolute bottom-0 right-0 py-1 px-8 bg-black rounded-full border border-neutral-400/50 dark:border-neutral-600/50 flex flex-start  ">
+              <Text className="text-base font-bold text-white">Follow</Text>
+            </TouchableOpacity>
+
+          )}
+
         </Animated.View>
       </Animated.View>
     </View>
@@ -431,7 +441,7 @@ const ProfileDetailsHeader = ({ user }: { user: User }) => {
   return (
     <ExpandedHeader>
       <View
-        style={{ marginTop: topInset - 10   + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2  }}
+        style={{ marginTop: topInset - 10 + HEADER_PROFILE_IMAGE_SIZE_VALUE / 2 }}
         className={`flex-col gap-2 px-${SCREEN_HORIZONTAL_PADDING / 3} w-full`}
       >
         <View className="flex-row gap-2 items-center">
@@ -512,26 +522,26 @@ export default function UserProfileScreen() {
   const listRef = useRef<any>(null);
   const { colorScheme, setColorScheme } = useColorScheme();
   const scrollPosition = useSharedValue(0);
-  
+
   // Get the handle parameter from the URL
   const params = useLocalSearchParams();
   const userHandle = params.id as string;
-  
+
   // Find the user in users.json by handle
   const user = useMemo(() => {
     return users.find((user) => user.handle.toLowerCase() === userHandle.toLowerCase()) || users[0];
   }, [userHandle]);
 
   const feedSections: SectionListData<FeedContent, { title: string }>[] = useMemo(() => [
-    { 
-      title: 'Feed', 
+    {
+      title: 'Feed',
       data: [
         {
           contentId: 'post-abc',
           poster_id: user.id,
-          authorName: user.name, 
-          authorHandle: user.handle, 
-          authorImageUrl: user.profile_picture, 
+          authorName: user.name,
+          authorHandle: user.handle,
+          authorImageUrl: user.profile_picture,
           posted_time: Date.now() - 3 * 60 * 60 * 1000, // 3 hours ago
           postedTime: '3h',
           message: `Three points 
@@ -563,7 +573,7 @@ It didn't take Antoine Semenyo long to give the Cherries the lead
           reply_count: 178,
           view_count: '78K'
         }
-      ] 
+      ]
     },
   ], [user]);
 
