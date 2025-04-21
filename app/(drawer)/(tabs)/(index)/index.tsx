@@ -131,11 +131,12 @@ export default function HomeScreen() {
             itemsByCategory[category] = [];
         });
 
-        // Special case for "For you" - either use posts explicitly marked "For you" or create a curated feed
-        const forYouItems = processedFeedItems.filter(item => item.category === 'For you');
-        itemsByCategory['For you'] = forYouItems.length > 0 ?
-            forYouItems :
-            processedFeedItems.slice(0, 5); // If no explicit "For you" posts, take first 5 posts
+        // Special case for "For you" - include ALL posts sorted by post time (newest first)
+        itemsByCategory['For you'] = [...processedFeedItems].sort((a, b) => {
+            const timeA = typeof a.posted_time === 'number' ? a.posted_time : parseInt(String(a.posted_time), 10);
+            const timeB = typeof b.posted_time === 'number' ? b.posted_time : parseInt(String(b.posted_time), 10);
+            return timeB - timeA; // Descending order (newest first)
+        });
 
         // Filter other categories
         processedFeedItems.forEach(item => {
@@ -154,6 +155,17 @@ export default function HomeScreen() {
         // Get posts for this category tab
         const tabPosts = feedItemsByCategory[tabName] || [];
 
+        // Empty state if no posts available
+        if (tabPosts.length === 0) {
+            return (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+                    <Text style={{ fontSize: 18, fontWeight: '600', color: '#555' }}>
+                        You are all caught up.
+                    </Text>
+                </View>
+            );
+        }
+
         const renderFeedItem = ({ item }: { item: FeedContent }) => (
             <FeedItem itemData={item} onPress={() => handleItemPress(item.contentId || '')} />
         );
@@ -162,7 +174,10 @@ export default function HomeScreen() {
             <Tabs.FlatList
                 data={tabPosts}
                 renderItem={renderFeedItem}
-                keyExtractor={(item) => item.contentId || `post-${item.poster_id}-${Date.now()}`}
+                keyExtractor={(item) => {
+                    // Create unique keys by adding the tab name to avoid duplicates across tabs
+                    return `${tabName}-${item.contentId || `post-${item.poster_id}-${item.posted_time}`}`;
+                }}
                 contentContainerStyle={{
                     paddingBottom: insets.bottom,
                 }}
