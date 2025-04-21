@@ -3,7 +3,6 @@ import React, { useState } from 'react'; // Import useState
 import {
   View,
   Text,
-  Image,
   TextInput,
   TouchableOpacity,
   SafeAreaView,
@@ -16,6 +15,11 @@ import Pin from "~/assets/svg/chat/pin.svg"
 import Report from "~/assets/svg/chat/report.svg"
 import Delete from "~/assets/svg/chat/delete.svg"
 import Snooze from "~/assets/svg/chat/snooze.svg"
+import Request from "~/assets/svg/chat/request.svg"
+import Search from "~/assets/svg/tabs/search.svg"
+import SettingIcon from "~/assets/svg/aside/settings.svg"
+import { Image } from 'expo-image'
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // --- Mock Data ---
 // (Keep your messagesData array as it is)
@@ -29,6 +33,7 @@ const initialMessagesData = [
     lastMessage: 'Great highlights package from yesterday! Can we get clearance to use a few clips?',
     avatar: 'https://pbs.twimg.com/profile_images/1605131756310614017/05qwHae-_400x400.jpg', // Placeholder
     isYou: false,
+    is_read: false
   },
   {
     id: '2',
@@ -37,18 +42,20 @@ const initialMessagesData = [
     username: '@ManUtd',
     time: '3h',
     lastMessage: 'You: Thanks for sending over the updated squad list for the website.',
-    avatar: 'https://placehold.co/100x100/FED7D7/9B2C2C?text=MU', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1889603596309639168/KSBuQ9vL_400x400.png', // Placeholder
     isYou: true,
+    is_read: true
   },
   {
     id: '3',
     key: '3',
-    name: 'Fantasy Premier League',
+    name: 'Fantasy PL',
     username: '@OfficialFPL',
     time: '2d',
     lastMessage: 'You: Reminder to get the Gameweek 30 deadline graphic ready by tomorrow EOD.',
-    avatar: 'https://placehold.co/100x100/E9D5FF/5B21B6?text=FPL', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1670723481837633538/H-tSt31R_400x400.jpg', // Placeholder
     isYou: true,
+    is_read: true
   },
   {
     id: '4',
@@ -57,18 +64,20 @@ const initialMessagesData = [
     username: '@LFC',
     time: '2d',
     lastMessage: "Just confirming the kick-off time adjustment for the match on the 25th.",
-    avatar: 'https://placehold.co/100x100/FEEBC8/9C4221?text=LFC', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1856268307868844032/lbdn4-vK_400x400.jpg', // Placeholder
     isYou: false,
+    is_read: false
   },
   {
-    id: '5',
+    id: '5',  
     key: '5',
     name: 'Arsenal',
     username: '@Arsenal',
     time: '4d',
     lastMessage: "You: Approved the submitted matchday photos. Look great!",
-    avatar: 'https://placehold.co/100x100/FECACA/7F1D1D?text=AFC', // Placeholder
-    isYou: true,
+    avatar: 'https://pbs.twimg.com/profile_images/1913143252741505026/vdNyLcu3_400x400.jpg', // Placeholder
+    isYou: true,  
+    is_read: true
   },
   {
     id: '6',
@@ -77,8 +86,20 @@ const initialMessagesData = [
     username: '@BBCSport',
     time: '5d',
     lastMessage: "Following up on the interview request for the Chief Executive.",
-    avatar: 'https://placehold.co/100x100/E0E7FF/312E81?text=BBC', // Placeholder
+    avatar: 'https://pbs.twimg.com/profile_images/1486488950680215553/Rc0iOmOY_400x400.jpg', // Placeholder
     isYou: false,
+    is_read: false
+  },
+  {
+    id: '7',
+    key: '7',
+    name: 'WWE',
+    username: '@WWE',
+    time: '2d',
+    lastMessage: 'Reminder to get the Gameweek 30 deadline graphic ready by tomorrow EOD.',
+    avatar: 'https://pbs.twimg.com/profile_images/1383079031805972485/3sWoMX-R_400x400.jpg', // Placeholder
+    isYou: true,
+    is_read: false
   },
   // Add more messages as needed
 ];
@@ -88,18 +109,18 @@ const initialMessagesData = [
 
 // Header Component (Keep as is)
 const MessagesHeader = () => {
+
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white">
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
       <TouchableOpacity>
         <Image
-          source={{ uri: 'https://placehold.co/80x80/DBEAFE/1E3A8A?text=Me' }}
-          className="w-8 h-8 rounded-full"
-          onError={(e) => console.log('Failed to load user avatar:', e.nativeEvent.error)}
+          source={{ uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg' }}
+          className="w-10 h-10 rounded-full"
         />
       </TouchableOpacity>
-      <Text className="text-lg font-semibold text-gray-900">Messages</Text>
+      <Text className="text-xl font-bold text-black">Messages</Text>
       <TouchableOpacity>
-        <Text className="text-xl">⚙️</Text>
+        <SettingIcon width={24} height={24} fill="#000" />
       </TouchableOpacity>
     </View>
   );
@@ -108,13 +129,13 @@ const MessagesHeader = () => {
 // Search Bar Component (Keep as is)
 const SearchBar = () => {
   return (
-    <View className="px-4 py-2 bg-white ">
-      <View className="flex-row items-center bg-gray-100 rounded-lg px-3 py-2">
-        <Text className="mr-2 text-gray-500">🔍</Text>
+    <View className="px-4 py-2 bg-white border-b border-gray-300">
+      <View className="flex-row items-center bg-[#EEF3F4] rounded-full px-3 py-2 gap-2 align-center justify-center">
+        <Search width={16} height={16} fill="#5C6A75" />
         <TextInput
           placeholder="Search Direct Messages"
           placeholderTextColor="#6b7280"
-          className="flex-1 text-base text-gray-900"
+          className=" text-gray-900 text-lg relative -top-1"
         />
       </View>
     </View>
@@ -124,11 +145,13 @@ const SearchBar = () => {
 // Message Requests Component (Keep as is)
 const MessageRequests = () => {
   return (
-    <TouchableOpacity className="flex-row items-center px-4 py-3 bg-white ">
-      <Text className="text-2xl mr-4">✉️</Text>
+    <TouchableOpacity className="flex-row items-center px-4 py-3 bg-white gap-3 ">
+      <View className="w-14 h-14 rounded-full  items-center justify-center border border-gray-200">
+        <Request width={24} height={24} fill="#000" />
+      </View>
       <View>
-        <Text className="text-base font-medium text-gray-900">Message requests</Text>
-        <Text className="text-sm text-gray-500">2 people you may know</Text>
+        <Text className="text-lg  font-bold text-gray-900">Message requests</Text>
+        <Text className="text-base text-gray-600">2 people you may know</Text>
       </View>
     </TouchableOpacity>
   );
@@ -145,18 +168,23 @@ const MessageItem = ({ data }) => {
       // Add onPress for navigation or other actions if needed
       onPress={() => console.log('Pressed message:', item.name)}
     >
+
       <Image
         source={{ uri: item.avatar }}
-        className="w-12 h-12 rounded-full mr-4"
-        onError={(e) => console.log(`Failed to load avatar for ${item.name}:`, e.nativeEvent.error)}
+        className="w-14 h-14 rounded-md mr-4 "
+
       />
+
       <View className="flex-1">
-        <View className="flex-row items-center mb-1">
-          <Text className="text-base font-semibold text-gray-900 mr-1">{item.name}</Text>
-          <Text className="text-sm text-gray-500 mr-1">{item.username}</Text>
-          <Text className="text-sm text-gray-500">· {item.time}</Text>
+
+
+        <View className="flex-row items-center mb-1 gap-1">
+          <Text className="text-lg font-semibold text-gray-900 mr-1">{item.name}</Text>
+          <Image source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/8/81/Twitter_Verified_Badge_Gold.svg" }} className="w-5 h-5 rounded-md" />
+          <Text className="text-lg text-gray-500 mr-1">{item.username}</Text>
+          <Text className="text-lg text-gray-500">· {item.time}</Text>
         </View>
-        <Text className="text-sm text-gray-600" numberOfLines={2} ellipsizeMode="tail">
+        <Text className={`text-lg ${!item.is_read ? 'font-semibold text-black' : 'text-gray-600'}`} numberOfLines={2} ellipsizeMode="tail">
           {item.lastMessage}
         </Text>
       </View>
@@ -268,12 +296,13 @@ export default function Messages() {
     />
   );
 
+  const insets = useSafeAreaInsets();
   // Calculate swipe distances (adjust these values as needed)
   const swipeRightOpenValue = 240; // Width for Report + Snooze + Delete (e.g., 3 * 80)
   const swipeLeftOpenValue = 80;   // Width for Pin
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom * 3 }}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <Stack.Screen options={{ title: 'Messages', headerShown: false }} />
 
@@ -281,7 +310,6 @@ export default function Messages() {
       <SearchBar />
 
       {/* Message Requests Section - Keep outside the SwipeListView */}
-      <MessageRequests />
 
       {/* Use SwipeListView instead of ScrollView + map */}
       <SwipeListView
@@ -301,10 +329,11 @@ export default function Messages() {
         // disableRightSwipe={true} // Disables left-to-right swipe
         // disableLeftSwipe={true} // Disables right-to-left swipe
         className="flex-1 bg-white" // Apply styling to the list container
-      // Optional: Add ListFooterComponent, ListHeaderComponent etc. like FlatList
+        // Optional: Add ListFooterComponent, ListHeaderComponent etc. like FlatList
+        ListHeaderComponent={MessageRequests}
       />
 
-    </SafeAreaView>
+    </View>
   );
 }
 
