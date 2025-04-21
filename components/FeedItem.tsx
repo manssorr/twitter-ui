@@ -203,11 +203,13 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
                                         <Text className="text-lg text-neutral-500 dark:text-neutral-400"> · {formatTime(itemData.posted_time, false)}</Text>
                                     </View>
                                 </TouchableOpacity>
-                                <DropdownMenu.Root>
-                                    <DropdownMenu.Trigger>
-                                        <TouchableOpacity className="p-1 -m-1">
-                                            <Feather name="more-horizontal" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
-                                        </TouchableOpacity>
+
+                                {!detailView && (
+                                    <DropdownMenu.Root>
+                                        <DropdownMenu.Trigger>
+                                            <TouchableOpacity className="p-1 -m-1">
+                                                <Feather name="more-horizontal" size={18} color={colorScheme === 'dark' ? 'white' : 'black'} />
+                                            </TouchableOpacity>
                                     </DropdownMenu.Trigger>
                                     <DropdownMenu.Content>
                                         <DropdownMenu.Item key="interactions">
@@ -258,6 +260,7 @@ export const FeedItem: React.FC<FeedItemProps> = ({ itemData, onPress, detailVie
 
                                     </DropdownMenu.Content>
                                 </DropdownMenu.Root>
+                            )}
                             </View>
 
                             <Text className="text-black dark:text-white mt-1 text-lg leading-6">{itemData.message}</Text>
