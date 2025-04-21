@@ -13,6 +13,8 @@ import {
 } from 'react-native';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import SettingIcon from "~/assets/svg/aside/settings.svg"
+import SearchIcon from "~/assets/svg/tabs/search.svg"
 
 // --- Mock Data ---
 // Updated trending topics to match Twitter format
@@ -98,40 +100,36 @@ const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 
 // --- Components ---
 
-// Header Component for Explore Screen
 const ExploreHeader = () => {
-  // Premier League Avatar Placeholder
-  const premierLeagueAvatar = 'https://placehold.co/80x80/6D28D9/EDE9FE?text=PL';
 
   return (
-    <View className="flex-row items-center space-x-3 px-4 py-2 bg-white border-b border-gray-200">
-      {/* Left: User Avatar */}
+    <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
       <TouchableOpacity>
         <Image
-          source={{ uri: premierLeagueAvatar }}
-          className="w-8 h-8 rounded-full"
-          onError={(e) => console.log('Failed to load user avatar:', e.nativeEvent.error)}
+          source={{ uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg' }}
+          className="w-10 h-10 rounded-full"
         />
       </TouchableOpacity>
 
-      {/* Center: Search Bar */}
-      <View className="flex-1 flex-row items-center bg-gray-100 rounded-full px-3 py-1.5">
-        <Text className="text-gray-500 mr-2">🔍</Text>
-        <TextInput
-          placeholder="Search Premier League"
-          placeholderTextColor="#6b7280" // gray-500
-          className="flex-1 text-base text-gray-900"
-        />
+      <View className="py-2 bg-white">
+        <View className="flex-row items-center bg-[#EEF3F4] rounded-full px-3 py-2 gap-2 align-center justify-center flex w-full">
+          <SearchIcon width={16} height={16} fill="#5C6A75" />
+          <TextInput
+            placeholder="Search"
+            placeholderTextColor="#6b7280"
+            className=" text-gray-900 text-lg relative -top-1"
+          />
+        </View>
       </View>
 
-      {/* Right: Settings Icon */}
+
       <TouchableOpacity>
-        {/* Replace with an actual Icon component */}
-        <Text className="text-xl">⚙️</Text>
+        <SettingIcon width={24} height={24} fill="#000" />
       </TouchableOpacity>
     </View>
   );
 };
+
 
 // Featured Content Component
 const FeaturedContent = () => {
@@ -172,25 +170,25 @@ const TrendingItem = ({ item }) => {
             <Text className="text-sm text-gray-500 mr-2">{item.rank} ·</Text>
           )}
           <Text className="text-sm text-gray-500">{item.category}</Text>
-          
+
           {/* Optional menu icon on the right */}
           <Text className="ml-auto text-gray-400">···</Text>
         </View>
-        
+
         {/* Main topic - larger and bolder */}
         <Text className="text-lg font-bold text-gray-900 mt-0.5">
           {item.topic}
         </Text>
-        
+
         {/* Post count - smaller size */}
         <Text className="text-sm text-gray-500 mt-0.5">
           {item.posts}
         </Text>
-        
+
         {/* Trending with section - if available */}
         {item.trendingWith && item.trendingWith.length > 0 && (
-          <Text className="text-sm text-gray-500 mt-0.5">
-            Trending with <Text className="text-blue-500">{item.trendingWith}</Text>
+          <Text className="text-base text-gray-500 mt-0.5">
+            Trending with <Text className="text-gray-800">{item.trendingWith}</Text>
           </Text>
         )}
       </View>
@@ -208,7 +206,7 @@ export default function Search() {
   );
 
   return (
-    <View className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-white" style={{ paddingTop: insets.top, paddingBottom: insets.bottom * 3 }}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
       <Stack.Screen options={{ headerShown: false }} />
 
@@ -236,6 +234,15 @@ export default function Search() {
             }}
           />
         )}
+
+
+
+        headerContainerStyle={{
+          backgroundColor: 'transparent',
+          elevation: 0,
+          shadowOpacity: 0,
+        }}
+
       >
 
 
