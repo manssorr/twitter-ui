@@ -22,7 +22,7 @@ import { BlurView } from 'expo-blur';
 const APP_PRIMARY_COLOR = '#1DA1F2'; // Twitter blue
 
 // Define category tabs with proper grouping
-const categoryTabs = ['For you', 'Following', 'RN/ React', 'AI', 'Premier League', 'Design', 'TPOT'];
+const categoryTabs = ['For you', 'Following', 'React & Expo', 'Al', 'Premier League', 'Design'];
 
 // Safely normalize post data with explicit type handling
 const processedFeedItems: FeedContent[] = sampleFeedItems.map((item: any): FeedContent => {
@@ -187,6 +187,7 @@ export default function HomeScreen() {
                 marginHorizontal: 10,
                 opacity: 1,
                 fontWeight: 'bold', textTransform: 'capitalize', textAlign: 'center', height: 24,
+                fontSize: 15,
                 color: '#606E79'
             }}
         />
