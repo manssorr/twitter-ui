@@ -482,7 +482,7 @@ const ProfileDetailsHeader = ({ user }: { user: User }) => {
           </TouchableOpacity>
         </View>
         <View className="flex-row gap-8 items-center">
-          <View className="relative flex-row -ml-3" style={{ width: PROFILE_IMAGE_SIZE_MAP.xs + (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * 2, height: PROFILE_IMAGE_SIZE_MAP.xs + 6 }}>
+          <View className="relative flex-row" style={{ width: PROFILE_IMAGE_SIZE_MAP.xs + (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * 2, height: PROFILE_IMAGE_SIZE_MAP.xs + 6 }}>
             {[10, 20, 30].map((imgNum, index) => (
               <ProfileImage
                 key={`follower-${imgNum}`}
@@ -492,19 +492,18 @@ const ProfileDetailsHeader = ({ user }: { user: User }) => {
                     index === 1 ? "https://pbs.twimg.com/profile_images/1785867863191932928/EpOqfO6d_400x400.png" :
                       "https://pbs.twimg.com/profile_images/1776070739319214080/TBARcp9C_400x400.jpg"
                 }}
-                // `https://i.pravatar.cc/128?img=${imgNum}}` }}
                 style={{
                   position: 'absolute',
                   top: 0,
                   zIndex: 3 - index,
-                  // left: (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * index,
+                  left: (PROFILE_IMAGE_SIZE_MAP.xs / 1.8) * index,
                   borderRadius: 100,
                 }}
                 className="border-2 border-white dark:border-black"
               />
             ))}
           </View>
-          <Text className="text-neutral-500 dark:text-neutral-400 text-sm flex-1">
+          <Text className="text-neutral-500 dark:text-neutral-400 text-sm flex-1 -ml-2">
             Followed by Expo, React Native, and 15 others
           </Text>
         </View>
