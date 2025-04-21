@@ -93,6 +93,7 @@ const ConfettiParticle = ({
 function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textColor: string }) {
     const [isLiked, setIsLiked] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [currentIconColor, setCurrentIconColor] = useState(iconColor);
     
     // Animation control values
     const unlikedIconScale = useSharedValue(1);
@@ -126,6 +127,9 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
         setIsLiked(willBeLiked);
         
         if (willBeLiked) {
+            // Update icon color for liked state
+            setCurrentIconColor("#f91880");
+            
             // Step 1: Animate the unliked icon scaling down (even faster)
             unlikedIconScale.value = withTiming(0, { 
                 duration: 35, // 30% faster than 50ms
@@ -176,6 +180,8 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
         } else {
             // When unliking, quickly transition back
             setShowConfetti(false);
+            // Reset icon color to original when unliking
+            setCurrentIconColor(iconColor);
             unlikedIconScale.value = withTiming(1, { duration: 70 }); // 30% faster than 100ms
             likedIconScale.value = 0;
             redCircleScale.value = 0;
@@ -232,7 +238,7 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
                 
                 {/* Unliked icon */}
                 <Animated.View style={[styles.iconAbsolute, unlikedIconStyle]}>
-                    <Like width={18} height={18} fill={iconColor} />
+                    <Like width={18} height={18} fill={currentIconColor} />
                 </Animated.View>
                 
                 {/* Liked icon */}
@@ -244,7 +250,7 @@ function LikeButton({ iconColor, textColor, likes }: { iconColor: string, textCo
             <Text 
                 className={textColor} 
                 style={{ 
-                    color: isLiked ? "#f91880" : textColor 
+                    color: isLiked ? "#f91880" : iconColor 
                 }}
             >
                {likes}
