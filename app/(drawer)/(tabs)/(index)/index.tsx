@@ -220,6 +220,7 @@ export default function HomeScreen() {
                 renderTabBar={renderTabBar}
                 pagerProps={{ scrollEnabled: true }}
                 initialTabName="For you"
+                minHeaderHeight={-60}
                 revealHeaderOnScroll
 
                 headerContainerStyle={{
