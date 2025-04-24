@@ -1,3 +1,4 @@
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Stack } from 'expo-router';
 import React from 'react';
 import {
@@ -13,26 +14,23 @@ import {
 } from 'react-native';
 import { Tabs, MaterialTabBar, MaterialTabItemProps } from 'react-native-collapsible-tab-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import SettingIcon from "~/assets/svg/aside/settings.svg"
-import HeartIcon from "~/assets/svg/like-filled.svg"
-import RetweetIcon from "~/assets/svg/notifications/repost.svg"
-import CommentIcon from "~/assets/svg/comment.svg"
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
-
-import usersData from "~/dummy/users.json";
-
-
+import SettingIcon from '~/assets/svg/aside/settings.svg';
+import CommentIcon from '~/assets/svg/comment.svg';
+import HeartIcon from '~/assets/svg/like-filled.svg';
+import RetweetIcon from '~/assets/svg/notifications/repost.svg';
+import usersData from '~/dummy/users.json';
 
 const notificationsData = [
   {
     id: '1',
     type: 'like',
     mainUser: {
-      id: '7', 
+      id: '7',
     },
     otherCount: 143,
-    postPreview: 'Matchday 38: Every goal, every emotion, every moment. What a Premier League season it has been!',
+    postPreview:
+      'Matchday 38: Every goal, every emotion, every moment. What a Premier League season it has been!',
     isRead: false,
     timestamp: '2h',
   },
@@ -41,10 +39,11 @@ const notificationsData = [
     id: '7',
     type: 'reply',
     mainUser: {
-      id: '11', 
+      id: '11',
     },
     otherCount: 0,
-    postPreview: 'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
+    postPreview:
+      'Love the new Premier League graphics package. Would you be interested in a case study about how it was designed?',
     isRead: true,
     timestamp: '1w',
   },
@@ -52,10 +51,11 @@ const notificationsData = [
     id: '2',
     type: 'retweet',
     mainUser: {
-      id: '2', 
+      id: '2',
     },
     otherCount: 87,
-    postPreview: 'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League! Record 6 teams qualified in the group stage.',
+    postPreview:
+      'Congratulations to the Premier League teams that qualified for the 2025/26 UEFA Champions League! Record 6 teams qualified in the group stage.',
     isRead: false,
     timestamp: '1d',
   },
@@ -63,7 +63,7 @@ const notificationsData = [
     id: '3',
     type: 'follow',
     mainUser: {
-      id: '8', 
+      id: '8',
     },
     otherCount: 898,
     isRead: true,
@@ -73,10 +73,10 @@ const notificationsData = [
     id: '4',
     type: 'reply',
     mainUser: {
-      id: '3', 
+      id: '3',
     },
     otherCount: 0,
-    postPreview: 'Could you share the top point-scorers from this weekend\'s fixtures?',
+    postPreview: "Could you share the top point-scorers from this weekend's fixtures?",
     isRead: false,
     timestamp: '3d',
   },
@@ -84,10 +84,11 @@ const notificationsData = [
     id: '5',
     type: 'like',
     mainUser: {
-      id: '6', 
+      id: '6',
     },
     otherCount: 523,
-    postPreview: 'Research suggests that Premier League footballers cover an average of 10-13km per match, with high-intensity sprints making up to 10% of that distance.',
+    postPreview:
+      'Research suggests that Premier League footballers cover an average of 10-13km per match, with high-intensity sprints making up to 10% of that distance.',
     isRead: true,
     timestamp: '4d',
   },
@@ -95,10 +96,11 @@ const notificationsData = [
     id: '6',
     type: 'retweet',
     mainUser: {
-      id: '10', 
+      id: '10',
     },
     otherCount: 24,
-    postPreview: 'Amazing to see how data science and AI are transforming football analysis in the Premier League.',
+    postPreview:
+      'Amazing to see how data science and AI are transforming football analysis in the Premier League.',
     isRead: false,
     timestamp: '1w',
   },
@@ -106,17 +108,17 @@ const notificationsData = [
     id: '8',
     type: 'like',
     mainUser: {
-      id: '9', 
+      id: '9',
     },
     otherCount: 36,
-    postPreview: 'The Premier League app is one of the best examples of cross-platform development we\'ve seen!',
+    postPreview:
+      "The Premier League app is one of the best examples of cross-platform development we've seen!",
     isRead: false,
     timestamp: '2w',
   },
 ];
 
-const APP_PRIMARY_COLOR = '#1DA1F2'; 
-
+const APP_PRIMARY_COLOR = '#1DA1F2';
 
 const formatNumber = (num: number) => {
   if (num >= 1000000) {
@@ -128,16 +130,15 @@ const formatNumber = (num: number) => {
   return num.toString();
 };
 
-
-
-
 const ScreenHeader = ({ title, avatarUri }: { title: string; avatarUri: string }) => {
   return (
-    <View className="flex-row items-center justify-between px-4 py-3 bg-white ">
+    <View className="flex-row items-center justify-between bg-white px-4 py-3 ">
       <TouchableOpacity>
         <Image
-          source={{ uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg' }}
-          className="w-10 h-10 rounded-full"
+          source={{
+            uri: 'https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg',
+          }}
+          className="h-10 w-10 rounded-full"
         />
       </TouchableOpacity>
       <Text className="text-xl font-bold text-black">Notifications</Text>
@@ -148,44 +149,36 @@ const ScreenHeader = ({ title, avatarUri }: { title: string; avatarUri: string }
   );
 };
 
-
 const CustomTabItem = (props: MaterialTabItemProps<string>) => {
   const { name, index, indexDecimal, onPress, label } = props;
-  
+
   const isActive = Math.round(indexDecimal.value) === index;
 
   return (
     <TouchableOpacity
       onPress={(e: GestureResponderEvent) => onPress(name)}
-      className={`py-3 flex-1 items-center ${isActive ? 'border-b-2 border-blue-500' : ''}`}
-    >
-      <Text
-        className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'text-gray-600'}`}
-      >
+      className={`flex-1 items-center py-3 ${isActive ? 'border-b-2 border-blue-500' : ''}`}>
+      <Text className={`text-base ${isActive ? 'font-semibold text-blue-500' : 'text-gray-600'}`}>
         {typeof label === 'string' ? label : name}
       </Text>
     </TouchableOpacity>
   );
 };
 
-
-const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?: number }) => {
-  
+const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[]; maxVisible?: number }) => {
   const visibleUsers = userIds.slice(0, maxVisible);
 
   return (
-    <View className="flex-row my-2">
+    <View className="my-2 flex-row">
       {visibleUsers.map((userId, index) => {
-        
-        const user = usersData.find(u => u.id === userId);
+        const user = usersData.find((u) => u.id === userId);
         if (!user) return null;
 
         return (
           <Image
             key={userId}
             source={{ uri: user.profile_picture }}
-            className="w-10 h-10 rounded-full border-2 border-white"
-          
+            className="h-10 w-10 rounded-full border-2 border-white"
           />
         );
       })}
@@ -193,29 +186,22 @@ const AvatarRow = ({ userIds, maxVisible = 8 }: { userIds: string[], maxVisible?
   );
 };
 
-
-const NotificationItem = ({ notification }: { notification: typeof notificationsData[0] }) => {
+const NotificationItem = ({ notification }: { notification: (typeof notificationsData)[0] }) => {
   const { type, mainUser, otherCount, postPreview, isRead, timestamp } = notification;
 
-  
-  const user = usersData.find(u => u.id === mainUser.id);
+  const user = usersData.find((u) => u.id === mainUser.id);
   if (!user) return null;
 
-  
   const userIds = [mainUser.id];
 
-  
-  
   const footballUserIds = ['2', '3', '5', '7', '4', '6', '9'];
-  const relevantUserIds = footballUserIds.filter(id => id !== mainUser.id);
+  const relevantUserIds = footballUserIds.filter((id) => id !== mainUser.id);
 
-  
   const othersToShow = Math.min(otherCount, 7);
   const selectedUserIds = relevantUserIds.slice(0, othersToShow);
 
   userIds.push(...selectedUserIds);
 
-  
   let icon = null;
   let iconColor = '#000';
   let actionText = '';
@@ -243,21 +229,18 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
   }
 
   return (
-    <TouchableOpacity className={`flex-row px-4 py-3 ${isRead ? 'bg-white' : 'bg-gray-50'} border-b border-gray-100`}>
-      
+    <TouchableOpacity
+      className={`flex-row px-4 py-3 ${isRead ? 'bg-white' : 'bg-gray-50'} border-b border-gray-100`}>
       {icon && (
         <View style={{ width: 24 }} className="mr-3 mt-2 items-center">
           {icon}
         </View>
       )}
 
-      
       <View className="flex-1">
-        
         <AvatarRow userIds={userIds} />
 
-        
-        <Text className="text-lg mb-1">
+        <Text className="mb-1 text-lg">
           <Text className="font-semibold">{user.name}</Text>
           {otherCount > 0 && (
             <Text className="text-gray-700"> and {formatNumber(otherCount)} others </Text>
@@ -265,28 +248,22 @@ const NotificationItem = ({ notification }: { notification: typeof notifications
           <Text className="text-gray-700">{actionText}</Text>
         </Text>
 
-        
         {postPreview && type !== 'follow' && (
-          <Text className="text-lg text-gray-600 mb-1" numberOfLines={5} ellipsizeMode="tail">
+          <Text className="mb-1 text-lg text-gray-600" numberOfLines={5} ellipsizeMode="tail">
             {postPreview}
           </Text>
         )}
 
-        
-        <Text className="text-lg text-gray-500 mt-1">{timestamp}</Text>
+        <Text className="mt-1 text-lg text-gray-500">{timestamp}</Text>
       </View>
     </TouchableOpacity>
   );
 };
 
-
 export default function Notifications() {
-  
-
-
   const insets = useSafeAreaInsets();
   const renderHeader = () => (
-    <View style={{ paddingTop: insets.top }} className="bg-white w-full">
+    <View style={{ paddingTop: insets.top }} className="w-full bg-white">
       <ScreenHeader
         title="Notifications"
         avatarUri="https://pbs.twimg.com/profile_images/1742837199005954048/YGI6Kw7P_400x400.jpg"
@@ -295,57 +272,58 @@ export default function Notifications() {
   );
 
   return (
-    <View className="flex-1 bg-white" >
+    <View className="flex-1 bg-white">
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
-      
 
       <Tabs.Container
         renderHeader={renderHeader}
         pagerProps={{ scrollEnabled: true }}
-        renderTabBar={props => (
+        renderTabBar={(props) => (
           <MaterialTabBar
             {...props}
             indicatorStyle={{
-              backgroundColor: APP_PRIMARY_COLOR, height: 3, borderRadius: 50
+              backgroundColor: APP_PRIMARY_COLOR,
+              height: 3,
+              borderRadius: 50,
             }}
             activeColor="black"
-            scrollEnabled={true}
+            scrollEnabled
             style={{
               paddingHorizontal: 16,
               textAlign: 'center',
-              elevation: 0, shadowOpacity: 0, borderBottomWidth: 0,
-              borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
-               backgroundColor: 'white',
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: '#f0f0f0',
+              backgroundColor: 'white',
             }}
-
             labelStyle={{
               marginHorizontal: 10,
               opacity: 1,
-              fontWeight: 'bold', textTransform: 'capitalize', textAlign: 'center', height: 24,
-              color: '#606E79'
+              fontWeight: 'bold',
+              textTransform: 'capitalize',
+              textAlign: 'center',
+              height: 24,
+              color: '#606E79',
             }}
             headerContainerStyle={{
               backgroundColor: 'transparent',
               elevation: 0,
               shadowOpacity: 0,
             }}
-
           />
         )}
-
         headerContainerStyle={{
           backgroundColor: 'transparent',
           elevation: 0,
           shadowOpacity: 0,
         }}
-
         minHeaderHeight={-100}
-        revealHeaderOnScroll
-
-      >
+        revealHeaderOnScroll>
         <Tabs.Tab name="All">
           <Tabs.ScrollView>
-            {notificationsData.map(notification => (
+            {notificationsData.map((notification) => (
               <NotificationItem key={notification.id} notification={notification} />
             ))}
           </Tabs.ScrollView>
@@ -353,7 +331,7 @@ export default function Notifications() {
 
         <Tabs.Tab name="Mentions">
           <Tabs.ScrollView>
-            <View className="p-6 items-center justify-center">
+            <View className="items-center justify-center p-6">
               <Text className="text-gray-500">No mentions yet</Text>
             </View>
           </Tabs.ScrollView>
@@ -361,12 +339,14 @@ export default function Notifications() {
 
         <Tabs.Tab name="Verified">
           <Tabs.ScrollView>
-            {notificationsData.filter(n => {
-              const user = usersData.find(u => u.id === n.mainUser.id);
-              return user?.is_verified;
-            }).map(notification => (
-              <NotificationItem key={notification.id} notification={notification} />
-            ))}
+            {notificationsData
+              .filter((n) => {
+                const user = usersData.find((u) => u.id === n.mainUser.id);
+                return user?.is_verified;
+              })
+              .map((notification) => (
+                <NotificationItem key={notification.id} notification={notification} />
+              ))}
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>

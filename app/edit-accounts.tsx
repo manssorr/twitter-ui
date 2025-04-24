@@ -1,3 +1,5 @@
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState, useCallback, memo } from 'react';
 import {
   View,
@@ -7,16 +9,14 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
-  StyleSheet
+  StyleSheet,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useStore } from '../store/store';
-import users from '../dummy/users.json';
-import authorizedAccounts from '../dummy/authorized_accounts.json';
-import { Feather } from '@expo/vector-icons';
 import Sortable from 'react-native-sortables';
-import { useRouter } from 'expo-router';
 
+import authorizedAccounts from '../dummy/authorized_accounts.json';
+import users from '../dummy/users.json';
+import { useStore } from '../store/store';
 
 type User = {
   id: string;
@@ -27,26 +27,22 @@ type User = {
   verified_badge: string;
 };
 
-
 type AccountItemProps = {
   item: User;
   currentUserId: string | null;
 };
 
-
 const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
   return (
     <View style={styles.accountItem}>
-      
       <View style={styles.subtractContainer}>
         <Feather name="minus" size={16} color="white" />
       </View>
 
-      
       <Image
         source={{ uri: item.profile_picture }}
         style={styles.profileImage}
-        onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+        onError={(e) => console.log('Failed to load image', e.nativeEvent.error)}
       />
 
       <View style={styles.accountInfo}>
@@ -56,14 +52,13 @@ const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
             <Image
               source={{ uri: item.verified_badge }}
               style={styles.verifiedBadge}
-              onError={(e) => console.log("Failed to load image", e.nativeEvent.error)}
+              onError={(e) => console.log('Failed to load image', e.nativeEvent.error)}
             />
           )}
         </View>
         <Text style={styles.handleText}>@{item.handle}</Text>
       </View>
 
-      
       <Sortable.Handle>
         <View style={styles.handleContainer}>
           <Feather name="menu" size={22} color="#767676" />
@@ -73,43 +68,34 @@ const AccountItem = memo(({ item, currentUserId }: AccountItemProps) => {
   );
 });
 
-
 export default function EditAccountsScreen() {
   const insets = useSafeAreaInsets();
   const { currentUserId } = useStore();
   const router = useRouter();
-  
+
   const [orderedAccounts, setOrderedAccounts] = useState<User[]>([]);
 
-  
   useEffect(() => {
-    
-    const authorizedUsers = users.filter(user =>
-      authorizedAccounts.includes(user.id)
-    );
+    const authorizedUsers = users.filter((user) => authorizedAccounts.includes(user.id));
 
     setOrderedAccounts(authorizedUsers);
   }, []);
 
-  
   const handleSaveOrder = () => {
     router.back();
   };
 
-  
-  const renderItem = useCallback(({ item }: { item: User }) => (
-    <AccountItem
-      key={item.id}
-      item={item}
-      currentUserId={currentUserId}
-    />
-  ), [currentUserId]);
+  const renderItem = useCallback(
+    ({ item }: { item: User }) => (
+      <AccountItem key={item.id} item={item} currentUserId={currentUserId} />
+    ),
+    [currentUserId]
+  );
 
-  
   const handleDragEnd = (params: any) => {
     console.log('Sortable.Grid onDragEnd params:', params);
     if (params.from !== undefined && params.to !== undefined) {
-      setOrderedAccounts(currentAccounts => {
+      setOrderedAccounts((currentAccounts) => {
         const newAccounts = [...currentAccounts];
         const [movedItem] = newAccounts.splice(params.from, 1);
         newAccounts.splice(params.to, 0, movedItem);
@@ -123,23 +109,19 @@ export default function EditAccountsScreen() {
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={handleSaveOrder}
-          style={styles.doneButton}
-        >
+        <TouchableOpacity onPress={handleSaveOrder} style={styles.doneButton}>
           <Text style={styles.doneText}>Done</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Accounts</Text>
       </View>
 
-      
       <View style={styles.gridContainer}>
         <Sortable.Grid
           data={orderedAccounts}
           renderItem={renderItem}
           onDragEnd={handleDragEnd}
           columns={1}
-          customHandle={true}
+          customHandle
           rowGap={0}
           overDrag="vertical"
           activeItemScale={1.02}
@@ -148,7 +130,6 @@ export default function EditAccountsScreen() {
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -162,25 +143,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0'
+    borderBottomColor: '#f0f0f0',
   },
   doneButton: {
     padding: 4,
     position: 'absolute',
-    left: 16
+    left: 16,
   },
   doneText: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'black'
+    color: 'black',
   },
   headerTitle: {
     fontSize: 17,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   gridContainer: {
     flex: 1,
-    width: '100%'
+    width: '100%',
   },
   accountItem: {
     flexDirection: 'row',
@@ -190,10 +171,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     backgroundColor: 'white',
-    width: '100%'
+    width: '100%',
   },
   handleContainer: {
-    padding: 4
+    padding: 4,
   },
   subtractContainer: {
     width: 24,
@@ -204,33 +185,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
     borderWidth: 1,
-    borderColor: '#FF3B30'
+    borderColor: '#FF3B30',
   },
   profileImage: {
     width: 40,
     height: 40,
     borderRadius: 4,
-    marginRight: 12
+    marginRight: 12,
   },
   accountInfo: {
     flex: 1,
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   nameContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   nameText: {
     fontSize: 16,
     fontWeight: '600',
-    marginRight: 4
+    marginRight: 4,
   },
   verifiedBadge: {
     width: 16,
-    height: 16
+    height: 16,
   },
   handleText: {
     fontSize: 14,
-    color: '#657786'
-  }
+    color: '#657786',
+  },
 });

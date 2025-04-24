@@ -1,9 +1,5 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 
-
-
-
-
 export default function Root({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -26,9 +22,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         */}
         <ScrollViewStyleReset />
 
-        
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
-        
       </head>
       <body>{children}</body>
     </html>

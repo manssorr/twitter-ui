@@ -1,3 +1,11 @@
+import { Feather } from '@expo/vector-icons';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { FlashList } from '@shopify/flash-list';
+import { useEvent } from 'expo';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation, useRouter } from 'expo-router';
+import { VideoView, useVideoPlayer } from 'expo-video';
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
@@ -8,25 +16,17 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import { VideoView, useVideoPlayer } from 'expo-video';
-import { useEvent } from 'expo';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
-import Fontisto from '@expo/vector-icons/Fontisto';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRouter } from 'expo-router';
-import SettingsIcon from '~/assets/svg/video/settings.svg';
-import P2PIcon from '~/assets/svg/video/p2p.svg';
-import AudioIcon from '~/assets/svg/video/audio.svg';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 import Comment from '~/assets/svg/comment.svg';
 import Repost from '~/assets/svg/repost.svg';
 import Save from '~/assets/svg/save.svg';
+import AudioIcon from '~/assets/svg/video/audio.svg';
+import P2PIcon from '~/assets/svg/video/p2p.svg';
+import SettingsIcon from '~/assets/svg/video/settings.svg';
 import Views from '~/assets/svg/views.svg';
 import LikeButton from '~/components/LikeButton';
-import Ionicons from '@expo/vector-icons/Ionicons';
-
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -254,7 +254,10 @@ const VideoItem = React.memo(({ item, isVisible, isFocused }: VideoItemProps) =>
 
   return (
     <View style={styles.videoContainer}>
-      <TouchableOpacity activeOpacity={1} onPress={togglePlayPause} style={[StyleSheet.absoluteFill, { top: insets.top }]}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={togglePlayPause}
+        style={[StyleSheet.absoluteFill, { top: insets.top }]}>
         <VideoView
           ref={videoViewRef}
           player={player}
@@ -267,9 +270,13 @@ const VideoItem = React.memo(({ item, isVisible, isFocused }: VideoItemProps) =>
         />
       </TouchableOpacity>
 
-      {status === 'loading' && <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />}
+      {status === 'loading' && (
+        <ActivityIndicator size="large" color="#fff" style={styles.loadingIndicator} />
+      )}
 
-      <LinearGradient colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.75)']} style={styles.overlayGradient}>
+      <LinearGradient
+        colors={['transparent', 'rgba(0,0,0,0.5)', 'rgba(0,0,0,0.75)']}
+        style={styles.overlayGradient}>
         <View style={styles.controlsRow}>
           <View style={styles.timeDisplayContainer}>
             <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
@@ -313,9 +320,12 @@ const VideoItem = React.memo(({ item, isVisible, isFocused }: VideoItemProps) =>
             </Text>
           </View>
           <TouchableOpacity
-            style={[styles.followButton, item.poster.isFollowing ? styles.followingButton : {}]}
-          >
-            <Text style={[styles.followButtonText, item.poster.isFollowing ? styles.followingButtonText : {}]}>
+            style={[styles.followButton, item.poster.isFollowing ? styles.followingButton : {}]}>
+            <Text
+              style={[
+                styles.followButtonText,
+                item.poster.isFollowing ? styles.followingButtonText : {},
+              ]}>
               {item.poster.isFollowing ? 'Following' : 'Follow'}
             </Text>
           </TouchableOpacity>
@@ -387,17 +397,21 @@ const VideoFeed = () => {
   const viewabilityConfig = { itemVisiblePercentThreshold: 50 };
 
   const renderItem = ({ item }) => (
-    <VideoItem item={item} isVisible={item.videoId === currentId} isFocused={true} />
+    <VideoItem item={item} isVisible={item.videoId === currentId} isFocused />
   );
 
   useEffect(() => {
-    const unsubscribeBeforeRemove = navigation.addListener('beforeRemove', () => setCurrentId(null));
+    const unsubscribeBeforeRemove = navigation.addListener('beforeRemove', () =>
+      setCurrentId(null)
+    );
     return () => unsubscribeBeforeRemove();
   }, [navigation]);
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { top: insets.top + 10 }]}>
+      <TouchableOpacity
+        onPress={() => router.back()}
+        style={[styles.backButton, { top: insets.top + 10 }]}>
         <Feather name="arrow-left" size={22} color="#fff" />
       </TouchableOpacity>
 

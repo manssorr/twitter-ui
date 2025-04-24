@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
-import { useStore } from "../../store/store";
-import users from "../../dummy/users.json";
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+
+import users from '../../dummy/users.json';
+import { useStore } from '../../store/store';
 
 export default function Home() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Home() {
   }, [selectedUserIndex]);
 
   const navigateToTabs = () => {
-    router.push("/(drawer)/(tabs)/(index)");
+    router.push('/(drawer)/(tabs)/(index)');
   };
 
   const handleNextUser = () => {
@@ -28,36 +29,34 @@ export default function Home() {
   const currentUser = users[selectedUserIndex];
 
   return (
-    <View className="flex-1 bg-black justify-center py-10 px-8 gap-10">
-      <Text className="text-[100px] text-white mb-10">𝕏</Text>
-      <View className="gap-2 flex-col">
-        <Text className="text-5xl font-bold text-white mb-2.5 tracking-tighter">Happening now</Text>
-        <Text className="text-3xl font-semibold text-white mb-12 tracking-tighter">Join today.</Text>
+    <View className="flex-1 justify-center gap-10 bg-black px-8 py-10">
+      <Text className="mb-10 text-[100px] text-white">𝕏</Text>
+      <View className="flex-col gap-2">
+        <Text className="mb-2.5 text-5xl font-bold tracking-tighter text-white">Happening now</Text>
+        <Text className="mb-12 text-3xl font-semibold tracking-tighter text-white">
+          Join today.
+        </Text>
       </View>
       <TouchableOpacity
-        className="bg-white py-4 px-6 rounded-full w-full items-center flex-row"
-        onPress={navigateToTabs}
-      >
+        className="w-full flex-row items-center rounded-full bg-white px-6 py-4"
+        onPress={navigateToTabs}>
         {currentUser && (
           <>
             <Image
               source={{ uri: currentUser.profile_picture }}
-              className="w-8 h-8 rounded-full mr-4"
+              className="mr-4 h-8 w-8 rounded-full"
             />
-            <Text className="text-black text-lg font-bold">Continue with @{currentUser.handle}</Text>
+            <Text className="text-lg font-bold text-black">
+              Continue with @{currentUser.handle}
+            </Text>
           </>
         )}
-        {!currentUser && (
-          <Text className="text-black text-lg font-bold">Continue</Text>
-        )}
+        {!currentUser && <Text className="text-lg font-bold text-black">Continue</Text>}
       </TouchableOpacity>
 
       {users.length > 1 && (
-        <TouchableOpacity
-          className="items-center mt-2"
-          onPress={handleNextUser}
-        >
-          <Text className="text-[#1d9bf0] text-base">Switch account</Text>
+        <TouchableOpacity className="mt-2 items-center" onPress={handleNextUser}>
+          <Text className="text-base text-[#1d9bf0]">Switch account</Text>
         </TouchableOpacity>
       )}
     </View>
